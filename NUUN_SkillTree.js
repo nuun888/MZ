@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.13
+ * @version 1.3.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -77,6 +77,8 @@
  * <SkillTreeSkillText:[text]> Set the description for the help window. If nothing is entered, the description for the database settings will be displayed.
  * [text]:Description (control characters allowed)
  * 
+ * <SkillTreeNoCostReturn> The skill cost for this skill will not be refunded.
+ * 
  * Item, Weapon, and Armor Notes
  * <SkillTreeCostNoReturn> Items will not be refunded upon reset.
  * 
@@ -94,6 +96,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/24/2025 Ver.1.3.0
+ * Added a feature to allow setting custom help text in the help window, separate from the database text.
+ * Added a feature to set skill points for each class.
+ * Added a feature to disable skill cost refund for specific skills.
  * 9/23/2025 Ver.1.2.13
  * Fixed an issue where the skill tree type window did not display at full width within the UI area.
  * 9/18/2025 Ver.1.2.12
@@ -545,6 +551,13 @@
  * @default true
  * @parent ClassSetting
  * 
+ * @param IsClassSp
+ * @desc Assign skill points per class.
+ * @text Class-specific skill points
+ * @type boolean
+ * @default false
+ * @parent ClassSetting
+ * 
  * 
  * @param WindowSetting
  * @text Window setting
@@ -736,6 +749,25 @@
  * @default false
  * @parent SkillTreeCostSetting
  * 
+ * @param SkillTreeCostExSetting
+ * @text Cost Window Ex settings
+ * @default To perform this setting, you need to have "NUUN_SkillTreeEx" installed.
+ * @parent SkillTreeCostSetting
+ * 
+ * @param ShowPrerequisite
+ * @desc This will display prerequisite skills. (Requires "NUUN_SkillTreeEx")
+ * @text Display prerequisite skills
+ * @type boolean
+ * @default false
+ * @parent SkillTreeCostExSetting
+ * 
+ * @param PrerequisiteSkillsName
+ * @text Prerequisite skill display name
+ * @desc Prerequisite skill display name.
+ * @type string
+ * @default Prerequisite skills
+ * @parent SkillTreeCostExSetting
+ * 
  * @param SkillTreeStatusSetting
  * @text Status window settings
  * @default ------------------------------
@@ -765,6 +797,14 @@
  * @desc Configure the Help window.
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0"}
  * @type struct<WindowSetting>
+ * @parent SkillTreeHelpSetting
+ * 
+ * @param SkillTreeHelpRows
+ * @text Skill Tree Help Window Display Lines
+ * @desc Number of lines displayed in the skill tree help window.
+ * @type number
+ * @default 2
+ * @min 0
  * @parent SkillTreeHelpSetting
  * 
  * @param HelpBottomMode
@@ -1505,7 +1545,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.13
+ * @version 1.3.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1566,6 +1606,11 @@
  * <SKillTreeImageImdex:[index]> スプライトシートのインデックス番号を指定します。記入がない場合はプラグインパラメータの設定が適用されます。
  * [index]:インデックス番号
  * 
+ * <SkillTreeSkillText:[text]> ヘルプウィンドウの説明文を設定します。記入がない場合はデータベース設定の説明が表示されます。
+ * [text]:説明文(制御文字使用可能)
+ * 
+ * <SkillTreeNoCostReturn> このスキルのスキルコストの返還が行われません。
+ * 
  * アイテム、武器、防具のメモ欄
  * <SkillTreeCostNoReturn> リセット時にアイテムの返還はありません。
  * 
@@ -1583,6 +1628,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/24 Ver.1.3.0
+ * ヘルプウィンドウの説明文にデータベースとは別の任意の説明文を設定できる機能を追加。
+ * クラス毎のスキルポイントを設定できる機能を追加。
+ * スキルコスト返還を無効になるスキルを設定できる機能を追加。
  * 2025/9/23 Ver.1.2.13
  * スキルツリータイプウィンドウの横幅がUIエリア最大まで表示されない問題を修正。
  * 2025/9/18 Ver.1.2.12
@@ -2034,6 +2083,13 @@
  * @default true
  * @parent ClassSetting
  * 
+ * @param IsClassSp
+ * @desc クラス毎にスキルポイントを割り当てます。
+ * @text クラス別スキルポイント
+ * @type boolean
+ * @default false
+ * @parent ClassSetting
+ * 
  * 
  * @param WindowSetting
  * @text ウィンドウ設定
@@ -2225,6 +2281,26 @@
  * @default false
  * @parent SkillTreeCostSetting
  * 
+ * @param SkillTreeCostExSetting
+ * @text コストウィンドウEx設定
+ * @default この設定を行うにはNUUN_SkillTreeExを導入している必要があります。
+ * @parent SkillTreeCostSetting
+ * 
+ * @param ShowPrerequisite
+ * @desc 前提スキルを表示します。(要スキルツリー有償版拡張)
+ * @text 前提スキル表示
+ * @type boolean
+ * @default false
+ * @parent SkillTreeCostExSetting
+ * 
+ * @param PrerequisiteSkillsName
+ * @text 前提スキル表示名
+ * @desc 前提スキルの表示名。
+ * @type string
+ * @default 前提スキル
+ * @parent SkillTreeCostExSetting
+ * 
+ * 
  * @param SkillTreeStatusSetting
  * @text ステータスウィンドウ設定
  * @default ------------------------------
@@ -2254,6 +2330,14 @@
  * @desc ヘルプウィンドウの設定を行います。
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0"}
  * @type struct<WindowSetting>
+ * @parent SkillTreeHelpSetting
+ * 
+ * @param SkillTreeHelpRows
+ * @text スキルツリーヘルプウィンドウ表示行数
+ * @desc スキルツリーヘルプウィンドウの表示行数。
+ * @type number
+ * @default 2
+ * @min 0
  * @parent SkillTreeHelpSetting
  * 
  * @param HelpBottomMode
@@ -3905,7 +3989,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.skillTreeHelpAreaHeight = function() {
-        return params.SkillTreeHelpRows > 0 ? this.calcWindowHeight(2, false) : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
+        return params.SkillTreeHelpRows > 0 ? this.calcWindowHeight(params.SkillTreeHelpRows, false) : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
     };
 
     Scene_SkillTree.prototype.isBottomHelpMode = function() {
@@ -4182,8 +4266,6 @@ Imported.NUUN_SkillTree = true;
         return (params.InnerWidth > 0 ? Math.max(params.InnerWidth, this.innerWidth) : this.innerWidth);
     };
 
-    var _0x1dd055=_0x2a0c;function _0x2a0c(_0x4e6bab,_0x184bff){var _0x292fdb=_0x292f();return _0x2a0c=function(_0x2a0cb2,_0x2ed32e){_0x2a0cb2=_0x2a0cb2-0x174;var _0x59c318=_0x292fdb[_0x2a0cb2];return _0x59c318;},_0x2a0c(_0x4e6bab,_0x184bff);}(function(_0x3aa8c8,_0x533127){var _0x3a660c=_0x2a0c,_0x361cff=_0x3aa8c8();while(!![]){try{var _0x515274=parseInt(_0x3a660c(0x182))/0x1*(-parseInt(_0x3a660c(0x180))/0x2)+parseInt(_0x3a660c(0x175))/0x3*(parseInt(_0x3a660c(0x17a))/0x4)+-parseInt(_0x3a660c(0x179))/0x5*(parseInt(_0x3a660c(0x181))/0x6)+parseInt(_0x3a660c(0x177))/0x7*(parseInt(_0x3a660c(0x183))/0x8)+parseInt(_0x3a660c(0x178))/0x9*(-parseInt(_0x3a660c(0x17e))/0xa)+parseInt(_0x3a660c(0x17c))/0xb*(-parseInt(_0x3a660c(0x176))/0xc)+-parseInt(_0x3a660c(0x174))/0xd*(-parseInt(_0x3a660c(0x17b))/0xe);if(_0x515274===_0x533127)break;else _0x361cff['push'](_0x361cff['shift']());}catch(_0x48b00d){_0x361cff['push'](_0x361cff['shift']());}}}(_0x292f,0x70750),Window_SkillTree[_0x1dd055(0x17f)][_0x1dd055(0x17d)]=function(){return 0x4b0;});function _0x292f(){var _0x1a0fe4=['8mWSIIn','1537601eIZowJ','171978mFZkYn','24kHjsBW','647213zEcFTS','81NlAXmg','95CCLtqv','52HcmUMw','154MPCRGX','3918244OaKOKn','getLimitInnerWidth','921470OsdFhT','prototype','105590MxdeUY','9726MZiXii','2dmegFM'];_0x292f=function(){return _0x1a0fe4;};return _0x292f();}
-
     Window_SkillTree.prototype.skillTreeCol = function() {
         return this.index() % this.maxCols();
     };
@@ -4194,6 +4276,7 @@ Imported.NUUN_SkillTree = true;
         rect.height -= this.rowsMargin();
         return rect;
     };
+
 
     Window_SkillTree.prototype.refresh = function() {
         this.makeItemList();
@@ -5001,6 +5084,15 @@ Imported.NUUN_SkillTree = true;
         return this._data && index >= 0 ? this._data[index] : null;
     };
 
+    Window_SkillTreeCost.prototype.itemRect = function(index) {
+        const rect = Window_Selectable.prototype.itemRect.apply(this, arguments);
+        const maxCols = this.maxCols();
+        const itemHeight = this.lineHeight();
+        const row = Math.floor(index / maxCols);
+        rect.y = row * itemHeight;
+        return rect;
+    };
+
     Window_SkillTreeCost.prototype.refresh = function() {
         this.contents.clear();
         this._heightRows = 0;
@@ -5009,11 +5101,19 @@ Imported.NUUN_SkillTree = true;
         this.drawCostTitle(rect.x, rect.y);
         this.drawCount(this._treeData, rect.x, rect.y, rect.width);
         if (!this._treeData || !this._treeData.isEnabled()) return;
-        this.drawCostList();
+        if (params.VisibleLearnedSkillCost && this.isMultipleCount(this._treeData)) return;
+        this.drawCostList(rect.x, rect.y);
+        if (params.ShowPrerequisite) {
+            this.drawPrerequisite(rect.x, rect.y + (this._heightRows * lineHeight), rect.width);
+        }
         this.drawCostTextEx(this._treeData, rect.x, rect.y + (this._heightRows * lineHeight));
     };
 
-    Window_SkillTreeCost.prototype.drawCostList = function() {
+    Window_SkillTreeCost.prototype.drawPrerequisite = function(x, y, width) {
+        
+    };
+
+    Window_SkillTreeCost.prototype.drawCostList = function(x, y) {
         const list = this.showCostList(this._treeData);
         const lineHeight = this.lineHeight();
         this.setHeightRows(1);
@@ -5027,10 +5127,8 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTreeCost.prototype.drawCostItem = function(type, x, y, width) {
         const textWidth = this.textWidth("0000");
         const data = this._treeData;
-        if (!(params.VisibleLearnedSkillCost && this.isMultipleCount(data))) {
-            this.drawCost(type, data, x, y, width - textWidth);
-            this.drawSkillTreeCost(type, data, x, y, width);
-        }
+        this.drawCost(type, data, x, y, width - textWidth);
+        this.drawSkillTreeCost(type, data, x, y, width);
     };
 
     Window_SkillTreeCost.prototype.drawCostTitle = function(x, y) {
@@ -5134,6 +5232,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.drawLevel = function(x, y, width) {
+        this.resetTextColor();
         this.drawText(params.LearningLevelName, x, y, width);
     };
 
@@ -5169,6 +5268,10 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTreeCost.prototype.setHeightRows = function(row) {
         this._heightRows += row;
+    };
+
+    Window_SkillTreeCost.prototype.getPrerequisiteSkillsName = function() {
+        return params.PrerequisiteSkillsName || "前提スキル";
     };
 
 
@@ -5339,7 +5442,7 @@ Imported.NUUN_SkillTree = true;
     const _Game_Actor_setup = Game_Actor.prototype.setup;
     Game_Actor.prototype.setup = function(actorId) {
         _Game_Actor_setup.apply(this, arguments);
-        this.setSkillPoint(this.initSkillPoint(actorId));
+        this.initSkillPoint();
         this.gainTotalSkillPoint(this._nsp);
         this.setupSkillTreeList();
         this.initLearnSkillList();
@@ -5376,7 +5479,7 @@ Imported.NUUN_SkillTree = true;
         }
         const sp = params.IsClassSp ? this._cnsp[this._classId] : this._nsp;
         if (isNaN(sp)) {
-            this.setSkillPoint(this.initBattlerSkillPoint(this.actorId()));
+            this.setSkillPoint(params.IsClassSp && this._cnsp.length > 0 ? 0 : this.initBattlerSkillPoint(this.actorId()), this._classId);
         }
     };
 
@@ -5620,12 +5723,12 @@ Imported.NUUN_SkillTree = true;
         if (this._skillTreeChangeClassMode) return;
         this.initSkillPoint();
         const newSp = (params.IsClassSp ? this._cnsp[classId] : this._nsp) + sp;
-        this.setSkillPoint(newSp.clamp(0, this.maxSkillTreePoint()));
+        this.setSkillPoint(newSp.clamp(0, this.maxSkillTreePoint()), classId);
     };
 
-    Game_Actor.prototype.setSkillPoint = function(sp) {
+    Game_Actor.prototype.setSkillPoint = function(sp, classId) {
         if (params.IsClassSp) {
-            this._cnsp[this._classId] = sp;
+            this._cnsp[classId] = sp;
         } else{
             this._nsp = sp;
         }
@@ -5679,7 +5782,7 @@ Imported.NUUN_SkillTree = true;
         for (const data of skillTree.SkillTreeList) {//プラグインパラメータのデータを参照
             if (this.isSkillTreeLearned(data.SkillId) && this.notDeletionSkillTreeSkill(data.SkillId)) {
                 const t = _getSkillTreeData(data, skillTree.SymbolName, this);
-                this.removeSkillTreeSkill(t, r, classId);
+                this.removeSkillTreeSkill(t, (!this.isNotSkillTreeCostReturn(t._id) && r), classId);
             }
         }
     };
@@ -5697,6 +5800,11 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.forgetSkillTreeSkill = function(data) {
         this.forgetSkill(data._id);
         this.removeLearnSkillTreeSkill(data._id);
+    };
+
+    Game_Actor.prototype.isNotSkillTreeCostReturn = function(skillId) {
+        const skill = $dataSkills[skillId];
+        return !!skill.meta.SkillTreeNoCostReturn;
     };
 
     Game_Actor.prototype.isNotSkillTreeLevelupSkill = function(classId, skillId) {
@@ -5732,7 +5840,7 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.skillTreeRemoveSkill = function(skillId, r) {
         const data = this.getSkillTreeIsRemoveSkillData(skillId);
         if (!!data) {
-            this.removeSkillTreeSkill(data, r);
+            this.removeSkillTreeSkill(data, (!this.isNotSkillTreeCostReturn(data._id)));
         }
     };
 

@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.2.13
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -175,6 +175,10 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/9/24 Ver.1.3.0  
+ヘルプウィンドウの説明文にデータベースとは別の任意の説明文を設定できる機能を追加。  
+クラス毎のスキルポイントを設定できる機能を追加。  
+スキルコスト返還を無効になるスキルを設定できる機能を追加。  
 2025/9/23 Ver.1.2.13  
 スキルツリータイプウィンドウの横幅がUIエリア最大まで表示されない問題を修正。  
 2025/9/18 Ver.1.2.12  

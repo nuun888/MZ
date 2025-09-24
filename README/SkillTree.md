@@ -86,6 +86,8 @@
 `<SkillTreeSkillText:[text]>`ヘルプウィンドウの説明文を設定します。記入がない場合はデータベース設定の説明が表示されます。  
 `[text]`:説明文(制御文字使用可能)  
 
+`<SkillTreeNoCostReturn>`このスキルのスキルコストの返還が行われません。  
+
 アイテム、武器、防具のメモ欄  
 `<SkillTreeCostNoReturn>` リセット時にアイテムの返還はありません。  
 

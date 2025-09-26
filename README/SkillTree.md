@@ -13,7 +13,6 @@
 
 #### オプション
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
-[拡張スキル習得](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeLearnEx.js)  
 
 ツリー型のスキル習得システムを実装します。  
 

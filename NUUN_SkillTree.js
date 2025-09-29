@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/29/2025 Ver.1.3.1
+ * The character selection button UI will now only be displayed while selecting the skill tree type.
+ * The help text will no longer be displayed when returning to the skill tree type selection screen.
  * 9/24/2025 Ver.1.3.0
  * Added a feature to allow setting custom help text in the help window, separate from the database text.
  * Added a feature to set skill points for each class.
@@ -1545,7 +1548,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.0
+ * @version 1.3.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1628,6 +1631,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/29 Ver.1.3.1
+ * キャラクター切り替えのボタンUIの表示をスキルツリータイプ選択中のみ表示するように修正。
+ * スキルツリータイプ選択に戻る際、ヘルプテキストを表示しないように修正。
  * 2025/9/24 Ver.1.3.0
  * ヘルプウィンドウの説明文にデータベースとは別の任意の説明文を設定できる機能を追加。
  * クラス毎のスキルポイントを設定できる機能を追加。
@@ -3172,6 +3178,10 @@ Imported.NUUN_SkillTree = true;
         return params.SkillFrameType === 'spritesheet' && params.ContentsBackImage;
     };
 
+    function _isBackgroundImage() {
+        return Imported.NUUN_SkillTreeEx && params.SkillFrameType === 'image';
+    }
+
     function _isConfirmation() {
         return _confirmation;
     };
@@ -4040,6 +4050,7 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeType.activate();
         this._skillTreeWindow.deselect();
         this._skillTreeCostWindow.setData(null);
+        this._skillTreeWindow.setHelpWindowItem(null);
     };
 
     Scene_SkillTree.prototype.onActorChange = function() {
@@ -4071,6 +4082,10 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.needsPageButtons = function() {
         return true;
+    };
+
+    Scene_SkillTree.prototype.arePageButtonsEnabled = function() {
+        return !!this._skillTreeType && this._skillTreeType.active;
     };
 
 
@@ -4170,6 +4185,8 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTree.prototype.loadSkillTreeImages = function() {
         if (_isSpriteSheet()) {
             return ImageManager.nuun_LoadPictures(params.ContentsBackImage);
+        } else if (_isBackgroundImage()) {
+
         }
         return null;
     };

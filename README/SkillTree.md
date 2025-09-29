@@ -14,6 +14,15 @@
 #### オプション
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
+以下のプラグインは有償プラグインです。  
+習得回数によりコスト、上位スキルの習得、下位スキルの消去、条件を設定できます。  
+NUUN_SkillTreeLearnEx  
+コスト、前提スキルのツールチップウィンドウを表示します。  
+NUUN_SkillTreeTooltipsWindow  
+ツリーの配置を横型にします。  
+NUUN_SkillTreeWideType  
+[販売先](https://booth.pm/ja/items/7456298)
+
 ツリー型のスキル習得システムを実装します。  
 
 ![画像](img/skillTree1.png)    

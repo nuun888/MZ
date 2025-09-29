@@ -74,6 +74,9 @@
 スキルラーニングでスキル習得時に習得した対象にポップアップを表示させます。なおNUUN_PopupEx、NUUN_SkillLearning(Ver.1.1.3以降)が必要になります。  
 [スキルラーニングポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearningPopUp.js)  
 
+#### 戦利品の撃破時ドロップポップアップ
+[撃破時ドロップポップアップ](https://github.com/nuun888/MZ/blob/master/README/DefeatDropPopup.md)  
+
 ## 更新履歴
 2025/3/29 Ver.1.0.1  
 イベントコマンドからステート付与、解除した場合でもポップアップが表示されるように修正。  

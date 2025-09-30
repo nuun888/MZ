@@ -2,8 +2,6 @@
  * NUUN_PopupEx.js
  * 
  * Copyright (C) 2025 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -12,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * Expands popups.
@@ -74,9 +72,16 @@
  * %1:Parameter (Critical, etc.)
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/30/2025 Ver.1.1.0
+ * "Defeat Drop Pop-up" feature added.
  * 3/29/2025 Ver.1.0.1
  * Fixed so that the popup will be displayed even when a state is applied or removed via an event command.
  * 3/21/2025 Ver.1.0.0
@@ -508,7 +513,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * ポップアップを拡張します。
@@ -566,9 +571,16 @@
  * %1:パラメータ(クリティカル等)
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/9/30 Ver.1.1.0
+ * 撃破時ドロップポップアップに対応。
  * 2025/3/29 Ver.1.0.1
  * イベントコマンドからステート付与、解除した場合でもポップアップが表示されるように修正。
  * 2025/3/21 Ver.1.0.0
@@ -1055,6 +1067,15 @@ Imported.NUUN_PopupEx = true;
                 case "learn":
                     this.setupLearn(status);
                     break;
+                case "rewardsExp":
+                    this.setupRewardsExp(status);
+                    break;
+                case "rewardsGold":
+                    this.setupRewardsGold(status);
+                    break;
+                case "rewardsItem":
+                    this.setupRewardsItem(status);
+                    break;
             }
         }
 
@@ -1158,6 +1179,27 @@ Imported.NUUN_PopupEx = true;
             }
         }
 
+        setupRewardsExp(status) {
+            this._data = NuunManager.getRewardExpPopupParams();
+            if (this._data) {
+                this._name = this.getRewardGoldText(status);
+            }
+        }
+
+        setupRewardsGold(status) {
+            this._data = NuunManager.getRewardGoldPopupParams();
+            if (this._data) {
+                this._name = this.getRewardGoldText(status);
+            }
+        }
+
+        setupRewardsItem(status) {
+            this._data = NuunManager.getRewardPopupParams();
+            if (this._data) {
+                this._name = this.getRewardItemText(status);
+            }
+        }
+
         getPopupText(status) {
             return this._data.PopUpText.format(this.getPopupTextParams(status));
         }
@@ -1223,6 +1265,14 @@ Imported.NUUN_PopupEx = true;
 
         getPopupSkillLearningText(status) {
             return this._data.PopUpText.format(status.skillName);
+        }
+
+        getRewardGoldText(status) {
+            return this._data.PopUpText.format(status);
+        }
+
+        getRewardItemText(status) {
+            return this._data.PopUpText.format(status.name);
         }
 
         getPopupBuffTextName(status) {
@@ -1482,6 +1532,25 @@ Imported.NUUN_PopupEx = true;
     };
 
 
+    const _Window_BattleLog_initialize = Window_BattleLog.prototype.initialize;
+    Window_BattleLog.prototype.initialize = function(rect) {
+        _Window_BattleLog_initialize.call(this, rect);
+        this._popupList = [];//即時発動用
+    };
+
+    const _Window_BattleLog_update = Window_BattleLog.prototype.update;
+    Window_BattleLog.prototype.update = function() {
+        _Window_BattleLog_update.apply(this, arguments);
+        this.updatePopupList();
+    };
+
+    Window_BattleLog.prototype.updatePopupList = function() {
+        if (this._popupList.length > 0) {
+            const popup = this._popupList.shift();
+            this.nuun_popupState(popup.target, popup.data);
+        }
+    };
+
     const _Window_BattleLog_displayCritical = Window_BattleLog.prototype.displayCritical;
     Window_BattleLog.prototype.displayCritical = function(target) {
         _Window_BattleLog_displayCritical.apply(this, arguments);
@@ -1608,10 +1677,12 @@ Imported.NUUN_PopupEx = true;
     Window_BattleLog.prototype.displayPopUpState = function(target) {
         const states = target.result().addedStateObjects();
         for (const state of states) {
-            const popupData = new PopupData("addState");
-            popupData.setup(state);
-            if ((popupData.popUpPattern() === 0 || popupData.popUpPattern() === 3)) {
-                this.setupPopup(target, popupData);   
+            if (target.deathStateId() !== state.id) {//暫定
+                const popupData = new PopupData("addState");
+                popupData.setup(state);
+                if ((popupData.popUpPattern() === 0 || popupData.popUpPattern() === 3)) {
+                    this.setupPopup(target, popupData);   
+                }
             }
         }
     };
@@ -1678,6 +1749,16 @@ Imported.NUUN_PopupEx = true;
         if (data.isPopup()) {
             this.push('nuun_popupState', target, data);
         }
+    };
+
+    Window_BattleLog.prototype.setupPopupList = function(target, data) {
+        if (data.isPopup()) {
+            this.pushPopupList(target, data);
+        }
+    };
+
+    Window_BattleLog.prototype.pushPopupList = function(target, data) {
+        this._popupList.push({data: data, target: target});
     };
 
     Window_BattleLog.prototype.nuun_popupState = function(target, popup) {

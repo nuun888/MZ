@@ -38,13 +38,6 @@
 2023/7/4 Ver 1.0.0  
 初版  
 
-## 旧バージョン
-# [敵グループの個別ＢＧＭ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)
-# Ver.1.1.0
- [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBGM.js)
-
- 敵グループごとに戦闘BGMを設定できます。
-
 ## 設定方法
 敵グループのバトルイベントの１ページ目に忠作で記入（フロー制御の一番下のコマンド）  
 

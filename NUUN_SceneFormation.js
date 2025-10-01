@@ -2,15 +2,13 @@
  * NUUN_SceneFormation.js
  * 
  * Copyright (C) 2021 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.7
+ * @version 2.1.9
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -37,9 +35,17 @@
  * They cannot be removed from the battle team.
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/2/2025 Ver.2.1.9
+ * Fixed an issue where the cursor would incorrectly target the wrong window when the member selection screen was not open.
+ * Fixed an issue where a battle member would not be removed from the battle member when being moved to the reserve member.
  * 8/3/2025 Ver.2.1.8
  * Fixed an issue where the behavior when switching was unnatural when a hidden actor was in the combat member.
  * When applying variable number of battle members when hidden actors are in the battle members, the specifications have been changed so that the maximum number of members is subtracted by the number of hidden actors.
@@ -1052,7 +1058,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.8
+ * @version 2.1.9
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1078,9 +1084,17 @@
  * 戦闘メンバーから外すことは出来ません。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/2 Ver.2.1.9
+ * メンバー変更画面を開いていない場合は、カーソルのウィンドウ対象処理を行わないように修正。
+ * 戦闘メンバーを控えメンバーに移動させた際に、戦闘メンバーから外れない問題を修正。
  * 2025/8/3 Ver.2.1.8
  * hiddenアクターが戦闘メンバーにいる場合に、交代時の挙動が不自然になる問題を修正。
  * hiddenアクターが戦闘メンバーにいる場合に戦闘メンバー数可変を適用時、最大メンバー数をhiddenアクター人数分差し引くように仕様変更。
@@ -2251,6 +2265,10 @@ Imported.NUUN_SceneFormation = true;
         }   
     };
 
+    Game_Party.prototype.initMaxBattleMembers = function() {
+        this._formationBattleMembers = Math.min(this._formationBattleMembers, this.battleMembers().length)
+    };
+
     Game_Party.prototype.changeWithdrawaBattleMember = function() {
         const members = this._formationBattleMembers - 1;
         this._formationBattleMembers = members.clamp(1, this.originalMaxBattleMembers());
@@ -2405,6 +2423,7 @@ Imported.NUUN_SceneFormation = true;
             this._baseSprite = null;
             this._changeMembers = [];
             this._beforeChangeParty = [];
+            $gameParty.initMaxBattleMembers();
         }
 
         setBattleCursorMode() {
@@ -3581,6 +3600,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationBattleMember.prototype.onTouchSelectActive = function() {
+        if (!(this.isOpen() || this.isOpening())) return;
         if (!this.activeSaveMembersWindow() && this.isHoverEnabled() && this._formation.isCursorMemberMode()) {
             const hitIndex = this.hitIndex();
             if (hitIndex >= 0) {
@@ -3867,6 +3887,7 @@ Imported.NUUN_SceneFormation = true;
     };
 
     Window_FormationMember.prototype.onTouchSelectActive = function() {
+        if (!(this.isOpen() || this.isOpening())) return;
         if (!this.activeSaveMembersWindow() && this.isHoverEnabled() && this._formation.isCursorBattleMode()) {
             const hitIndex = this.hitIndex();
             if (hitIndex >= 0) {

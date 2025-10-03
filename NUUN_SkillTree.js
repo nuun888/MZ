@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.3
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,13 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/4/2025 Ver.1.3.3
+ * Fixed an issue where the skill icon after learning was only applied when "NUUN_SkillTreeLearnEx" was set.
+ * Added a feature that allows you to set the skill icon after learning for each skill.
+ * 10/2/2025 Ver.1.3.2
+ * Corrected the processing of skill item display.
+ * Added a feature that allows you to set skill icons during the learning process. (If you have the paid version, you can write the evaluation formula in the Text tab)
+ * The skill acquisition count has been changed from "greater than or equal to" to "same".
  * 9/29/2025 Ver.1.3.1
  * The character selection button UI will now only be displayed while selecting the skill tree type.
  * The help text will no longer be displayed when returning to the skill tree type selection screen.
@@ -897,6 +904,13 @@
  * @min -1
  * @parent LearnSetting
  * 
+ * @param LearnSkillIcon
+ * @text Learning icon
+ * @desc Skill item icon after acquisition. (0 represents the default skill icon)
+ * @type icon
+ * @default 0 
+ * @parent LearnSetting
+ * 
  * @param LearnedIconSetting
  * @text Learned icon settings
  * @default ------------------------------
@@ -904,7 +918,7 @@
  * 
  * @param LearnedIcon
  * @text Learned icon
- * @desc Specifies the learned icon.
+ * @desc Specifies the learned icon. (The icon next to the skill is set in "Learning icon")
  * @type icon
  * @default 0
  * @min 0
@@ -966,7 +980,6 @@
  * @type number
  * @default 24
  * @parent SkillSetting
- * 
  * 
  * @param LineSetting
  * @text Line setting
@@ -1459,6 +1472,13 @@
  * @default 
  * @parent LearnSetting
  * 
+ * @param LearnSkillIcon
+ * @text Learning icon
+ * @desc Skill item icon after acquisition. (0 is the default)
+ * @type icon
+ * @default 0 
+ * @parent LearnSetting
+ * 
  * @param IndividualSetting
  * @text Individual setting
  * @default ------------------------------
@@ -1548,7 +1568,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.1
+ * @version 1.3.3
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1631,6 +1651,13 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/3 Ver.1.3.4
+ * 習得後スキルアイコンがNUUN_SkillTreeLearnEx設定している場合しか適用されていなかった問題を修正。
+ * 習得後スキルアイコンをスキルごとに設定できるように修正。
+ * 2025/10/2 Ver.1.3.2
+ * スキル項目表示の処理の修正。
+ * 習得時のスキルアイコンを設定できる機能を追加。(有償版をお持ちの場合はテキストタブで評価式で記述可能)
+ * 回数のスキル習得判定を以上から同じに仕様変更。
  * 2025/9/29 Ver.1.3.1
  * キャラクター切り替えのボタンUIの表示をスキルツリータイプ選択中のみ表示するように修正。
  * スキルツリータイプ選択に戻る際、ヘルプテキストを表示しないように修正。
@@ -2433,6 +2460,13 @@
  * @min -1
  * @parent LearnSetting
  * 
+ * @param LearnSkillIcon
+ * @text 習得後スキルアイコン
+ * @desc 習得後のスキル項目のアイコン。0でスキルアイコン
+ * @type icon
+ * @default 0
+ * @parent LearnSetting
+ * 
  * @param LearnedIconSetting
  * @text 習得済みアイコン設定
  * @default ------------------------------
@@ -2440,7 +2474,7 @@
  * 
  * @param LearnedIcon
  * @text 習得済みのアイコン
- * @desc 習得済みのアイコンを指定します。
+ * @desc 習得済みのアイコンを指定します。(スキルの横のアイコンは習得後スキルアイコンで設定)
  * @type icon
  * @default 0
  * @min 0
@@ -2502,7 +2536,6 @@
  * @type number
  * @default 24
  * @parent SkillSetting
- * 
  * 
  * @param LineSetting
  * @text ライン設定
@@ -2995,6 +3028,13 @@
  * @default 
  * @parent LearnSetting
  * 
+ * @param LearnSkillIcon
+ * @text 習得後アイコン
+ * @desc スキルごとの習得後のスキル項目のアイコン。0でデフォルト
+ * @type icon
+ * @default 0
+ * @parent LearnSetting
+ * 
  * @param IndividualSetting
  * @text 個別設定
  * @default ------------------------------
@@ -3269,10 +3309,6 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    NuunManager.skillTreeExKey = function() {
-        return false;
-    };
-
     NuunManager.getSkillPointParamName = function() {
         return params.SkillPointName;
     };
@@ -3298,15 +3334,21 @@ Imported.NUUN_SkillTree = true;
         return data;
     };
 
+    NuunManager.getLearnSkillIconFormula = function(text) {
+        return text;
+    };
+
 
     class SkillTreeData {
         constructor(data, type, actor) {
+            this._data = data;
             this._id = data.SkillId;
             this._type = type;
             this._actor = actor;
             this._derivedSkill = data.DerivedSkill || [];
             this._x = data.DerivedSkillX || 0;
             this._y = data.DerivedSkillY || 0;
+            this._iconIndex = 0;
             this._cond = data.SkillTreeCond || "";
             this._secret = data.SkillTreeSecret || "";
             this._learnCond = data.LearnCond || "";
@@ -3321,6 +3363,7 @@ Imported.NUUN_SkillTree = true;
             this.setCountLearnSkillData();
             const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
+            this.setupIcon(exLearningData);
             this.updateCost();
         }
 
@@ -3363,7 +3406,16 @@ Imported.NUUN_SkillTree = true;
             if (!!exLearningData) {
                 this.setupCost(exLearningData);
             }
+            this.setupIcon(exLearningData);
             this.updateCost();
+        }
+
+        setupIcon(exData) {
+            this._iconIndex = exData && exData.LearnSkillIcon && exData.LearnSkillIcon > 0 ? exData.LearnSkillIcon : this.getDefaultIcon();
+        }
+
+        getDefaultIcon() {
+            return this._data.LearnSkillIcon && this._data.LearnSkillIcon > 0 ? this._data.LearnSkillIcon : (params.LearnSkillIcon || 0);
         }
 
         setCostList() {
@@ -3524,6 +3576,10 @@ Imported.NUUN_SkillTree = true;
             return this._secret;
         }
 
+        getIconIndex() {
+            return NuunManager.getLearnSkillIconFormula(this._iconIndex);
+        }
+
         setupPrerequisiteSkill(flag) {
             this._isPrerequisiteSkill = flag;
         }
@@ -3589,7 +3645,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         isCountLearnExData(list) {
-            return list.find(data => data.Count <= this._actor.getSkillTreeCount(this._id));
+            return list.find(data => data.Count === this._actor.getSkillTreeCount(this._id));
         }
 
         getLearnSkill() {
@@ -4604,7 +4660,11 @@ Imported.NUUN_SkillTree = true;
             const secret = data.isSkillTreeSecretCond();
             this.changePaintOpacity(enabled);
             this._learnedSkillColor = learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
-            this.drawSkillTreeText(data, skill, rect, enabled, secret);
+            if (!enabled && !secret) {
+                this.drawSkillTreeSecretText(data, skill, rect);
+            } else {
+                this.drawSkillTreeText(data, skill, rect, learned);    
+            }
             if (secret) {
                 this.drawItemNumber(data, rect.x, rect.y, rect.width);
             }
@@ -4615,31 +4675,52 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Window_SkillTree.prototype.drawSkillTreeText = function(data, skill, rect, enabled, secret) {
+    Window_SkillTree.prototype.drawSkillTreeText = function(data, skill, rect, learned) {
         const x = rect.x + (params.SkillTreeTextX || 0);
         const w = rect.width - (this.numberWidth() + (params.SkillTreeTextX || 0));
-        if (!enabled && !secret) {
-            if (params.SkillTreeTextType === "icon") {
+        switch (params.SkillTreeTextType) {
+            case "icon":
+                const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+                this.setExSkillIcon(learned, data, skill);
+                this.drawIcon(skill.iconIndex, x, iconY);
+                break;
+            case "default":
+                this.setExSkillIcon(learned, data, skill);
+                this.drawItemName(skill, x, rect.y, w);
+                break;
+            case "name":
+                this.drawText(skill.name, x, rect.y, w);
+                break;
+        }
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeSecretText = function(data, skill, rect) {
+        const x = rect.x + (params.SkillTreeTextX || 0);
+        const w = rect.width - (this.numberWidth() + (params.SkillTreeTextX || 0));
+        if (params.SkillTreeTextType === "icon") {
                 const iconY = x + (this.lineHeight() - ImageManager.iconHeight) / 2;
                 this.drawIcon(data.getSecretIcon(), rect.x, iconY);
             } else {
                 this.drawText(data.getSkillSecretName(skill), x, rect.y, w);
             }
             data.enabled();
-        } else {
-            switch (params.SkillTreeTextType) {
-                case "icon":
-                    const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
-                    this.drawIcon(skill.iconIndex, x, iconY);
-                    break;
-                case "default":
-                    this.drawItemName(skill, x, rect.y, w);
-                    break;
-                case "name":
-                    this.drawText(skill.name, x, rect.y, w);
-                    break;
-            }
+    };
+
+    Window_SkillTree.prototype.getSkillIcon = function(data, skill) {
+        const index = data.getIconIndex();
+        return index > 0 ? index : skill.iconIndex;
+    };
+
+    Window_SkillTree.prototype.setExSkillIcon = function(learned, data, skill) {
+        this._exSkillIcon = learned ? this.getSkillIcon(data, skill) : skill.iconIndex;
+    };
+
+    Window_SkillTree.prototype.drawIcon = function(iconIndex, x, y) {
+        if (this._exSkillIcon > 0) {
+            iconIndex = this._exSkillIcon;
+            this._exSkillIcon = 0;
         }
+        Window_Base.prototype.drawIcon.apply(this, arguments);
     };
 
     Window_SkillTree.prototype.drawItemNumber = function(data, x, y, width) {

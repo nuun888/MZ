@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.1.9
+# Ver.2.1.10
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,8 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2025/10/4 Ver.2.1.10  
+可変メンバーを許可していない場合に、最大メンバー数が少なくなる問題を修正。  
 2025/10/2 Ver.2.1.9  
 メンバー変更画面を開いていない場合は、カーソルのウィンドウ対象処理を行わないように修正。  
 戦闘メンバーを控えメンバーに移動させた際に、戦闘メンバーから外れない問題を修正。  

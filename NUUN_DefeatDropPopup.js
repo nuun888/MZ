@@ -12,7 +12,7 @@
  * @base NUUN_PopupEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_PopupEx
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * The rewards obtained after defeating an enemy will be displayed in a pop-up window during the battle.
@@ -28,6 +28,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/4/2025 Ver.1.0.1
+ * Fixed an issue where an error would occur when an actor died.
  * 9/30/2025 Ver.1.0.0
  * First edition.
  * 
@@ -126,7 +128,7 @@
  * @base NUUN_PopupEx
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_PopupEx
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 敵を倒した際に得る報酬を撃破時にポップアップ表示します。報酬は戦闘終了時に取得されます。
@@ -141,6 +143,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/4 Ver.1.0.1
+ * アクター死亡時にエラーが出る問題を修正。
  * 2025/9/30 Ver.1.0.0
  * 初版
  * 
@@ -308,6 +312,7 @@ Imported.NUUN_DefeatDropPopup = true;
 
 
     Window_BattleLog.prototype.displayRewards = function(target) {
+        if (target.isActor()) return;
         const rewards = target.getRewards();
         if (rewards.exp > 0 && params.ShowPopUpRewardsExp && !!params.PopUpRewardsExp) {
             this.popupRewardExp(target, rewards);

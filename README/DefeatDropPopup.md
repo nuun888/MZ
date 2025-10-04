@@ -1,5 +1,5 @@
 # [撃破時ドロップポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DefeatDropPopup.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DefeatDropPopup.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -23,5 +23,7 @@
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
 
 ## 更新履歴
+2025/10/4 Ver.1.0.1  
+アクター死亡時にエラーが出る問題を修正。  
 2025/9/30 Ver.1.0.0  
 初版  

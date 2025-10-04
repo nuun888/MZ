@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.9
+ * @version 2.1.10
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -43,6 +43,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/4/2025 Ver.2.1.10
+ * Fixed an issue where the maximum number of members would be lower if "Variable combat members" was not allowed.
  * 10/2/2025 Ver.2.1.9
  * Fixed an issue where the cursor would incorrectly target the wrong window when the member selection screen was not open.
  * Fixed an issue where a battle member would not be removed from the battle member when being moved to the reserve member.
@@ -119,7 +121,7 @@
  * @default ------------------------------
  * 
  * @param VariableBattleMember
- * @text Number of combat members
+ * @text Variable combat members
  * @desc Variable number of combat members.
  * @type boolean
  * @default false
@@ -1058,7 +1060,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.9
+ * @version 2.1.10
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1092,6 +1094,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/4 Ver.2.1.10
+ * 可変メンバーを許可していない場合に、最大メンバー数が少なくなる問題を修正。
  * 2025/10/2 Ver.2.1.9
  * メンバー変更画面を開いていない場合は、カーソルのウィンドウ対象処理を行わないように修正。
  * 戦闘メンバーを控えメンバーに移動させた際に、戦闘メンバーから外れない問題を修正。
@@ -2199,12 +2203,17 @@ Imported.NUUN_SceneFormation = true;
 
     const _Game_Party_maxBattleMembers = Game_Party.prototype.maxBattleMembers;
     Game_Party.prototype.getFormationBattleMember = function() {
-        if (!this._formationBattleMembers) {
-            this._formationBattleMembers = _Game_Party_maxBattleMembers.call(this);
-        }
+        this.initMaxBattleMembers();
         return this._formationBattleMembers;
     };
 
+    Game_Party.prototype.initMaxBattleMembers = function() {
+        if (!!this._formationBattleMembers) return;
+        this._formationBattleMembers = _Game_Party_maxBattleMembers.call(this);
+        if (params.VariableBattleMember) {
+            this._formationBattleMembers = Math.min(_Game_Party_maxBattleMembers.call(this), this.battleMembers().length);
+        }
+    };
     
     Game_Party.prototype.maxBattleMembers = function() {
         return Math.min(this.getFormationBattleMember(), _Game_Party_maxBattleMembers.call(this));
@@ -2263,10 +2272,6 @@ Imported.NUUN_SceneFormation = true;
                 this.withdrawalOrder(actorIndex);
             }
         }   
-    };
-
-    Game_Party.prototype.initMaxBattleMembers = function() {
-        this._formationBattleMembers = Math.min(this._formationBattleMembers, this.battleMembers().length)
     };
 
     Game_Party.prototype.changeWithdrawaBattleMember = function() {
@@ -2423,7 +2428,6 @@ Imported.NUUN_SceneFormation = true;
             this._baseSprite = null;
             this._changeMembers = [];
             this._beforeChangeParty = [];
-            $gameParty.initMaxBattleMembers();
         }
 
         setBattleCursorMode() {

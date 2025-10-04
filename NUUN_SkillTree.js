@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.3
+ * @version 1.3.4
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,13 +96,14 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/5/2025 Ver.1.3.4
+ * Fixed an issue where skill names were not displayed correctly depending on the number of times the skill was learned.
  * 10/4/2025 Ver.1.3.3
  * Fixed an issue where the skill icon after learning was only applied when "NUUN_SkillTreeLearnEx" was set.
  * Added a feature that allows you to set the skill icon after learning for each skill.
  * 10/2/2025 Ver.1.3.2
  * Corrected the processing of skill item display.
  * Added a feature that allows you to set skill icons during the learning process. (If you have the paid version, you can write the evaluation formula in the Text tab)
- * The skill acquisition count has been changed from "greater than or equal to" to "same".
  * 9/29/2025 Ver.1.3.1
  * The character selection button UI will now only be displayed while selecting the skill tree type.
  * The help text will no longer be displayed when returning to the skill tree type selection screen.
@@ -905,7 +906,7 @@
  * @parent LearnSetting
  * 
  * @param LearnSkillIcon
- * @text Learning icon
+ * @text Learning skill icon
  * @desc Skill item icon after acquisition. (0 represents the default skill icon)
  * @type icon
  * @default 0 
@@ -918,7 +919,7 @@
  * 
  * @param LearnedIcon
  * @text Learned icon
- * @desc Specifies the learned icon. (The icon next to the skill is set in "Learning icon")
+ * @desc Specifies the learned icon. (The icon next to the skill is set in "Learning skill icon")
  * @type icon
  * @default 0
  * @min 0
@@ -1473,7 +1474,7 @@
  * @parent LearnSetting
  * 
  * @param LearnSkillIcon
- * @text Learning icon
+ * @text Learning skill icon
  * @desc Skill item icon after acquisition. (0 is the default)
  * @type icon
  * @default 0 
@@ -1651,13 +1652,14 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2025/10/3 Ver.1.3.4
+ * 2025/10/5 Ver.1.3.4
+ * スキル習得回数によるスキル名が正常に表示されない問題を修正。
+ * 2025/10/4 Ver.1.3.3
  * 習得後スキルアイコンがNUUN_SkillTreeLearnEx設定している場合しか適用されていなかった問題を修正。
  * 習得後スキルアイコンをスキルごとに設定できるように修正。
  * 2025/10/2 Ver.1.3.2
  * スキル項目表示の処理の修正。
  * 習得時のスキルアイコンを設定できる機能を追加。(有償版をお持ちの場合はテキストタブで評価式で記述可能)
- * 回数のスキル習得判定を以上から同じに仕様変更。
  * 2025/9/29 Ver.1.3.1
  * キャラクター切り替えのボタンUIの表示をスキルツリータイプ選択中のみ表示するように修正。
  * スキルツリータイプ選択に戻る際、ヘルプテキストを表示しないように修正。
@@ -3029,7 +3031,7 @@
  * @parent LearnSetting
  * 
  * @param LearnSkillIcon
- * @text 習得後アイコン
+ * @text 習得後スキルアイコン
  * @desc スキルごとの習得後のスキル項目のアイコン。0でデフォルト
  * @type icon
  * @default 0
@@ -3334,7 +3336,7 @@ Imported.NUUN_SkillTree = true;
         return data;
     };
 
-    NuunManager.getLearnSkillIconFormula = function(text) {
+    NuunManager.getLearnSkillIconFormula = function(data, text) {
         return text;
     };
 
@@ -3411,7 +3413,11 @@ Imported.NUUN_SkillTree = true;
         }
 
         setupIcon(exData) {
-            this._iconIndex = exData && exData.LearnSkillIcon && exData.LearnSkillIcon > 0 ? exData.LearnSkillIcon : this.getDefaultIcon();
+            if (exData && exData.LearnSkillIcon && exData.LearnSkillIcon > 0) {
+                this._iconIndex = exData.Count === this._actor.getSkillTreeCount(this._id) ? exData.LearnSkillIcon : this.getDefaultIcon();
+            } else {
+                this._iconIndex = this.getDefaultIcon();
+            }
         }
 
         getDefaultIcon() {
@@ -3577,7 +3583,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         getIconIndex() {
-            return NuunManager.getLearnSkillIconFormula(this._iconIndex);
+            return NuunManager.getLearnSkillIconFormula(this, this._iconIndex);
         }
 
         setupPrerequisiteSkill(flag) {
@@ -3645,7 +3651,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         isCountLearnExData(list) {
-            return list.find(data => data.Count === this._actor.getSkillTreeCount(this._id));
+            return list.find(data => data.Count <= this._actor.getSkillTreeCount(this._id));
         }
 
         getLearnSkill() {
@@ -4669,7 +4675,7 @@ Imported.NUUN_SkillTree = true;
                 this.drawItemNumber(data, rect.x, rect.y, rect.width);
             }
             this.drawSkillTreeContentsFrame(index, data, learned, enabled);
-            this.learnedDrawIcon(learned, rect);
+            this.learnedDrawIcon(data, learned, rect);
             this.drawSkillCount(data, learned, rect);
             this.changePaintOpacity(1);
         }
@@ -4949,13 +4955,18 @@ Imported.NUUN_SkillTree = true;
         this.contents.strokeRect(x, y, w, h, c1);
     };
 
-    Window_SkillTree.prototype.learnedDrawIcon = function(enabled, rect) {
-        if (enabled) {
+    Window_SkillTree.prototype.getLearnedIcon = function(data) {
+        return params.LearnedIcon || 0;
+    };
+
+    Window_SkillTree.prototype.learnedDrawIcon = function(data, enabled, rect) {
+        const iconId = this.getLearnedIcon(data);
+        if (iconId && iconId > 0 && enabled) {
             const iconY = rect.y + (this.lineHeight() - ImageManager.iconHeight) / 2;
             const delta = ImageManager.standardIconWidth - ImageManager.iconWidth;
             const x = rect.x + rect.width + params.LearnedIconX + delta;
             const y = params.LearnedIconY + iconY;
-            this.drawLearnedIcon(params.LearnedIcon, x, y);
+            this.drawLearnedIcon(iconId, x, y);
         }
     };
 

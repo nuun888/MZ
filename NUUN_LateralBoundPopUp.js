@@ -2,15 +2,13 @@
  * NUUN_LateralBoundPopUp.js
  * 
  * Copyright (C) 2022 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
  * @plugindesc Bound popup
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -23,9 +21,16 @@
  * Please fill in classes not listed above directly in the text tab.
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/4/2025 Ver.1.1.4
+ * Bound handling correction.
  * 2/2/2025 Ver.1.1.3
  * Fixed a possible conflict.
  * 12/5/2022 Ver.1.1.2
@@ -99,7 +104,7 @@
  * @target MZ
  * @plugindesc バウンドポップアップ
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * @orderBefore BattleEffectPopup
  * 
  * @help
@@ -112,9 +117,16 @@
  * 上記にないクラスはテキストタブで直接記入してください。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/4 Ver.1.1.4
+ * バウンドの処理の修正。
  * 2025/2/2 Ver.1.1.3
  * 競合が起きる可能性がある処理を修正。
  * 2022/12/5 Ver.1.1.2
@@ -265,8 +277,8 @@ Sprite_Damage.prototype.updateChild = function(sprite) {
             sprite.dy *= -BoundRepulsion;//-0.7;
             this.setRondomMoveX();
         }
-        sprite.x += this.MoveX;
         sprite.y = Math.round(sprite.ry);
+        sprite.x += sprite.y < 0 ? this.MoveX : 0;
         sprite.setBlendColor(this._flashColor);
     } else {
         _Sprite_Damage_updateChild.call(this, sprite);

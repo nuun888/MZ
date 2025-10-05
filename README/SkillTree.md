@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.3.4
+# Ver.1.3.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -226,6 +226,8 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/10/6 Ver.1.3.5  
+スキル削除のコスト返還が機能していなかった問題を修正。  
 2025/10/5 Ver.1.3.4  
 スキル習得回数によるスキル名が正常に表示されない問題を修正。  
 2025/10/4 Ver.1.3.3  

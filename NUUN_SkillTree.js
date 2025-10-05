@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.4
+ * @version 1.3.5
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/5/2025 Ver.1.3.5
+ * Fixed an issue where the cost refund for "SkillTreeRemoveSkill" was not working.
  * 10/5/2025 Ver.1.3.4
  * Fixed an issue where skill names were not displayed correctly depending on the number of times the skill was learned.
  * 10/4/2025 Ver.1.3.3
@@ -1144,21 +1146,6 @@
  * @text Image Settings
  * @default ------------------------------
  * 
- * @param ContentsBackImage
- * @text Content background image
- * @desc Content background sprite sheet image
- * @type file
- * @dir img/
- * @default
- * @parent ImagsSetting
- * 
- * @param FocusImageIndex
- * @text Focused Index
- * @desc Specifies the index of the sprite sheet image when focused.
- * @type number
- * @default 0
- * @parent ImagsSetting
- * 
  * @param HideFocusCursor
  * @desc Hides the cursor when in focus.
  * @text Hide cursor when focused
@@ -1166,13 +1153,33 @@
  * @default true
  * @parent ImagsSetting
  * 
+ * @param SpriteSheetSetting
+ * @text  Sprite sheet setting
+ * @default ------------------------------
+ * @parent ImagsSetting
+ * 
+ * @param ContentsBackImage
+ * @text Content background image
+ * @desc Content background sprite sheet image
+ * @type file
+ * @dir img/
+ * @default
+ * @parent SpriteSheetSetting
+ * 
+ * @param FocusImageIndex
+ * @text Focused Index
+ * @desc Specifies the index of the sprite sheet image when focused.
+ * @type number
+ * @default 0
+ * @parent SpriteSheetSetting
+ * 
  * @param ContentsBackImageCols
  * @text Number of horizontal divisions in sprite sheet
  * @desc Specifies the number of horizontal divisions in the sprite sheet.
  * @type number
  * @default 4
  * @min 1
- * @parent ImagsSetting
+ * @parent SpriteSheetSetting
  * 
  * @param ContentsBackImageRows
  * @text Number of vertical divisions in sprite sheet
@@ -1180,11 +1187,12 @@
  * @type number
  * @default 2
  * @min 1
- * @parent ImagsSetting
+ * @parent SpriteSheetSetting
  * 
  * @param BackgroundSetting
  * @text Background image
  * @default ------------------------------
+ * @parent ImagsSetting
  * 
  * @param BackgroundImage
  * @text Background image
@@ -1652,6 +1660,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/6 Ver.1.3.5
+ * スキル削除のコスト返還が機能していなかった問題を修正。
  * 2025/10/5 Ver.1.3.4
  * スキル習得回数によるスキル名が正常に表示されない問題を修正。
  * 2025/10/4 Ver.1.3.3
@@ -2701,21 +2711,6 @@
  * @text 画像設定
  * @default ------------------------------
  * 
- * @param ContentsBackImage
- * @text コンテンツ背景画像
- * @desc コンテンツ背景のスプライトシート画像
- * @type file
- * @dir img/
- * @default
- * @parent ImagsSetting
- * 
- * @param FocusImageIndex
- * @text フォーカス時インデックス
- * @desc フォーカス時のスプライトシート画像のインデックスを指定します。
- * @type number
- * @default 0
- * @parent ImagsSetting
- * 
  * @param HideFocusCursor
  * @desc フォーカス時にカーソルを非表示にします。
  * @text フォーカス時カーソル非表示
@@ -2723,13 +2718,33 @@
  * @default true
  * @parent ImagsSetting
  * 
+ * @param SpriteSheetSetting
+ * @text スプライトシート設定
+ * @default ------------------------------
+ * @parent ImagsSetting
+ * 
+ * @param ContentsBackImage
+ * @text コンテンツ背景画像
+ * @desc コンテンツ背景のスプライトシート画像
+ * @type file
+ * @dir img/
+ * @default
+ * @parent SpriteSheetSetting
+ * 
+ * @param FocusImageIndex
+ * @text フォーカス時インデックス
+ * @desc フォーカス時のスプライトシート画像のインデックスを指定します。
+ * @type number
+ * @default 0
+ * @parent SpriteSheetSetting
+ * 
  * @param ContentsBackImageCols
  * @text スプライトシート横分割数
  * @desc スプライトシートの横分割数を指定します。
  * @type number
  * @default 4
  * @min 1
- * @parent ImagsSetting
+ * @parent SpriteSheetSetting
  * 
  * @param ContentsBackImageRows
  * @text スプライトシート縦分割数
@@ -2737,11 +2752,12 @@
  * @type number
  * @default 2
  * @min 1
- * @parent ImagsSetting
+ * @parent SpriteSheetSetting
  * 
  * @param BackgroundSetting
  * @text 背景設定
  * @default ------------------------------
+ * @parent ImagsSetting
  * 
  * @param BackgroundImage
  * @text 背景画像
@@ -3090,6 +3106,17 @@
  * @default 0
  * @parent FrameImageSetting
  * 
+ * @param FrameImageSettingEx
+ * @text 画像設定
+ * @default ------------------------------
+ * 
+ * @param ImageId
+ * @text 画像ID
+ * @desc 画像設定のIDを指定します。0を指定した場合はデフォルトのIDになります。
+ * @type number
+ * @default 0
+ * @parent FrameImageSettingEx
+ * 
  */
 /*~struct~LearnSE:ja
  * 
@@ -3362,6 +3389,7 @@ Imported.NUUN_SkillTree = true;
             this._derivedLineType = data.LineType === "none" ? params.LineType : (data.LineType || params.LineType);
             this._maxCount = data.MaxCount || 0;
             this._countLearnSkillList = data.CountLearnSkill;
+            this._imageId = data.ImageId;
             this.setCountLearnSkillData();
             const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
@@ -3580,6 +3608,10 @@ Imported.NUUN_SkillTree = true;
 
         getSecret() {
             return this._secret;
+        }
+
+        getImageId() {
+            return this._imageId;
         }
 
         getIconIndex() {
@@ -3956,6 +3988,7 @@ Imported.NUUN_SkillTree = true;
         this._helpWindow = new Window_SkillTreeHelp(rect);
         this.addWindow(this._helpWindow);
         this._skillTreeWindow.setHelpWindow(this._helpWindow);
+        this._skillTreeType.setHelpWindow(this._helpWindow);
         if (params.HelpWindowTransparent) {
             this._helpWindow.opacity = 0;
         }
@@ -4113,6 +4146,7 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeWindow.deselect();
         this._skillTreeCostWindow.setData(null);
         this._skillTreeWindow.setHelpWindowItem(null);
+        this._skillTreeType.updateHelp();
     };
 
     Scene_SkillTree.prototype.onActorChange = function() {
@@ -4163,7 +4197,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeHelp.prototype.setItem = function(item) {
-        if (item && item.meta.SkillTreeSkillText) {
+        if (item && item.meta && item.meta.SkillTreeSkillText) {
             this.setText(item.meta.SkillTreeSkillText);
         } else {
             Window_Help.prototype.setItem.call(this, item);
@@ -4190,6 +4224,11 @@ Imported.NUUN_SkillTree = true;
             this._actor = actor;
             this.refresh();
         }
+    };
+
+    Window_SkillTreeType.prototype.updateHelp = function() {
+        Window_Selectable.prototype.updateHelp.call(this);
+        //this.setHelpWindowItem({description: params.SkillTreeTypeHelpText || ""});
     };
 
     Window_SkillTreeType.prototype.maxCols = function() {
@@ -4248,9 +4287,19 @@ Imported.NUUN_SkillTree = true;
         if (_isSpriteSheet()) {
             return ImageManager.nuun_LoadPictures(params.ContentsBackImage);
         } else if (_isBackgroundImage()) {
-
+            return this.loadSkillTreeImages2();
         }
         return null;
+    };
+
+    Window_SkillTree.prototype.loadSkillTreeImages2 = function() {
+        const parameter = params.ContentsBackSingleImage;
+        if (!parameter) return;
+        const imageList = [];
+        for (let i = 0; i < parameter.length; i++) {
+            imageList[i] = ImageManager.nuun_LoadPictures(parameter[i]);
+        }
+        return imageList;
     };
 
     Window_SkillTree.prototype.maxCols = function() {
@@ -4376,11 +4425,13 @@ Imported.NUUN_SkillTree = true;
             const data = this.itemAt(index);
             const id = this.getFrameIndex(data, index);
             const rect = this.itemRect(index);
-            this.drawSkillTreeImage(id, rect);
+            this.drawSkillTreeSpriteSheet(id, rect);
+        } else if (_isBackgroundImage()) {
+            this.drawSkillTreeImage(index, params);
         }
     };
 
-    Window_SkillTree.prototype.drawSkillTreeImage = function(index, rect) {
+    Window_SkillTree.prototype.drawSkillTreeSpriteSheet = function(index, rect) {
         const bitmap = this._skillTreeImages;
         const pw = rect.width;
         const ph = rect.height;
@@ -4389,6 +4440,29 @@ Imported.NUUN_SkillTree = true;
         const sx = (index % params.ContentsBackImageCols) * w;
         const sy = Math.floor(index / params.ContentsBackImageCols) * h;
         this.contentsBack.blt(bitmap, sx, sy, w, h, rect.x, rect.y, pw, ph);
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeImage = function(index) {
+        const data = this.itemAt(index);
+        const rect = this.itemRect(index);
+        const bitmap = this.getSkillTreeContentsImage(index, data);
+        const w = bitmap.width;
+        const h = bitmap.height;
+        this.contentsBack.blt(bitmap, 0, 0, w, h, rect.x, rect.y, rect.width, rect.height);
+    };
+
+    Window_SkillTree.prototype.getSkillTreeContentsImage = function(index, data) {
+        if (index === this.index()) {
+            return this._skillTreeImages[this.getFocusImageId()];
+        } else if (data.getImageId() > 0) {
+            return this._skillTreeImages[data.getImageId() - 1];
+        } else {
+            return this._skillTreeImages[0];
+        }
+    };
+
+    Window_SkillTree.prototype.getFocusImageId = function() {
+        return Math.max(params.FocusImageId - 1, 0);
     };
 
     Window_SkillTree.prototype.select = function(index) {
@@ -5080,7 +5154,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.isSkillTreeContentsImage = function() {
-        return !!_isSpriteSheet();
+        return !!_isSpriteSheet() || !!_isBackgroundImage();
     };
 
     Window_SkillTree.prototype.setSkillTreeCostWindow = function(costWindow) {
@@ -5949,7 +6023,7 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.skillTreeRemoveSkill = function(skillId, r) {
         const data = this.getSkillTreeIsRemoveSkillData(skillId);
         if (!!data) {
-            this.removeSkillTreeSkill(data, (!this.isNotSkillTreeCostReturn(data._id)));
+            this.removeSkillTreeSkill(data, r && !this.isNotSkillTreeCostReturn(data._id), this._classId);
         }
     };
 

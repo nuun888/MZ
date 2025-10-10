@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.5
+ * @version 1.4.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,7 +96,11 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
- * 10/5/2025 Ver.1.3.5
+ * 10/11/2025 Ver.1.4.0
+ * Added a feature that allows you to specify a single image as the background for skill item content.
+ * Added a feature that allows you to set help text when selecting a skill type.
+ * Fixed the display order of derived lines.
+ * 10/6/2025 Ver.1.3.5
  * Fixed an issue where the cost refund for "SkillTreeRemoveSkill" was not working.
  * 10/5/2025 Ver.1.3.4
  * Fixed an issue where skill names were not displayed correctly depending on the number of times the skill was learned.
@@ -611,6 +615,13 @@
  * @min 1
  * @parent SkillTypeSetting
  * 
+ * @param SkillTreeTypeHelpText
+ * @text Skill tree type help
+ * @desc Sets the default help window text.
+ * @type string
+ * @default 
+ * @parent SkillTypeSetting
+ * 
  * @param SkillTreeWindowSetting
  * @text Skill tree window settings
  * @default ------------------------------
@@ -967,6 +978,8 @@
  * @value frame
  * @option Images (sprite sheets)
  * @value spritesheet
+ * @option Images
+ * @value image
  * @default default
  * @parent SkillSetting
  * 
@@ -994,10 +1007,12 @@
  * @type select
  * @option Straight
  * @value straight
- * @option Type1
+ * @option key line(under)
  * @value type1
- * @option Type1
+ * @option key line(up)
  * @value type2
+ * @option key line(middle)
+ * @value type3
  * @option None
  * @value none
  * @default type1
@@ -1285,6 +1300,12 @@
  * @default 
  * @type struct<SkillTreeDataTable>[]
  * 
+ * @param SkillTreeTypeHelpText
+ * @text Skill tree type help
+ * @desc Sets the text for the help window.
+ * @type string
+ * @default 
+ * 
  */
 /*~struct~SkillTreeActorList:
  * 
@@ -1498,10 +1519,12 @@
  * @type select
  * @option Straight
  * @value straight
- * @option Type1
+ * @option key line(under)
  * @value type1
- * @option Type1
+ * @option key line(up)
  * @value type2
+ * @option key line(middle)
+ * @value type3
  * @option None
  * @value none
  * @default none
@@ -1577,7 +1600,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.3.3
+ * @version 1.4.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1660,6 +1683,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/11 Ver.1.4.0
+ * スキル項目コンテンツ背景に単体画像を指定できる機能を追加。
+ * スキルタイプ選択中にヘルプテキストを設定できる機能を追加。
+ * 派生ラインの表示順を修正。
  * 2025/10/6 Ver.1.3.5
  * スキル削除のコスト返還が機能していなかった問題を修正。
  * 2025/10/5 Ver.1.3.4
@@ -2175,6 +2202,13 @@
  * @min 1
  * @parent SkillTypeSetting
  * 
+ * @param SkillTreeTypeHelpText
+ * @text スキルツリータイプヘルプ
+ * @desc デフォルトのヘルプウィンドウのテキストを設定します。
+ * @type string
+ * @default 
+ * @parent SkillTypeSetting
+ * 
  * @param SkillTreeWindowSetting
  * @text スキルツリーウィンドウ設定
  * @default ------------------------------
@@ -2532,6 +2566,8 @@
  * @value frame
  * @option 画像(スプライトシート)
  * @value spritesheet
+ * @option 画像
+ * @value image
  * @default default
  * @parent SkillSetting
  * 
@@ -2563,6 +2599,8 @@
  * @value type1
  * @option カギ線(上)
  * @value type2
+ * @option カギ線(中)
+ * @value type3
  * @option なし
  * @value none
  * @default type1
@@ -2754,6 +2792,26 @@
  * @min 1
  * @parent SpriteSheetSetting
  * 
+ * @param SingleImageSetting
+ * @text 単体画像設定
+ * @default ------------------------------
+ * @parent ImagsSetting
+ * 
+ * @param ContentsBackSingleImage
+ * @text 画像設定
+ * @desc コンテンツ背景の画像を設定します。ID1はデフォルトの画像になります。
+ * @type file[]
+ * @dir img/
+ * @default
+ * @parent SingleImageSetting
+ * 
+ * @param FocusImageId
+ * @text フォーカス時画像ID
+ * @desc フォーカス時の画像設定のIDを指定します。
+ * @type number
+ * @default 0
+ * @parent SingleImageSetting
+ * 
  * @param BackgroundSetting
  * @text 背景設定
  * @default ------------------------------
@@ -2849,6 +2907,12 @@
  * @desc スキルツリーに表示させるスキルリストを設定します。
  * @default 
  * @type struct<SkillTreeDataTable>[]
+ * 
+ * @param SkillTreeTypeHelpText
+ * @text スキルツリータイプヘルプ
+ * @desc ヘルプウィンドウのテキストを設定します。
+ * @type string
+ * @default 
  * 
  */
 /*~struct~SkillTreeActorList:ja
@@ -3069,6 +3133,8 @@
  * @value type1
  * @option カギ線(上)
  * @value type2
+ * @option カギ線(中)
+ * @value type3
  * @default none
  * @parent IndividualSetting
  * 
@@ -3248,7 +3314,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     function _isBackgroundImage() {
-        return Imported.NUUN_SkillTreeEx && params.SkillFrameType === 'image';
+        return params.SkillFrameType === 'image';
     }
 
     function _isConfirmation() {
@@ -4228,7 +4294,16 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTreeType.prototype.updateHelp = function() {
         Window_Selectable.prototype.updateHelp.call(this);
-        //this.setHelpWindowItem({description: params.SkillTreeTypeHelpText || ""});
+        this.setHelpWindowItem({description: this.getHelpText()});
+    };
+
+    Window_SkillTreeType.prototype.getHelpText = function() {
+        const data = params.SkillTreeSetting[this.currentExt()];
+        if (!data) {
+            return params.SkillTreeTypeHelpText;
+        } else {
+            return data.SkillTreeTypeHelpText ? data.SkillTreeTypeHelpText : params.SkillTreeTypeHelpText;
+        }
     };
 
     Window_SkillTreeType.prototype.maxCols = function() {
@@ -4257,6 +4332,7 @@ Imported.NUUN_SkillTree = true;
                 }
             }
         }
+        this.setHelpWindowItem({description: this.getHelpText()});
     };
 
     Window_SkillTreeType.prototype.update = function() {
@@ -4281,6 +4357,16 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeImages = this.loadSkillTreeImages();
         this._learnOk = true;
         Window_Selectable.prototype.initialize.call(this, rect);
+        this.setSkillTreeLineSprite();
+    };
+
+    Window_SkillTree.prototype.contentsSkillTreeLine = function() {
+        const sprite = new Sprite();
+        this._contentsBackSprite.addChild(sprite);
+        const width = this.contentsWidth();
+        const height = this.contentsHeight();
+        sprite.bitmap = new Bitmap(width, height);
+        return sprite;
     };
 
     Window_SkillTree.prototype.loadSkillTreeImages = function() {
@@ -4300,6 +4386,12 @@ Imported.NUUN_SkillTree = true;
             imageList[i] = ImageManager.nuun_LoadPictures(parameter[i]);
         }
         return imageList;
+    };
+
+    Window_SkillTree.prototype.setSkillTreeLineSprite = function() {
+        this._contentsSkillTreeLine = this.contentsSkillTreeLine();
+        this._contentsSkillTreeUnlearnedLine = this.contentsSkillTreeLine();
+        this._contentsSkillTreeLearningLine = this.contentsSkillTreeLine();
     };
 
     Window_SkillTree.prototype.maxCols = function() {
@@ -4371,7 +4463,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.itemWidth = function() {
-        return (params.SkillTreeContentsWidth > 0 ? params.SkillTreeContentsWidth : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin() / this.maxCols();
+        return (params.SkillTreeContentsWidth > 0 ? (params.SkillTreeContentsWidth + this.colsMargin()) : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin() / this.maxCols();
     };
 
     Window_SkillTree.prototype.itemHeight = function() {
@@ -4718,12 +4810,14 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawDerivedSkillTreeLineBase = function() {
+        this.getSkillTreeLineClear();
         const list = this._data;
         const length = list.length;
         for (let i = 0; i < length; i++) {
             const data = list[i];
             if (!!data) {
-                const rect = this.itemLineRect(i);
+                //const rect = this.itemLineRect(i);
+                const rect = this.itemRect(i);
                 this.drawDerivedSkillTreeLine(data, rect);
             }
         }
@@ -4739,7 +4833,7 @@ Imported.NUUN_SkillTree = true;
             const learned = this._actor.isSkillTreeLearned(data._id);
             const secret = data.isSkillTreeSecretCond();
             this.changePaintOpacity(enabled);
-            this._learnedSkillColor = learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
+            this._learnedSkillColor = this.getSkillTreeLearnedColor(learned);
             if (!enabled && !secret) {
                 this.drawSkillTreeSecretText(data, skill, rect);
             } else {
@@ -4803,7 +4897,7 @@ Imported.NUUN_SkillTree = true;
         Window_Base.prototype.drawIcon.apply(this, arguments);
     };
 
-    Window_SkillTree.prototype.drawItemNumber = function(data, x, y, width) {
+    Window_SkillTree.prototype.drawItemNumber = function(data, x, y, width, align = "right") {
         if (params.SkillTreeNumText) {
             const actor = this._actor;
             const count = actor.getSkillTreeCount(data._id);
@@ -4813,7 +4907,7 @@ Imported.NUUN_SkillTree = true;
             const v = $gameVariables._data;
             const s = $gameSwitches._data;
             const itemWidth = this.numberWidth() - this.itemPadding();
-            this.drawText(eval(params.SkillTreeNumText), x + (width - itemWidth), y, itemWidth, "right");
+            this.drawText(eval(params.SkillTreeNumText), x + (width - itemWidth), y, itemWidth, align);
         }
     };
 
@@ -4867,9 +4961,7 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
-    Window_SkillTree.prototype.getLineColor = function(data, learned) {
-        const enabled = this.isEnabled(data);
-        const derivedLearned = this._actor.isSkillTreeLearned(data._id);
+    Window_SkillTree.prototype.getLineColor = function(derivedLearned, enabled, learned) {
         if (derivedLearned && learned) {
             return NuunManager.getColorCode(params.LearnedLineColor);
         } else if (derivedLearned && !learned) {
@@ -4878,6 +4970,30 @@ Imported.NUUN_SkillTree = true;
             return NuunManager.getColorCode(params.UnlearnedLineColor);
         } else {
             return NuunManager.getColorCode(params.NormalLineColor);
+        }
+    };
+
+    Window_SkillTree.prototype.getSkillTreeLineContents = function(derivedLearned, enabled, learned) {
+        if (derivedLearned && learned) {
+             return this._contentsSkillTreeLearningLine.bitmap;
+        } else if (derivedLearned && !learned) {
+            return this._contentsSkillTreeLine.bitmap;
+        } else if (enabled) {
+            return this._contentsSkillTreeUnlearnedLine.bitmap;
+        } else {
+            return this._contentsSkillTreeLine.bitmap;
+        }
+    };
+
+    Window_SkillTree.prototype.getSkillTreeLineClear = function() {
+        if (this._contentsSkillTreeLine) {
+            this._contentsSkillTreeLine.bitmap.clear();
+        }
+        if (this._contentsSkillTreeUnlearnedLine) {
+            this._contentsSkillTreeUnlearnedLine.bitmap.clear();
+        }
+        if (this._contentsSkillTreeLearningLine) {
+            this._contentsSkillTreeLearningLine.bitmap.clear();
         }
     };
 
@@ -4890,37 +5006,40 @@ Imported.NUUN_SkillTree = true;
             const derivedData = this._data[index];
             const learned = this._actor.isSkillTreeLearned(data._id);
             if (!!derivedData && this.isSkillTreeCond(derivedData)) {
-                const colorId = this.getLineColor(derivedData, learned);
-                const derivedRect = this.itemLineRect(index);
+                const enabled = this.isEnabled(derivedData);
+                const derivedLearned = this._actor.isSkillTreeLearned(derivedData._id);
+                const colorId = this.getLineColor(derivedLearned, enabled, learned);
+                const bitmapContents = this.getSkillTreeLineContents(derivedLearned, enabled, learned);
+                const derivedRect = this.itemRect(index);
                 const color = NuunManager.getColorCode(colorId);
                 const x2 = this.getDerivedX(derivedRect);
                 const y2 = this.getDerivedY(derivedRect);
                 switch (data.getDerivedLineType()) {
                     case "straight":
-                        this.drawSkillTreeStraightLine(x, y, x2, y2, params.LineThick, color);
+                        this.drawSkillTreeStraightLine(bitmapContents, x, y, x2, y2, params.LineThick, color);
                         break;
                     case "type1":
-                        this.drawSkillTreeType1Line(x, y, x2, y2, params.LineThick, color);
+                        this.drawSkillTreeType1Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
                         break;
                     case "type2":
-                        this.drawSkillTreeType2Line(x, y, x2, y2, params.LineThick, color);
+                        this.drawSkillTreeType2Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
                         break;
                     case "type3":
-                        this.drawSkillTreeType3Line(x, y, x2, y2, params.LineThick, color);
+                        this.drawSkillTreeType3Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
                         break;
                     case "type4":
-                        this.drawSkillTreeType4Line(x, y, x2, y2, params.LineThick, color);
+                        this.drawSkillTreeType4Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
                         break;
                     case "type7":
-                        this.drawSkillTreeType7Line(x, y, x2, y2, params.LineThick, color);
+                        this.drawSkillTreeType7Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
                         break;
                 }
             } 
         }
     };
 
-    Window_SkillTree.prototype.drawSkillTreeStraightLine = function(x1, y1, x2, y2, thick, color) {
-        const context = this.contents._context;
+    Window_SkillTree.prototype.drawSkillTreeStraightLine = function(contents, x1, y1, x2, y2, thick, color) {
+        const context = contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
         context.beginPath();
@@ -4929,8 +5048,8 @@ Imported.NUUN_SkillTree = true;
         context.stroke();
     };
 
-    Window_SkillTree.prototype.drawSkillTreeType1Line = function(x1, y1, x2, y2, thick, color) {
-        const context = this.contents._context;
+    Window_SkillTree.prototype.drawSkillTreeType1Line = function(contents, x1, y1, x2, y2, thick, color) {
+        const context = contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
         const height = this.rowsMarginHeight();
@@ -4944,8 +5063,8 @@ Imported.NUUN_SkillTree = true;
         context.stroke();
     };
 
-    Window_SkillTree.prototype.drawSkillTreeType2Line = function(x1, y1, x2, y2, thick, color) {
-        const context = this.contents._context;
+    Window_SkillTree.prototype.drawSkillTreeType2Line = function(contents, x1, y1, x2, y2, thick, color) {
+        const context = contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
         const height = this.rowsMarginHeight();
@@ -4959,8 +5078,8 @@ Imported.NUUN_SkillTree = true;
         context.stroke();
     };
 
-    Window_SkillTree.prototype.drawSkillTreeType3Line = function(x1, y1, x2, y2, thick, color) {//EX
-        const context = this.contents._context;
+    Window_SkillTree.prototype.drawSkillTreeType3Line = function(contents, x1, y1, x2, y2, thick, color) {//EX
+        const context = contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
         const height = this.rowsMarginHeight();
@@ -4976,8 +5095,8 @@ Imported.NUUN_SkillTree = true;
         context.stroke();
     };
 
-    Window_SkillTree.prototype.drawSkillTreeType4Line = function(x1, y1, x2, y2, thick, color) {//EX
-        const context = this.contents._context;
+    Window_SkillTree.prototype.drawSkillTreeType4Line = function(contents, x1, y1, x2, y2, thick, color) {//EX
+        const context = contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
         const height = this.rowsMarginHeight();
@@ -4989,8 +5108,8 @@ Imported.NUUN_SkillTree = true;
         context.stroke();
     };
 
-    Window_SkillTree.prototype.drawSkillTreeType7Line = function(x1, y1, x2, y2, thick, color) {//EX
-        const context = this.contents._context;
+    Window_SkillTree.prototype.drawSkillTreeType7Line = function(contents, x1, y1, x2, y2, thick, color) {//EX
+        const context = contents._context;
         context.strokeStyle = color;
         context.lineWidth = thick;
         const height = this.rowsMarginHeight();
@@ -5011,7 +5130,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.getLineY = function(rect) {
-        return rect.y + rect.height + 2;
+        return rect.y + rect.height;
     };
 
     Window_SkillTree.prototype.getDerivedX = function(rect) {
@@ -5019,7 +5138,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.getDerivedY = function(rect) {
-        return rect.y - 2;
+        return rect.y;
     };
 
     Window_SkillTree.prototype.drawCountBackgroundRect = function(x, y ,w, h) {
@@ -5218,6 +5337,18 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.contentsWidth = function() {
         return this.innerWidth + this.itemWidth();
+    };
+
+    Window_SkillTree.prototype.getSkillTreeSkillCostColor = function() {
+        return params.SkillCosTColor;
+    };
+
+    Window_SkillTree.prototype.getSkillTreeSkillCostType = function() {
+        return params.SkillCostType;
+    };
+
+    Window_SkillTree.prototype.getSkillTreeLearnedColor = function(learned) {
+        return learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
     };
 
 

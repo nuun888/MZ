@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/11/2025 Ver.1.4.1
+ * Fix item width.
  * 10/11/2025 Ver.1.4.0
  * Added a feature that allows you to specify a single image as the background for skill item content.
  * Added a feature that allows you to set help text when selecting a skill type.
@@ -1600,7 +1602,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1683,6 +1685,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/11 Ver.1.4.1
+ * 項目の幅を修正。
  * 2025/10/11 Ver.1.4.0
  * スキル項目コンテンツ背景に単体画像を指定できる機能を追加。
  * スキルタイプ選択中にヘルプテキストを設定できる機能を追加。
@@ -4463,7 +4467,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.itemWidth = function() {
-        return (params.SkillTreeContentsWidth > 0 ? (params.SkillTreeContentsWidth + this.colsMargin()) : Math.floor(this.skillTreeInnerWidth() / this.maxCols())) + this.colsMargin() / this.maxCols();
+        return params.SkillTreeContentsWidth > 0 ? (params.SkillTreeContentsWidth + this.colsMargin() + this.itemPadding()) : Math.floor(this.skillTreeInnerWidth() / this.maxCols()) + Math.floor(this.colsMargin() / this.maxCols());
     };
 
     Window_SkillTree.prototype.itemHeight = function() {
@@ -5274,6 +5278,10 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.isSkillTreeContentsImage = function() {
         return !!_isSpriteSheet() || !!_isBackgroundImage();
+    };
+
+    Window_SkillTree.prototype.isSkillTreeBackgroundImage = function() {
+        return !!_isBackgroundImage();
     };
 
     Window_SkillTree.prototype.setSkillTreeCostWindow = function(costWindow) {

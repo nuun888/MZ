@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -226,6 +226,8 @@ Ver.1.0.4での更新によりスキル習得後の処理方法を変更した�
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/10/11 Ver.1.4.1  
+項目の幅を修正。  
 2025/10/11 Ver.1.4.0  
 スキル項目コンテンツ背景に単体画像を指定できる機能を追加。  
 スキルタイプ選択中にヘルプテキストを設定できる機能を追加。  

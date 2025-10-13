@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.1
+ * @version 1.4.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/13/2025 Ver.1.4.2
+ * Added the ability to specify an actor when displaying the skill tree window from a plugin command.
  * 10/11/2025 Ver.1.4.1
  * Fix item width.
  * 10/11/2025 Ver.1.4.0
@@ -207,6 +209,13 @@
  * @command ShowSkillTreeWindow
  * @desc Displays the skill tree window.
  * @text Skill tree window display
+ * 
+ * @arg ActorId
+ * @text Actor id
+ * @desc Specifies the actor ID.
+ * @type actor
+ * @min 0
+ * @default 0
  * 
  * @command GainSkillPoint
  * @desc Causes the target actor to gain a skill point.
@@ -1685,6 +1694,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/13 Ver.1.4.2
+ * プラグインコマンドからスキルツリーウィンドウを表示する際に、アクターを指定できる機能を追加。
  * 2025/10/11 Ver.1.4.1
  * 項目の幅を修正。
  * 2025/10/11 Ver.1.4.0
@@ -1796,6 +1807,14 @@
  * @command ShowSkillTreeWindow
  * @desc スキルツリーウィンドウを表示します。
  * @text スキルツリーウィンドウ表示
+ * 
+ * @arg ActorId
+ * @text アクターID
+ * @desc 表示するアクターIDを指定します。
+ * @type actor
+ * @min 0
+ * @default 0
+ * 
  * 
  * @command GainSkillPoint
  * @desc 対象のアクターにスキルポイントを取得させます。
@@ -3225,9 +3244,11 @@ Imported.NUUN_SkillTree = true;
     const params = Nuun_PluginParams.getPluginParams(document.currentScript);
     const pluginName = params.pluginName;
     let _confirmation = false;
+    let _setActor = null;
 
     PluginManager.registerCommand(pluginName, 'ShowSkillTreeWindow', args => {
         SceneManager.push(Scene_SkillTree);
+        _setActor = $gameActors.actor(Number(args.ActorId));
     });
 
     PluginManager.registerCommand(pluginName, 'GainSkillPoint', args => {
@@ -4006,6 +4027,7 @@ Imported.NUUN_SkillTree = true;
         this.createSkillTreeStatusWindow();
         this.createSkillTreeHelpWindow();
         this.createSkillTreeConfirmationWindow();
+        this.setupActor();
     };
 
     Scene_SkillTree.prototype.createSkillTreeTypeWindow = function() {
@@ -4171,8 +4193,11 @@ Imported.NUUN_SkillTree = true;
         return params.HelpBottomMode;
     };
 
-    Scene_SkillTree.prototype.setupActor = function(actor) {
-        this._actor = actor;
+    Scene_SkillTree.prototype.setupActor = function() {
+        if (!!_setActor) {
+            this._actor = _setActor;
+            _setActor = null
+        }
     };
 
     Scene_SkillTree.prototype.start = function() {

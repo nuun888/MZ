@@ -1,4 +1,4 @@
-# [シンボルエンカウント](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
+# [シンボルエンカウント(無償版)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
 # Ver.1.0.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SymbolEncounter.js)
 #### 必須、前提プラグイン
@@ -10,6 +10,8 @@
 [トリガー起動時のプレイヤーとイベントの向き状況取得](https://github.com/nuun888/MZ/blob/master/README/EventPlayerDirection.md)  
 
 シンボルエンカウントシステムを実装します。  
+
+このプラグインは現在、不具合対応のみ行っております。  
 
 ## 設定
 イベントのメモ欄  

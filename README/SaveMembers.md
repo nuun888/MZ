@@ -1,5 +1,5 @@
 # [パーティメンバーの保存、呼び出し](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)
-# Ver.1.0.5   
+# Ver.1.0.6   
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,6 +14,8 @@
 当プラグインのSceneFormation登録画面表示をtrueに設定することでNUUN_SceneFormationからQキー(デフォルト)で開くことが出来ます。  
 
 ## 更新履歴
+2025/10/19 Ver.1.0.6  
+表示アクター数を1以上に設定した場合に、セーブメンバー画面を表示するとエラーが出る問題を修正。  
 2025/5/23 Ver.1.0.5  
 戦闘中のウィンドウの座標を指定できる機能を追加。(NUUN_SceneFormation使用時)  
 2025/5/5 Ver.1.0.4  

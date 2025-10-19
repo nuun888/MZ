@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.1.14
+ * @version 3.1.15
  * 
  * @help
  * Change and extend the menu screen display.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/19/2025 Ver.3.1.15
+ * Add skill points to actor status (requires NUUN_SkillTree).
  * 4/12/2025 Ver.3.1.14
  * Fixed processing due to gauge imaging update.
  * 2/14/2025 Ver.3.1.13
@@ -711,6 +713,8 @@
  * @value Class
  * @option Level(1)(3)(4)(5)(6)(7)(13)(14)(15)
  * @value Level
+ * @option Skill point(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value SkillPoint
  * @option State(3)(4)(5)(6)(7)(10※1)
  * @value State
  * @option State (same display as for battle)(3)(4)(5)(6)
@@ -1448,6 +1452,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/19 Ver.3.1.15
+ * アクターのステータスにスキルポイント(要NUUN_SkillTree)を追加。
  * 2025/4/13 Ver.3.1.14
  * ゲージ画像化更新による処理の修正。
  * 2025/2/14 Ver.3.1.13
@@ -2066,6 +2072,8 @@
  * @value Class
  * @option レベル(1)(3)(4)(5)(6)(7)(13)(14)(15)
  * @value Level
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(13)(14)(15)
+ * @value SkillPoint
  * @option ステート(3)(4)(5)(6)(7)(10※1)
  * @value State
  * @option ステート(戦闘用と同じ表示)(3)(4)(5)(6)
@@ -3793,6 +3801,20 @@ Imported.NUUN_MenuScreenEX = true;
         textParam = NuunManager.numPercentage(textParam, (data.Decimal - 2) || 0, this.getDecimalMode());
         this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
         //this.drawText(textParam, x + textWidth + 8, y, width - (textWidth + 8), data.Align);
+        this.resetFontSettings();
+    };
+
+    Window_StatusBase.prototype.nuun_DrawMenuStatusContentsSkillPoint = function(data, x, y, width, actor) {
+        this.changeTextColor(NuunManager.getColorCode(data.NameColor));
+        const nameText = data.ParamName ? data.ParamName : NuunManager.getSkillPointParamName();
+        this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
+        this.nuun_setContentsFontFace(data);
+        const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? this.textWidth(nameText) : this.nuunMenu_systemWidth(data.SystemItemWidth, width);
+        this.drawText(nameText, x, y, textWidth);
+        this.resetTextColor();
+        this.nuun_setContentsValueFontFace(data);
+        const textParam = (data.DetaEval ? eval(data.DetaEval) : actor.nsp);
+        this.nuun_DrawContentsParamUnitText(textParam, data, x + textWidth + 8, y, width - (textWidth + 8));
         this.resetFontSettings();
     };
 

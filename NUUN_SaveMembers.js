@@ -2,8 +2,6 @@
  * NUUN_SaveMembers.js
  * 
  * Copyright (C) 2025 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
@@ -12,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.5
+ * @version 1.0.6
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -21,9 +19,16 @@
  * Delete registered party Press Q (Oageup) key on the registered party screen
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/19/2025 Ver.1.0.6
+ * Fixed an issue where an error would occur when displaying the Save Member screen if "Number of Actors Displayed" was set to 1 or higher.
  * 5/23/2025 Ver.1.0.5
  * Added the ability to specify the coordinates of the window during battle (when using NUUN_SceneFormation).
  * 5/5/2025 Ver.1.0.4
@@ -384,7 +389,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.5
+ * @version 1.0.6
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -393,9 +398,16 @@
  * 登録パーティの消去 登録パーティ画面でQ（Oageup）キー
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/19 Ver.1.0.6
+ * 表示アクター数を1以上に設定した場合に、セーブメンバー画面を表示するとエラーが出る問題を修正。
  * 2025/5/23 Ver.1.0.5
  * 戦闘中のウィンドウの座標を指定できる機能を追加。(NUUN_SceneFormation使用時)
  * 2025/5/5 Ver.1.0.4
@@ -895,7 +907,7 @@ Imported.NUUN_SaveMembers = true;
         if (params.MaxShowSaveMembers > 0) {
             return $gameSystem.windowPadding() * 2 + params.MaxShowSaveMembers * _saveMemberCharacterModeWidth();
         } else {
-            return $gameSystem.windowPadding() * 2 + (Imported.NUUN_SceneFormation ? $gameParty.originalMaxBattleMembers() : $gameParty.maxBattleMembers()) * this.characterModeWidth();
+            return $gameSystem.windowPadding() * 2 + (Imported.NUUN_SceneFormation ? $gameParty.originalMaxBattleMembers() : $gameParty.maxBattleMembers()) * _saveMemberCharacterModeWidth();
         }
     };
 

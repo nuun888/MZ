@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.10
+ * @version 2.1.11
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -43,6 +43,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/19/2025 Ver.2.1.11
+ * Fixed initial processing of "Variable combat members".
  * 10/4/2025 Ver.2.1.10
  * Fixed an issue where the maximum number of members would be lower if "Variable combat members" was not allowed.
  * 10/2/2025 Ver.2.1.9
@@ -1060,7 +1062,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.10
+ * @version 2.1.11
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1094,6 +1096,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/10/19 Ver.2.1.11
+ * 可変メンバーの初期処理を修正。
  * 2025/10/4 Ver.2.1.10
  * 可変メンバーを許可していない場合に、最大メンバー数が少なくなる問題を修正。
  * 2025/10/2 Ver.2.1.9
@@ -2119,6 +2123,7 @@ Imported.NUUN_SceneFormation = true;
     const parameters = PluginManager.parameters('NUUN_SceneFormation');
     const paramSupport = PluginManager.parameters('NUUN_SceneFormation_SupportActor');
     params.SupportActorBackColor = (DataManager.nuun_structureData(paramSupport['SupportActorBackColor']));
+    let _initMAxMembers = !params.VariableBattleMember;
     const paramList = {};
 
     const pluginName = "NUUN_SceneFormation";
@@ -2203,16 +2208,10 @@ Imported.NUUN_SceneFormation = true;
 
     const _Game_Party_maxBattleMembers = Game_Party.prototype.maxBattleMembers;
     Game_Party.prototype.getFormationBattleMember = function() {
-        this.initMaxBattleMembers();
-        return this._formationBattleMembers;
-    };
-
-    Game_Party.prototype.initMaxBattleMembers = function() {
-        if (!!this._formationBattleMembers) return;
-        this._formationBattleMembers = _Game_Party_maxBattleMembers.call(this);
-        if (params.VariableBattleMember) {
-            this._formationBattleMembers = Math.min(_Game_Party_maxBattleMembers.call(this), this.battleMembers().length);
+        if (!this._formationBattleMembers) {
+            this._formationBattleMembers = _Game_Party_maxBattleMembers.call(this);
         }
+        return this._formationBattleMembers;
     };
     
     Game_Party.prototype.maxBattleMembers = function() {
@@ -2243,6 +2242,13 @@ Imported.NUUN_SceneFormation = true;
 
     Game_Party.prototype.allStandByMembers = function() {
         return this.allMembers().filter(member => member.isAppeared()).slice(this.battleMembers().length);
+    };
+
+    Game_Party.prototype.checkVariableMaxBattleMembers = function() {
+        if (!_initMAxMembers && params.VariableBattleMember) {
+            this._formationBattleMembers = Math.min(this._formationBattleMembers, this.battleMembers().length);
+            _initMAxMembers = true;
+        }
     };
 
     Game_Party.prototype.checkFormationBattleMember = function(addActor, withdrawalActor) {
@@ -2343,6 +2349,7 @@ Imported.NUUN_SceneFormation = true;
     Scene_Formation.prototype.initialize = function() {
         Scene_MenuBase.prototype.initialize.call(this);
         this._formation = this.setNuun_Formation(false);
+        $gameParty.checkVariableMaxBattleMembers();
     };
       
     Scene_Formation.prototype.create = function() {

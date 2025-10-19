@@ -45,6 +45,7 @@
  * Log
  * 10/19/2025 Ver.2.1.11
  * Fixed initial processing of "Variable combat members".
+ * Fixed an issue where followers were not displayed when "Variable combat members" was set.
  * 10/4/2025 Ver.2.1.10
  * Fixed an issue where the maximum number of members would be lower if "Variable combat members" was not allowed.
  * 10/2/2025 Ver.2.1.9
@@ -1098,6 +1099,7 @@
  * 更新履歴
  * 2025/10/19 Ver.2.1.11
  * 可変メンバーの初期処理を修正。
+ * 可変メンバー設定時にフォロワーが表示されない問題を修正。​
  * 2025/10/4 Ver.2.1.10
  * 可変メンバーを許可していない場合に、最大メンバー数が少なくなる問題を修正。
  * 2025/10/2 Ver.2.1.9

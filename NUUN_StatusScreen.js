@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc ステータス画面表示拡張
  * @author NUUN
- * @version 2.7.2
+ * @version 2.7.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -112,6 +112,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/10/19 Ver.2.7.3
+ * 表示できる項目にスキルポイント(要NUUN_SkillTree)を追加。
  * 2025/8/8 Ver.2.7.2
  * レーダーチャートのパラメータ名の表示方法の仕様を変更。
  * 2025/8/2 Ver.2.7.1
@@ -1254,6 +1256,8 @@
  * @value 5
  * @option ステート(戦闘用と同じ表示)(4)(5)(6)(7)
  * @value 6
+ * @option スキルポイント(1)(2)(3)(4)(5)(6)(7)(8)(9)(10)(11)(14)(15)(16)(17)(20)(21)
+ * @value 9
  * @option ＨＰ(4)(5)(6)(7)
  * @value 10
  * @option ＭＰ(4)(5)(6)(7)
@@ -2220,6 +2224,9 @@ Window_Status.prototype.dateDisplay = function(list, x, y, width) {
     case 6:
       this.drawPlaceStateIcon(x, y, this._actor);
       break;
+    case 9:
+      this.nuunStatusDrawSkillPoint(list, this._actor, x, y, width);
+      break;
     case 10:
     case 11:
     case 12:
@@ -2730,6 +2737,31 @@ Window_Status.prototype.drawOriginalStatus = function(list, actor, x, y, width) 
         this.nuun_setContentsFontFace(list);
         this.nuun_DrawContentsParamUnitText(text, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
     }
+};
+
+Window_Status.prototype.nuunStatusDrawSkillPoint = function(list, actor, x, y, width) {
+    if (!Imported.NUUN_SkillTree) return;
+    const dactor = actor.actor();
+    const aclass = actor.currentClass();
+    this.contentsFontSize(list);
+    this.changeTextColor(NuunManager.getColorCode(list.NameColor));
+    if (list.Back) {
+        this.drawContentsBackground(list.Back, x, y, width);
+        x = this.contensX(x);
+        width = this.contensWidth(width);
+    }
+    let margin = 0;
+    if (list.IconId > 0) {
+        this.drawIcon(list.IconId, x, y + list.IconY);
+        margin = ImageManager.iconWidth + 4;
+    }
+    const systemWidth = this.systemWidth(list.SystemItemWidth, width);
+    const nameText = list.paramName ? list.paramName : NuunManager.getSkillPointParamName();
+    this.drawText(nameText, x + margin, y, systemWidth - margin);
+    this.resetTextColor();
+    this.nuun_setContentsFontFace(list);
+    const textParam = (list.DetaEval ? eval(list.DetaEval) : actor.nsp);
+    this.nuun_DrawContentsParamUnitText(textParam, list, x + systemWidth + this.itemPadding(), y, width - (systemWidth + this.itemPadding()));
 };
 
 Window_Status.prototype.drawElement = function(list, actor, x, y, width) {

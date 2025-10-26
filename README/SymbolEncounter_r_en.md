@@ -5,7 +5,7 @@
 
 Implements a symbol encounter system.  
 ## Setting
-Event Noto's
+Event Note's
 `<SymbolEncEnemy:[id]>` Events with this tag are symbol encounters.  
 `[id]`:Symbol encounter setting ID or Identification name.  
 

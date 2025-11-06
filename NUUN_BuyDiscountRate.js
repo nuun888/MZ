@@ -142,7 +142,7 @@ Imported.NUUN_BuyDiscountRate = true;
     };
 
     Game_Party.prototype.buyDiscountRate = function() {
-        if (params.EnableBuyDiscountSwitch > 0 && $gameSwitches.value(params.EnableBuyDiscountSwitch)) return 1.0;
+        if (params.EnableBuyDiscountSwitch > 0 && $gameSwitches.value(params.EnableBuyDiscountSwitch)) return 0;
         return params.BuyDiscountRateItems.reduce((r, data) => {
             const item = $dataItems[data.Item];
             if (data.Item > 0 && !!item && this.hasItem(item) && data.DiscountRate > r) {

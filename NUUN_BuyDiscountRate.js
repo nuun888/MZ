@@ -145,10 +145,10 @@ Imported.NUUN_BuyDiscountRate = true;
         if (params.EnableBuyDiscountSwitch > 0 && $gameSwitches.value(params.EnableBuyDiscountSwitch)) return 1.0;
         return params.BuyDiscountRateItems.reduce((r, data) => {
             const item = $dataItems[data.Item];
-            if (data.Item > 0 && data.DiscountRate > r && !!item && this.hasItem(item)) {
+            if (data.Item > 0 && !!item && this.hasItem(item) && data.DiscountRate > r) {
                 return (data.DiscountRate * -1);
             }
-            return 0;
+            return r;
         }, 0);
     };
 

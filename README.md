@@ -315,6 +315,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [売値任意設定](https://github.com/nuun888/MZ/blob/master/README/AnySellPrice.md) | [NUUN_AnySellPrice](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnySellPrice.js) | 共 | 1.1.0 |
 | [ショップ購入カテゴリー表示](https://github.com/nuun888/MZ/blob/master/README/PurchaseCategory.md) | [NUUN_PurchaseCategory](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PurchaseCategory.js) | 共 | 1.1.0 |
 | [店の所持金](https://github.com/nuun888/MZ/blob/master/README/VendorMoney.md) | [NUUN_VendorMoney](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_VendorMoney.js) | 共 | 1.0.0 |
+| [所持中割引率適用アイテム](https://github.com/nuun888/MZ/blob/master/README/BuyDiscountRate.md) | [NUUN_BuyDiscountRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuyDiscountRate.js) | 共 | 1.0.0 |
 | ショップ画面拡張 |  |  |  |
 |  |  |  |  |
 |  |  |  |  |

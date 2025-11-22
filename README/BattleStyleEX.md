@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.21   
+# Ver.1.0.22  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 無償ライセンス
 NUUN_BattleStyleEXのみ適用  
@@ -176,6 +176,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 アニメーション製作者様に報告をお願いいたします。  
 
 ## 更新履歴
+2025/11/22 Ver.1.0.22  
+アクター追加時にバトルステータスの追加したアクターの顔グラフィックが表示されない問題を修正。  
 2025/7/26 Ver.1.0.21  
 連続行動時に特定の条件でアクターの画像が切り替わらない問題を修正。  
 顔グラに表示範囲指定を適用できるように修正。  

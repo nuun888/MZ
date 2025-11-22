@@ -12,7 +12,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.21
+ * @version 1.0.22
  * 
  * @help
  * You can change and customize the battle layout.
@@ -87,6 +87,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 11/22/2025 Ver.1.0.22
+ * Fixed an issue where the face graphic of the added actor in battle status would not be displayed when adding an actor.
  * 7/26/2025 Ver.1.0.21
  * Fixed an issue where actor images would not change under certain conditions when performing consecutive actions.
  * Fixed so that display range can be specified for face graphics.
@@ -1994,7 +1996,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.21
+ * @version 1.0.22
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2069,6 +2071,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/11/22 Ver.1.0.22
+ * アクター追加時にバトルステータスの追加したアクターの顔グラフィックが表示されない問題を修正。
  * 2025/7/26 Ver.1.0.21
  * 連続行動時に特定の条件でアクターの画像が切り替わらない問題を修正。
  * 顔グラに表示範囲指定を適用できるように修正。
@@ -6476,8 +6480,8 @@ Imported.NUUN_BattleStyleEX = true;
         const key = "actor_%1-BSImg".format(index);
         const sprite = this.createActorImgSprite(key, Sprite_ActorImges);
         this.createStateAnimation(contentsData, index);
-        sprite.setup(contentsData, contentsData.getImgIndex());
         sprite.setRect(Math.min(width, rect.width), rect.height);
+        sprite.setup(contentsData, contentsData.getImgIndex());
         sprite.setHome(rect.x, rect.y);
         sprite.show();
         NuunManager.styleData.setFrontActor(index, sprite);
@@ -6630,7 +6634,7 @@ Imported.NUUN_BattleStyleEX = true;
     Window_BattleActorStatus.prototype.hide = function() {
         Window_Base.prototype.hide.apply(this, arguments);
     };
-    
+
 
     function Window_BsBattleActor() {
         this.initialize(...arguments);

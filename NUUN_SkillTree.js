@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.2
+ * @version 1.4.3
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 11/28/2025 Ver.1.4.3
+ * Corrected the process of applying "NUUN_SkillTreeFreeArrangement".
  * 10/13/2025 Ver.1.4.2
  * Added the ability to specify an actor when displaying the skill tree window from a plugin command.
  * 10/11/2025 Ver.1.4.1
@@ -1611,7 +1613,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.1
+ * @version 1.4.3
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1694,6 +1696,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/11/28 Ver.1.4.3
+ * スキルツリー自由配置プラグイン適用に関する処理の修正。
  * 2025/10/13 Ver.1.4.2
  * プラグインコマンドからスキルツリーウィンドウを表示する際に、アクターを指定できる機能を追加。
  * 2025/10/11 Ver.1.4.1
@@ -3468,6 +3472,8 @@ Imported.NUUN_SkillTree = true;
             this._derivedSkill = data.DerivedSkill || [];
             this._x = data.DerivedSkillX || 0;
             this._y = data.DerivedSkillY || 0;
+            this._coordinateX = data.DerivedSkillCoordinateX || 0;
+            this._coordinateY = data.DerivedSkillCoordinateY || 0;
             this._iconIndex = 0;
             this._cond = data.SkillTreeCond || "";
             this._secret = data.SkillTreeSecret || "";
@@ -3478,6 +3484,7 @@ Imported.NUUN_SkillTree = true;
             this._force = data.ForcedPlacement;
             this._spriteIndex = _isSpriteSheet() ? this.getSkillFrame(data) : 0;
             this._derivedLineType = data.LineType === "none" ? params.LineType : (data.LineType || params.LineType);
+            this._derivedLineMode = data.LineMode || [];
             this._maxCount = data.MaxCount || 0;
             this._countLearnSkillList = data.CountLearnSkill;
             this._imageId = data.ImageId;
@@ -3705,6 +3712,14 @@ Imported.NUUN_SkillTree = true;
             return this._imageId;
         }
 
+        getX() {
+            return this._coordinateX;
+        }
+
+        getY() {
+            return this._coordinateY;
+        }
+
         getIconIndex() {
             return NuunManager.getLearnSkillIconFormula(this, this._iconIndex);
         }
@@ -3746,6 +3761,10 @@ Imported.NUUN_SkillTree = true;
 
         getDerivedLineType() {
             return this._derivedLineType;
+        }
+
+        getDerivedLineMode(index) {
+            return this._derivedLineMode[index] || "auto";
         }
 
         isForce() {
@@ -4099,10 +4118,14 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    Scene_SkillTree.prototype.getSkillTreeBackgroundImage = function() {
+        return params.BackgroundImage;
+    };
+
     Scene_SkillTree.prototype.createBackground = function() {
         Scene_MenuBase.prototype.createBackground.call(this);
         if (params.BackgroundImage) {
-            const bitmap = ImageManager.nuun_LoadPictures(params.BackgroundImage);
+            const bitmap = ImageManager.nuun_LoadPictures(this.getSkillTreeBackgroundImage());
             const sprite = new Sprite(bitmap);
             this.addChild(sprite);
             bitmap.addLoadListener(function() {
@@ -4215,7 +4238,7 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.onSkillTreeTypeOk = function() {
         this._skillTreeWindow.activate();
-        this._skillTreeWindow.select(0);
+        this._skillTreeWindow.select(this._skillTreeWindow.initSkillTreeCursorIndex());
     };
 
     Scene_SkillTree.prototype.skillTreeLearnConfirmation = function() {
@@ -4445,6 +4468,10 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    Window_SkillTree.prototype.initSkillTreeCursorIndex = function() {
+        return 0;
+    };
+
     Window_SkillTree.prototype.update = function() {
         Window_Selectable.prototype.update.apply(this, arguments);
     };
@@ -4643,8 +4670,12 @@ Imported.NUUN_SkillTree = true;
         return params.SkillTreeSetting[this._skillTreeId].SymbolName;
     };
 
+    Window_SkillTree.prototype.getSkillTreeSetting = function() {
+        return params.SkillTreeSetting || [];
+    };
+
     Window_SkillTree.prototype.getSkillTreeList = function() {
-        const treeData = params.SkillTreeSetting[this._skillTreeId];
+        const treeData = this.getSkillTreeSetting()[this._skillTreeId];
         if (!treeData) return null;
         const list = treeData.SkillTreeList;
         if (!list) return null;
@@ -4757,7 +4788,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.initialSkillTreeList = function() {
-        const list = params.SkillTreeSetting[this._skillTreeId].SkillTreeList;
+        const list = this.getSkillTreeSetting()[this._skillTreeId].SkillTreeList;
         const tree = [];
         if (!list) return [];
         for (let i = 0; i < list.length; i++) {
@@ -5030,7 +5061,8 @@ Imported.NUUN_SkillTree = true;
         if (data && !data.isDerivedSkill()) return;
         const x = this.getLineX(rect);
         const y = this.getLineY(rect);
-        for (const skillId of data._derivedSkill) {
+        for (let i = 0; i < data._derivedSkill.length; i++) {
+            const skillId = data._derivedSkill[i];
             const index = this.getSkillTreeDataIndex(skillId);
             const derivedData = this._data[index];
             const learned = this._actor.isSkillTreeLearned(data._id);
@@ -5043,26 +5075,31 @@ Imported.NUUN_SkillTree = true;
                 const color = NuunManager.getColorCode(colorId);
                 const x2 = this.getDerivedX(derivedRect);
                 const y2 = this.getDerivedY(derivedRect);
-                switch (data.getDerivedLineType()) {
-                    case "straight":
-                        this.drawSkillTreeStraightLine(bitmapContents, x, y, x2, y2, params.LineThick, color);
-                        break;
-                    case "type1":
-                        this.drawSkillTreeType1Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
-                        break;
-                    case "type2":
-                        this.drawSkillTreeType2Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
-                        break;
-                    case "type3":
-                        this.drawSkillTreeType3Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
-                        break;
-                    case "type4":
-                        this.drawSkillTreeType4Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
-                        break;
-                    case "type7":
-                        this.drawSkillTreeType7Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
-                        break;
+                if (Imported.NUUN_SkillTreeFreeArrangement) {
+                    this.drawSkillTreeFreeArrangementLine(bitmapContents, data.getDerivedLineMode(i), x, y, x2, y2,derivedRect.width, derivedRect.height, params.LineThick, color);
+                } else {
+                    switch (data.getDerivedLineType()) {
+                        case "straight":
+                            this.drawSkillTreeStraightLine(bitmapContents, x, y, x2, y2, params.LineThick, color);
+                            break;
+                        case "type1":
+                            this.drawSkillTreeType1Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+                            break;
+                        case "type2":
+                            this.drawSkillTreeType2Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+                            break;
+                        case "type3":
+                            this.drawSkillTreeType3Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+                            break;
+                        case "type4":
+                            this.drawSkillTreeType4Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+                            break;
+                        case "type7":
+                            this.drawSkillTreeType7Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+                            break;
+                    }
                 }
+                
             } 
         }
     };

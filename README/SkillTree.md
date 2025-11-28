@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.4.2
+# Ver.1.4.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -264,6 +264,8 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/11/28 Ver.1.4.3  
+スキルツリー自由配置プラグイン適用に関する処理の修正。  
 2025/10/13 Ver.1.4.2  
 プラグインコマンドからスキルツリーウィンドウを表示する際に、アクターを指定できる機能を追加。  
 2025/10/11 Ver.1.4.1  

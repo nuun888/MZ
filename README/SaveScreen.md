@@ -1,5 +1,5 @@
 # [セーブ画面拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen.js)
-# Ver.3.0.11
+# Ver.3.0.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveScreen_3.js)  
 #### 無償ライセンス
 クレジット表記：任意  
@@ -77,6 +77,8 @@ actor:$gameActors (指定のアクター変更で指定したアクター(指定
 旧版の配布は終了いたしました。  
 
 ## 更新履歴
+2025/11/29 Ver.3.0.12  
+背景画像をスクロール表示させる機能を追加。  
 2025/4/26 Ver.3.0.11  
 セーブ後画面を終了しないをtrueにして保存を行うと、画像が表示されなくなる問題を修正。  
 2025/4/20 Ver.3.0.10  

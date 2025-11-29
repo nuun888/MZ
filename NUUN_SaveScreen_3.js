@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Save screen EX
  * @author NUUN
- * @version 3.0.11
+ * @version 3.0.12
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -74,6 +74,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 11/29/2025 Ver.3.0.12
+ * Added the ability to scroll the background image.
  * 4/25/2025 Ver.3.0.11
  * Fixed an issue where images would not be displayed when saving with "Do not exit screen after saving" set to true.
  * 4/20/2025 Ver.3.0.10
@@ -509,16 +511,32 @@
  * 
  * @param BackUiWidth
  * @text Background image window UI size
- * @desc Fit the background image to the window UI size.
+ * @desc Fit the background image to the window UI size.If scrolling is specified, it will be disabled.
  * @type boolean
  * @default true
  * @parent BackGround
  * 
  * @param BackFitWidth
  * @text Background image enlargement
- * @desc Scales the background image to fit the window size or screen.
+ * @desc Scales the background image to fit the window size or screen.If scrolling is specified, it will be disabled.
  * @type boolean
  * @default false
+ * @parent BackGround
+ * 
+ * @param BackScrollX
+ * @desc Horizontal scrolling speed of the background image. Positive values scroll to the right, negative values to the left.
+ * @text Background Scroll Speed X
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BackGround
+ * 
+ * @param BackScrollY
+ * @desc Vertical scrolling speed of the background image. Positive values scroll downward, negative values upward.
+ * @text Background Scroll Speed Y
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent BackGround
  * 
  * @param AutomaticSetting
@@ -1326,7 +1344,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 3.0.11
+ * @version 3.0.12
  * 
  * @help
  * セーブ画面をカスタマイズできます。
@@ -1395,6 +1413,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/11/29 Ver.3.0.12
+ * 背景画像をスクロール表示させる機能を追加。
  * 2025/4/26 Ver.3.0.11
  * セーブ後画面を終了しないをtrueにして保存を行うと、画像が表示されなくなる問題を修正。
  * 2025/4/20 Ver.3.0.10
@@ -1831,16 +1851,32 @@
  * 
  * @param BackUiWidth
  * @text 背景画像ウィンドウUIサイズ
- * @desc 背景画像をウィンドウUIサイズに合わせる。
+ * @desc 背景画像をウィンドウUIサイズに合わせる。スクロール指定している場合は無効になります。
  * @type boolean
  * @default true
  * @parent BackGround
  * 
  * @param BackFitWidth
  * @text 背景画像拡大
- * @desc 背景画像をウィンドウサイズまたは画面に合わせ拡大します。
+ * @desc 背景画像をウィンドウサイズまたは画面に合わせ拡大します。スクロール指定している場合は無効になります。
  * @type boolean
  * @default false
+ * @parent BackGround
+ * 
+ * @param BackScrollX
+ * @desc 背景画像の横方向のスクロール速度。正の値は右にスクロールし、負の値は左にスクロールします。
+ * @text 横方向スクロール速度
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BackGround
+ * 
+ * @param BackScrollY
+ * @desc 背景画像の縦方向のスクロール速度。正の値は下方向にスクロールし、負の値は上方向にスクロールします。
+ * @text 縦方向スクロール速度
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent BackGround
  * 
  * @param AutomaticSetting
@@ -3128,8 +3164,9 @@ Imported.NUUN_SaveScreen_3 = true;
                 data = DataManager.loadBackground() || saveLayout.BackGroundImg;
             }
             if (data) {
-                const sprite = new Sprite();
-                sprite.bitmap = ImageManager.nuun_LoadPictures(data);
+                const sprite = new Sprite_BackgroundSprite(data);
+                sprite.setup(data, saveLayout.BackScrollX, saveLayout.BackScrollY);
+                sprite.setBitmap(ImageManager.nuun_LoadPictures(data));
                 if (data) {
                     this.addChild(sprite);
                     if (sprite.bitmap && !sprite.bitmap.isReady()) {
@@ -3143,6 +3180,9 @@ Imported.NUUN_SaveScreen_3 = true;
     };
 
     Scene_File.prototype.setBackGround = function(sprite) {
+        if (sprite.isScroll()) {
+            return;
+        }
         if (saveLayout.BackUiWidth) {
             sprite.x = (Graphics.width - Graphics.boxWidth) / 2 - 4;
             sprite.y = (Graphics.height - Graphics.boxHeight) / 2 - 4;
@@ -4171,6 +4211,64 @@ Imported.NUUN_SaveScreen_3 = true;
         }
     };
 
+
+    function Sprite_BackgroundSprite() {
+        this.initialize(...arguments);
+    }
+
+    Sprite_BackgroundSprite.prototype = Object.create(Sprite.prototype);
+    Sprite_BackgroundSprite.prototype.constructor = Sprite_BackgroundSprite;
+
+    Sprite_BackgroundSprite.prototype.initialize = function() {
+        Sprite.prototype.initialize.call(this);
+        this.initMembers();
+    };
+
+    Sprite_BackgroundSprite.prototype.initMembers = function() {
+        this._backgroundName = null;
+        this._scrollX = 0;
+        this._scrollY = 0;
+    };
+
+    Sprite_BackgroundSprite.prototype.setup = function(name, sx = 0, sy = 0) {
+        if (!!name) {
+            this._backgroundName = name;
+            this._scrollX = sx;
+            this._scrollY = sy;
+        } else {
+            this._backgroundName = null;
+            this._scrollX = 0;
+            this._scrollY = 0;
+        }
+    };
+
+    Sprite_BackgroundSprite.prototype.setBitmap = function(bitmap) {
+        if (this.isScroll()) {
+            this._scrollBackground = new TilingSprite();
+            this._scrollBackground.move(0, 0, Graphics.width, Graphics.height);
+            this.addChild(this._scrollBackground);
+            this._scrollBackground.bitmap = bitmap;
+        } else {
+            this.bitmap = bitmap;
+        }
+    };
+
+    Sprite_BackgroundSprite.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.updateScrollBackground();
+    };
+
+    Sprite_BackgroundSprite.prototype.updateScrollBackground = function() {
+        if (!!this._backgroundName && !!this._scrollBackground && this.isScroll()) {
+            const sprite = this._scrollBackground;
+            sprite.origin.x += this._scrollX;
+            sprite.origin.y += this._scrollY;
+        }
+    };
+
+    Sprite_BackgroundSprite.prototype.isScroll = function() {
+        return this._scrollX !== 0 || this._scrollY !== 0;
+    };
 
 
 })();

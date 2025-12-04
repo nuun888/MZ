@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.3
+ * @version 1.5.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 12/4/2025 Ver.1.5.0
+ * Added a feature to play a custom sound effect when learning a skill.
+ * Added a feature to scroll the background image.
  * 11/28/2025 Ver.1.4.3
  * Corrected the process of applying "NUUN_SkillTreeFreeArrangement".
  * 10/13/2025 Ver.1.4.2
@@ -1232,9 +1235,25 @@
  * 
  * @param BackUiWidth
  * @text Background image window UI size
- * @desc Fit the background image to the window UI size.
+ * @desc Fit the background image to the window UI size. If scrolling is specified, it will be disabled.
  * @type boolean
  * @default true
+ * @parent BackgroundSetting
+ * 
+ * @param BackScrollX
+ * @desc Horizontal scrolling speed of the background image. Positive values scroll to the right, negative values to the left.
+ * @text Background Scroll Speed X
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BackgroundSetting
+ * 
+ * @param BackScrollY
+ * @desc Vertical scrolling speed of the background image. Positive values scroll downward, negative values upward.
+ * @text Background Scroll Speed Y
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent BackgroundSetting
  * 
  */
@@ -1522,6 +1541,27 @@
  * @default 0 
  * @parent LearnSetting
  * 
+ * @param LearnSe
+ * @text Individual se on learning
+ * @desc Plays a custom SE instead of the default one when the skill is learned.
+ * @type struct<LearnSE>
+ * @default {"LearnSE":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent LearnSetting
+ * 
+ * @param LearnCommonEvent
+ * @text Common event on learning
+ * @desc Executes a specified common event after the skill is learned. (NUUN_SkillTreeEx required)
+ * @type common_event
+ * @default 0
+ * @parent LearnSetting
+ * 
+ * @param ImmediateCommonEvent
+ * @text Immediate common event execution
+ * @desc Triggers the common event immediately. Some commands are unavailable in this mode.
+ * @type boolean
+ * @default false
+ * @parent LearnSetting
+ * 
  * @param IndividualSetting
  * @text Individual setting
  * @default ------------------------------
@@ -1613,7 +1653,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.3
+ * @version 1.5.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1696,6 +1736,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/12/4 Ver.1.5.0
+ * スキル習得時に任意のSEを再生する機能を追加。
+ * 背景画像をスクロールさせる機能を追加。
  * 2025/11/28 Ver.1.4.3
  * スキルツリー自由配置プラグイン適用に関する処理の修正。
  * 2025/10/13 Ver.1.4.2
@@ -2846,7 +2889,7 @@
  * 
  * @param BackgroundImage
  * @text 背景画像
- * @desc 背景画像を指定します。
+ * @desc 背景画像を指定します。スクロール指定している場合は無効になります。
  * @type file
  * @dir img/
  * @default
@@ -2854,9 +2897,25 @@
  * 
  * @param BackUiWidth
  * @text 背景サイズモード
- * @desc 背景サイズをUIに合わせる。
+ * @desc 背景サイズをUIに合わせる。スクロール指定している場合は無効になります。
  * @type boolean
  * @default true
+ * @parent BackgroundSetting
+ * 
+ * @param BackScrollX
+ * @desc 背景画像の横方向のスクロール速度。正の値は右にスクロールし、負の値は左にスクロールします。
+ * @text 横方向スクロール速度
+ * @type number
+ * @default 0
+ * @min -9999
+ * @parent BackgroundSetting
+ * 
+ * @param BackScrollY
+ * @desc 背景画像の縦方向のスクロール速度。正の値は下方向にスクロールし、負の値は上方向にスクロールします。
+ * @text 縦方向スクロール速度
+ * @type number
+ * @default 0
+ * @min -9999
  * @parent BackgroundSetting
  * 
  */
@@ -3142,6 +3201,27 @@
  * @desc スキルごとの習得後のスキル項目のアイコン。0でデフォルト
  * @type icon
  * @default 0
+ * @parent LearnSetting
+ * 
+ * @param LearnSe
+ * @text 習得時の個別SE
+ * @desc 習得後にデフォルトのSEではなく、任意のSEを再生します。
+ * @type struct<LearnSE>
+ * @default {"LearnSE":"","volume":"90","pitch":"100","pan":"0"}
+ * @parent LearnSetting
+ * 
+ * @param LearnCommonEvent
+ * @text 習得時のコモンイベント
+ * @desc 習得後に任意のコモンイベントを実行します。(要スキルツリー有償版拡張)
+ * @type common_event
+ * @default 0
+ * @parent LearnSetting
+ * 
+ * @param ImmediateCommonEvent
+ * @text 即時コモンイベント発動
+ * @desc 即時にコモンイベントを発動させます。一部コマンドは使用できません。
+ * @type boolean
+ * @default false
  * @parent LearnSetting
  * 
  * @param IndividualSetting
@@ -3488,6 +3568,9 @@ Imported.NUUN_SkillTree = true;
             this._maxCount = data.MaxCount || 0;
             this._countLearnSkillList = data.CountLearnSkill;
             this._imageId = data.ImageId;
+            this._se = !!data.LearnSe && !!data.LearnSe.LearnSE ? data.LearnSe : params.LearnSESetting;
+            this._commonEvent = data.LearnCommonEvent || 0;
+            this._immediateCommonEvent = data.ImmediateCommonEvent;
             this.setCountLearnSkillData();
             const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
@@ -3718,6 +3801,22 @@ Imported.NUUN_SkillTree = true;
 
         getY() {
             return this._coordinateY;
+        }
+
+        isLearnSe() {
+            return !!this._se && !!this._se.LearnSE;
+        }
+
+        getLearnSe() {
+            return this._se;
+        }
+
+        getCommonEvent() {
+            return this._commonEvent;
+        }
+
+        isImmediateCommonEvent() {
+            return this._immediateCommonEvent;
         }
 
         getIconIndex() {
@@ -4124,9 +4223,12 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.createBackground = function() {
         Scene_MenuBase.prototype.createBackground.call(this);
-        if (params.BackgroundImage) {
-            const bitmap = ImageManager.nuun_LoadPictures(this.getSkillTreeBackgroundImage());
-            const sprite = new Sprite(bitmap);
+        const image = this.getSkillTreeBackgroundImage();
+        if (image) {
+            const sprite = new Sprite_BackgroundSprite(image);
+            sprite.setup(image, params.BackScrollX, params.BackScrollY);
+            const bitmap = ImageManager.nuun_LoadPictures(image);
+            sprite.setBitmap(bitmap);
             this.addChild(sprite);
             bitmap.addLoadListener(function() {
                 this.setBackGround(sprite);
@@ -4135,6 +4237,9 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.setBackGround = function(sprite) {
+        if (sprite.isScroll()) {
+            return;
+        }
         if (params.BackUiWidth) {
             sprite.x = (Graphics.width - (Graphics.boxWidth + 8)) / 2;
             sprite.y = (Graphics.height - (Graphics.boxHeight + 8)) / 2;
@@ -5298,14 +5403,15 @@ Imported.NUUN_SkillTree = true;
         this.refresh();
         this._skillTreeStatusWindow.refresh();
         this._skillTreeCostWindow.refresh();
+        this.skillTreeLearnCommonEvent(data);
     };
 
     Window_SkillTree.prototype.playOkSound = function() {
         if (!this.isProcessLearnOk()) {
             return;
         }
-        const _se = params.LearnSESetting;
-        if (!!_se && !!_se.LearnSE) {
+        const _se = this.playSoundLearnSE();
+        if (!!_se) {
             AudioManager.playSe({"name":_se.LearnSE,"volume":_se.volume,"pitch":_se.pitch,"pan":_se.pan});
         } else {
             Window_Base.prototype.playOkSound.call(this);
@@ -5419,6 +5525,19 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.getSkillTreeLearnedColor = function(learned) {
         return learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
+    };
+
+    Window_SkillTree.prototype.playSoundLearnSE = function() {
+        const data = this.itemAt(this.index());
+        if (!!data.isLearnSe()) {
+            return data.getLearnSe();
+        } else {
+            return null;
+        }
+    };
+
+    Window_SkillTree.prototype.skillTreeLearnCommonEvent = function(data) {
+        
     };
 
 
@@ -6339,6 +6458,65 @@ Imported.NUUN_SkillTree = true;
                 $gameMessage.add("\\." + text);
             }
         }
+    };
+
+
+    function Sprite_BackgroundSprite() {
+        this.initialize(...arguments);
+    }
+
+    Sprite_BackgroundSprite.prototype = Object.create(Sprite.prototype);
+    Sprite_BackgroundSprite.prototype.constructor = Sprite_BackgroundSprite;
+
+    Sprite_BackgroundSprite.prototype.initialize = function() {
+        Sprite.prototype.initialize.call(this);
+        this.initMembers();
+    };
+
+    Sprite_BackgroundSprite.prototype.initMembers = function() {
+        this._backgroundName = null;
+        this._scrollX = 0;
+        this._scrollY = 0;
+    };
+
+    Sprite_BackgroundSprite.prototype.setup = function(name, sx = 0, sy = 0) {
+        if (!!name) {
+            this._backgroundName = name;
+            this._scrollX = sx;
+            this._scrollY = sy;
+        } else {
+            this._backgroundName = null;
+            this._scrollX = 0;
+            this._scrollY = 0;
+        }
+    };
+
+    Sprite_BackgroundSprite.prototype.setBitmap = function(bitmap) {
+        if (this.isScroll()) {
+            this._scrollBackground = new TilingSprite();
+            this._scrollBackground.move(0, 0, Graphics.width, Graphics.height);
+            this.addChild(this._scrollBackground);
+            this._scrollBackground.bitmap = bitmap;
+        } else {
+            this.bitmap = bitmap;
+        }
+    };
+
+    Sprite_BackgroundSprite.prototype.update = function() {
+        Sprite.prototype.update.call(this);
+        this.updateScrollBackground();
+    };
+
+    Sprite_BackgroundSprite.prototype.updateScrollBackground = function() {
+        if (!!this._backgroundName && !!this._scrollBackground && this.isScroll()) {
+            const sprite = this._scrollBackground;
+            sprite.origin.x += this._scrollX;
+            sprite.origin.y += this._scrollY;
+        }
+    };
+
+    Sprite_BackgroundSprite.prototype.isScroll = function() {
+        return this._scrollX !== 0 || this._scrollY !== 0;
     };
 
 })();

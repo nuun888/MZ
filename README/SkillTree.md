@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.4.3
+# Ver.1.5.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -265,6 +265,9 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/12/4 Ver.1.5.0  
+スキル習得時に任意のSEを再生する機能を追加。  
+背景画像をスクロールさせる機能を追加。  
 2025/11/28 Ver.1.4.3  
 スキルツリー自由配置プラグイン適用に関する処理の修正。  
 2025/10/13 Ver.1.4.2  

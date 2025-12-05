@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 12/6/2025 Ver.1.5.1
+ * Fixed an issue where variable costs were not working.
  * 12/4/2025 Ver.1.5.0
  * Added a feature to play a custom sound effect when learning a skill.
  * Added a feature to scroll the background image.
@@ -950,7 +952,7 @@
  * @text Learned icon
  * @desc Specifies the learned icon. (The icon next to the skill is set in "Learning skill icon")
  * @type icon
- * @default 0
+ * @default 89
  * @min 0
  * @parent LearnedIconSetting
  * 
@@ -1481,7 +1483,7 @@
  * @param CostVariables
  * @text Consumed game variable cost
  * @desc Set the game variable to consume.
- * @type variables
+ * @type variable
  * @default 0
  * @parent CostVariablesSetting
  * 
@@ -1653,7 +1655,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.0
+ * @version 1.5.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1736,6 +1738,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/12/4 Ver.1.5.1
+ * 変数コストが機能していなかった問題を修正。
  * 2025/12/4 Ver.1.5.0
  * スキル習得時に任意のSEを再生する機能を追加。
  * 背景画像をスクロールさせる機能を追加。
@@ -2592,7 +2596,7 @@
  * @text 習得済みのアイコン
  * @desc 習得済みのアイコンを指定します。(スキルの横のアイコンは習得後スキルアイコンで設定)
  * @type icon
- * @default 0
+ * @default 89
  * @min 0
  * @parent LearnedIconSetting
  * 
@@ -3143,7 +3147,7 @@
  * @param CostVariables
  * @text 消費ゲーム変数コスト
  * @desc 消費するゲーム変数を設定します
- * @type variables
+ * @type variable
  * @default 0
  * @parent CostVariablesSetting
  * 
@@ -3603,7 +3607,7 @@ Imported.NUUN_SkillTree = true;
         updateCost() {
             this._cost = this.getCode(this._costFormula);
             this._costGold = this.getCode(this._costGoldFormula);
-            this._costVariables = this.getCode(this._costVariablesFormula);
+            //this._costVariables = this.getCode(this._costVariablesFormulat);
             this._consumeItem = this.getCode(this._consumeItemFormula);
             this._consumeWeapon = this.getCode(this._consumeWeaponFormula);
             this._consumeArmor = this.getCode(this._consumeArmorFormula);
@@ -3672,7 +3676,7 @@ Imported.NUUN_SkillTree = true;
                 case 'gold':
                     return this.getCostGold();
                 case 'var':
-                    return this.getVariableNum();
+                    return this.getVariablesNum();
                 case 'level':
                     return this._learningLevel;
             }
@@ -3980,7 +3984,7 @@ Imported.NUUN_SkillTree = true;
             if (this.getCostGold() > 0 && !this.getCanGold($gameParty.gold())) {
                 return false;
             }
-            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables() < this.getVariableNum())) {
+            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) < this.getVariablesNum()) {
                 return false;
             }
             return true;
@@ -4007,7 +4011,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         isPaySkillTreeVariablesCostOk() {
-            return $gameVariables.value(this.getCostVariables() >= this.getVariableNum());
+            return $gameVariables.value(this.getCostVariables()) >= this.getVariablesNum();
         }
 
         paySkillTreeCost() {
@@ -4026,9 +4030,9 @@ Imported.NUUN_SkillTree = true;
             if (this.getCostGold() > 0 && !this.getCanGold($gameParty.gold())) {
                 $gameParty.loseGold(this.getCostGold());
             }
-            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) >= this.getVariableNum()) {
+            if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) >= this.getVariablesNum()) {
                 const value = $gameVariables.value(this.getCostVariables());
-                $gameVariables.setValue(value - this.getVariableNum());
+                $gameVariables.setValue(value - this.getVariablesNum());
             }
         }
 
@@ -5758,7 +5762,7 @@ Imported.NUUN_SkillTree = true;
             case 'gold':
                 return $gameParty.gold();
             case 'var':
-                return data.getCostVariables();
+                return $gameVariables.value(data.getCostVariables());
             case 'level':
                 return this._actor._level;
         }
@@ -6018,7 +6022,7 @@ Imported.NUUN_SkillTree = true;
             learnData.goldCost += data.getCostGold();
         }
         if (data.getCostVariables() > 0) {
-            const i = learnData.varindexOf(data.getCostVariables());
+            const i = learnData.var.indexOf(data.getCostVariables());
             const index = i >= 0 ? i : learnData.var.length;
             learnData.var[index] = data.getCostVariables();
             learnData.varCost[index] = (learnData.varCost[index] || 0) + data.getVariablesNum();

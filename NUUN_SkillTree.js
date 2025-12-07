@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.1
+ * @version 1.5.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -32,7 +32,7 @@
  * The position of the skill you set will be calculated in order from the left side of the window based on the derived skills. If you set the same coordinates as an already displayed skill, 
  * it will be displayed shifted to the right.
  * 
- * (code): You can enter the color code in the text tab.
+ * When specifying a color, for plugin parameters with (code) appended to the parameter name, you can enter a color code in the text field (Text tab).
  * 
  * 
  * Actor's notes
@@ -96,6 +96,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 12/7/2025 Ver.1.5.2
+ * Added a feature that allows you to specify the color of the system text in the cost window.
+ * Added a feature that allows you to specify the color of the cost name in the cost window.
  * 12/6/2025 Ver.1.5.1
  * Fixed an issue where variable costs were not working.
  * 12/4/2025 Ver.1.5.0
@@ -729,6 +732,27 @@
  * @type icon
  * @default 0
  * @min 0
+ * @parent SkillTreeCostSetting
+ * 
+ * @param SkillCostSystemColor
+ * @text System text color (code)
+ * @desc Specifies the color of the system text in the Cost window.
+ * @type color
+ * @default 16
+ * @parent SkillTreeCostSetting
+ * 
+ * @param LearnedNameColor
+ * @text Learned name text color (code)
+ * @desc Specifies the text color of "Learned names" in the cost window.
+ * @type color
+ * @default 16
+ * @parent SkillTreeCostSetting
+ * 
+ * @param SkillCostNameColor
+ * @text Cost name text color (code)
+ * @desc Specifies the color of the cost name text in the Cost window.
+ * @type color
+ * @default 16
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCosTColor
@@ -1655,7 +1679,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.1
+ * @version 1.5.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1674,7 +1698,8 @@
  * 右側にずれて表示されます。
  * 派生スキルの終端スキルは設定しなくても問題ありませんが、座標やコスト等を設定する場合は追加する必要があります。
  * 
- * (code):テキストタブでカラーコードを記入できます。
+ * 
+ * 色指定時、プラグインパラメータ名に(code)が付いたプラグインパラメータは、テキストタブでカラーコードが記入できます。
  * 
  * 
  * アクター、職業のメモ欄
@@ -1738,6 +1763,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/12/7 Ver.1.5.2
+ * コストウィンドウのシステム文字の色を指定できる機能を追加。
+ * コストウィンドウのコスト名の色を指定できる機能を追加。
  * 2025/12/6 Ver.1.5.1
  * 変数コストが機能していなかった問題を修正。
  * 2025/12/4 Ver.1.5.0
@@ -2372,6 +2400,27 @@
  * @type icon
  * @default 0
  * @min 0
+ * @parent SkillTreeCostSetting
+ * 
+ * @param SkillCostSystemColor
+ * @text システム文字色(code)
+ * @desc コストウィンドウのシステム文字の色を指定します。
+ * @type color
+ * @default 16
+ * @parent SkillTreeCostSetting
+ * 
+ * @param LearnedNameColor
+ * @text 習得済み名称文字色(code)
+ * @desc コストウィンドウの習得済み名称の文字の色を指定します。
+ * @type color
+ * @default 16
+ * @parent SkillTreeCostSetting
+ * 
+ * @param SkillCostNameColor
+ * @text コスト名文字色(code)
+ * @desc コストウィンドウのコスト名の文字の色を指定します。
+ * @type color
+ * @default 16
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCosTColor
@@ -5436,11 +5485,10 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.resetTextColor = function() {
+        Window_Base.prototype.resetTextColor.apply(this, arguments);
         if (this._learnedSkillColor) {
             this.changeTextColor(this._learnedSkillColor);
             this._learnedSkillColor = null;
-        } else {
-            Window_Base.prototype.resetTextColor.apply(this, arguments);
         }
     };
 
@@ -5643,10 +5691,10 @@ Imported.NUUN_SkillTree = true;
         const data = this._treeData;
         if (!!data) {
             if (this.isMultipleCount(data)) {
-                this.changeTextColor(ColorManager.systemColor());
+                this.changeTextColor(NuunManager.getColorCode(params.LearnedNameColor));
                 text = params.LearnedName || "習得済み";
             } else {
-                this.resetTextColor();
+                this.changeTextColor(NuunManager.getColorCode(params.SkillCostSystemColor));
                 text = params.SkillCostName.format(data.getSkillName());
             }
         }
@@ -5661,7 +5709,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.drawCost = function(type, data, x, y, width) {
-        this.changeTextColor(ColorManager.systemColor());
+        this.changeTextColor(NuunManager.getColorCode(params.SkillCostNameColor));
         switch (type) {
             case "sp":
                 this.drawSkillCostIconName(params.SkillPointName, params.SkillCostIcon, x, y, width);

@@ -735,8 +735,8 @@
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCostSystemColor
- * @text System text color (code)
- * @desc Specifies the color of the system text in the Cost window.
+ * @text "Skill cost display name" text color (code)
+ * @desc Specifies the text color of the "Skill cost display name" in the cost window.
  * @type color
  * @default 16
  * @parent SkillTreeCostSetting
@@ -2403,8 +2403,8 @@
  * @parent SkillTreeCostSetting
  * 
  * @param SkillCostSystemColor
- * @text システム文字色(code)
- * @desc コストウィンドウのシステム文字の色を指定します。
+ * @text スキルコスト表示名文字色(code)
+ * @desc コストウィンドウのスキルコスト表示名の文字の色を指定します。
  * @type color
  * @default 16
  * @parent SkillTreeCostSetting

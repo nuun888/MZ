@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.2
+ * @version 1.5.3
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 12/13/2025 Ver.1.5.3
+ * Fixed an issue where the branch lines were not displayed in "NUUN_SkillTreeFreeArrangement".
  * 12/7/2025 Ver.1.5.2
  * Added a feature that allows you to specify the color of the system text in the cost window.
  * Added a feature that allows you to specify the color of the cost name in the cost window.
@@ -1763,6 +1765,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/12/13 Ver.1.5.3
+ * NUUN_SkillTreeFreeArrangementでの派生線が表示されない問題を修正。
  * 2025/12/7 Ver.1.5.2
  * コストウィンドウのシステム文字の色を指定できる機能を追加。
  * コストウィンドウのコスト名の色を指定できる機能を追加。
@@ -3617,7 +3621,7 @@ Imported.NUUN_SkillTree = true;
             this._force = data.ForcedPlacement;
             this._spriteIndex = _isSpriteSheet() ? this.getSkillFrame(data) : 0;
             this._derivedLineType = data.LineType === "none" ? params.LineType : (data.LineType || params.LineType);
-            this._derivedLineMode = data.LineMode || [];
+            this._derivedLineMode = Array.isArray(data.LineMode) ? data.LineMode : ([data.LineMode] || []);
             this._maxCount = data.MaxCount || 0;
             this._countLearnSkillList = data.CountLearnSkill;
             this._imageId = data.ImageId;

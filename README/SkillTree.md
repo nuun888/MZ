@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.5.2
+# Ver.1.5.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -268,6 +268,8 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/12/13 Ver.1.5.3  
+NUUN_SkillTreeFreeArrangementでの派生線が表示されない問題を修正。  
 2025/12/7 Ver.1.5.2  
 コストウィンドウのシステム文字の色を指定できる機能を追加。  
 コストウィンドウのコスト名の色を指定できる機能を追加。  

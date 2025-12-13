@@ -1,5 +1,5 @@
 # [敵が仲間を呼ぶスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallingEnemy.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CallingEnemy.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -37,6 +37,10 @@
 戦闘不能のモンスターの座標重座標を有効にする場合、死亡時座標重複有効をtureに設定してください。  
 
 ## 更新履歴
+2025/12/13 Ver.1.1.0  
+呼び出せるモンスターの最大数を設定できる機能を追加。  
+呼び出しスキルが使用できない場合はアクションを実行しない機能を追加。  
+呼び出し成功時のメッセージのデフォルト設定を修正。  
 2024/12/1 Ver.1.0.0  
 初版  
 

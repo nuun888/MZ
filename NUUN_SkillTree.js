@@ -1681,7 +1681,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.2
+ * @version 1.5.3
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。

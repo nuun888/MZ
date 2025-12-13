@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * You can set skills that allow enemies to call allies.
@@ -26,6 +26,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 12/13/2025 Ver.1.1.0
+ * Add a feature to set the maximum number of monsters that can be called.
+ * Add a feature that prevents the action from being executed if the calling skill cannot be used.
+ * Fix the default setting for the message displayed when calling succeeds.
  * 12/1/2024 Ver.1.0.0
  * First edition.
  * 
@@ -33,13 +37,13 @@
  * @desc A list of settings for enemies that call allies.
  * @text Settings List
  * @type struct<CallEnemiesData>[]
- * @default []
+ * @default ["{\"Name\":\"test\",\"CallEnemies\":\"[\\\"{\\\\\\\"CallEnemy\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Cond\\\\\\\":\\\\\\\"\\\\\\\"}\\\"]\",\"Probability\":\"100\",\"MaxCallEnemies\":\"0\",\"MaxNumberIdenticalEnemy\":\"0\",\"AppearCoordinate\":\"[]\",\"AppearanceX\":\"404\",\"AppearanceRangeWidth\":\"800\",\"AppearanceY\":\"436\",\"AppearanceRangeHeight\":\"50\",\"EnableOverlapOnDeath\":\"false\",\"NoAppearXRange\":\"0\",\"NoAppearYRange\":\"0\"}"]
  * 
  * @param SuccessMessage
  * @desc Message on successful call. %1 User %2 Call enemy
  * @text Success message
  * @type string
- * @default %1 has appeared!
+ * @default %2 has appeared!
  * 
  * @param MissSuccessMessage
  * @desc Message when call fails. %1 User
@@ -53,6 +57,11 @@
  * @type number
  * @default 0
  * 
+ * @param ActionExecution
+ * @desc If an ally cannot be called, the action to call the ally will not be performed.
+ * @text No execution when call is not possible
+ * @type boolean
+ * @default false
  * 
  * 
  */
@@ -75,6 +84,12 @@
  * @text Probability of success
  * @type number
  * @default 100
+ * 
+ * @param MaxCallEnemies
+ * @desc Specify the maximum number of companions to call. 0 means unlimited
+ * @text Maximum number of summoned enemise.
+ * @type number
+ * @default 0
  * 
  * @param MaxNumberIdenticalEnemy
  * @desc Specify the maximum number of the same monsters that can be called as allies. 0 means unlimited
@@ -133,7 +148,6 @@
  * @default 0
  * 
  */
-
 /*~struct~EnemiesData:
  *
  * @param CallEnemy
@@ -173,7 +187,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * 敵が仲間を呼ぶスキルを設定できます。
@@ -189,6 +203,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/12/13 Ver.1.1.0
+ * 呼び出せるモンスターの最大数を設定できる機能を追加。
+ * 呼び出しスキルが使用できない場合はアクションを実行しない機能を追加。
+ * 呼び出し成功時のメッセージのデフォルト設定を修正。
  * 2024/12/1 Ver.1.0.0
  * 初版
  * 
@@ -196,13 +214,13 @@
  * @desc 仲間を呼ぶモンスターの設定リスト。
  * @text 設定リスト
  * @type struct<CallEnemiesData>[]
- * @default []
+ * @default ["{\"Name\":\"test\",\"CallEnemies\":\"[\\\"{\\\\\\\"CallEnemy\\\\\\\":\\\\\\\"1\\\\\\\",\\\\\\\"Cond\\\\\\\":\\\\\\\"\\\\\\\"}\\\"]\",\"Probability\":\"100\",\"MaxCallEnemies\":\"0\",\"MaxNumberIdenticalEnemy\":\"0\",\"AppearCoordinate\":\"[]\",\"AppearanceX\":\"404\",\"AppearanceRangeWidth\":\"800\",\"AppearanceY\":\"436\",\"AppearanceRangeHeight\":\"50\",\"EnableOverlapOnDeath\":\"false\",\"NoAppearXRange\":\"0\",\"NoAppearYRange\":\"0\"}"]
  * 
  * @param SuccessMessage
  * @desc 呼び出し成功時のメッセージ。%1 使用者 %2 呼び出したモンスター
  * @text 成功時メッセージ
  * @type string
- * @default %1が出現した！
+ * @default %2が出現した！
  * 
  * @param MissSuccessMessage
  * @desc 呼び出し失敗時のメッセージ。 %1 使用者
@@ -216,7 +234,11 @@
  * @type number
  * @default 0
  * 
- * 
+ * @param ActionExecution
+ * @desc 呼び出しが出来ない場合、呼び出す行動を行わないようにします。
+ * @text 呼び出し不可時実行なし
+ * @type boolean
+ * @default false
  * 
  */
 /*~struct~CallEnemiesData:ja
@@ -238,6 +260,12 @@
  * @text 成功確率
  * @type number
  * @default 100
+ * 
+ * @param MaxCallEnemies
+ * @desc 仲間を呼び出せる最大数を指定します。0で無制限
+ * @text 最大呼び出しモンスター数
+ * @type number
+ * @default 0
  * 
  * @param MaxNumberIdenticalEnemy
  * @desc 仲間を呼びだす同一モンスターの最大数を指定します。0で無制限
@@ -344,6 +372,10 @@ Imported.NUUN_CallingEnemy = true;
         this._appearEnemies = [];
     };
 
+    Game_Temp.prototype.getCallEnemies = function() {
+        return this._callEnemies.length;
+    };
+
     const _Game_Action_applyItemUserEffect = Game_Action.prototype.applyItemUserEffect;
     Game_Action.prototype.applyItemUserEffect = function(target) {
         _Game_Action_applyItemUserEffect.apply(this, arguments);
@@ -355,12 +387,15 @@ Imported.NUUN_CallingEnemy = true;
         if (subject.isActor()) return;
         if (!this.item().meta.CallEnemy) return;
         this.makeSuccess(target);
-        const data = params.CallEnemiesList[_getCallEnemiesData(NuunManager.getMetaCode(this.item(), "CallEnemy"))];
+        const id = _getCallEnemiesData(NuunManager.getMetaCode(this.item(), "CallEnemy"));
+        const data = params.CallEnemiesList[Number(id)];
         if (!data) return;
+        if ((data.MaxCallEnemies || 0) > 0 && $gameTroop.getCallEnemy(id) >= data.MaxCallEnemies) return;
         if (Math.random() < data.Probability / 100) {
             const enemy = this.getCallEnemyLottery(data);
             if (enemy && this.isCallEnemy(data, enemy)) {
                 $gameTemp._callEnemies.push(enemy);
+                $gameTroop.setCallEnemy(Number(id));
                 $gameTroop._enemies.push(enemy);
                 $gameTroop.makeUniqueNames();
                 this.setAppearEnemyMessage(true, enemy);
@@ -415,7 +450,7 @@ Imported.NUUN_CallingEnemy = true;
                 return new Game_Enemy(id, x, y);
             }
         }
-        const subject = this.subject();console.log(subject._screenY)
+        const subject = this.subject();
         let result = false;
         let count = 0;
         while (count < 5) {
@@ -450,6 +485,46 @@ Imported.NUUN_CallingEnemy = true;
         } else {
             $gameTemp._appearEnemies.push(params.MissSuccessMessage.format(this.subject().name()));
         }       
+    };
+
+
+    const _Game_Enemy_isActionValid = Game_Enemy.prototype.isActionValid;
+    Game_Enemy.prototype.isActionValid = function(action) {
+        return _Game_Enemy_isActionValid.apply(this, arguments) && this.isCallingEnemy(action);
+    };
+
+    Game_Enemy.prototype.isCallingEnemy = function(action) {
+        const skill = $dataSkills[action.skillId];
+        if (!skill || !skill.meta.CallEnemy) return true;
+        if (params.ActionExecution) {
+            const id = _getCallEnemiesData(NuunManager.getMetaCode(skill, "CallEnemy"));
+            const data = params.CallEnemiesList[Number(id)];
+            if (!data) return false;
+            if (params.MaxNumberEnemy > 0 && params.MaxNumberEnemy <= $gameTroop.members().length) return false;
+            if ((data.MaxCallEnemies || 0) > 0 && (data.MaxCallEnemies || 0) <= $gameTroop.getCallEnemy(id)) return false;
+        }
+        return true;
+    };
+
+
+    const _Game_Troop_clear = Game_Troop.prototype.clear;
+    Game_Troop.prototype.clear = function() {
+        _Game_Troop_clear.apply(this, arguments);
+        this._callEnemy = [];
+    };
+
+    Game_Troop.prototype.setCallEnemy = function(id) {
+        if (!this._callEnemy[id]) {
+            this._callEnemy[id] = 0;
+        }
+        this._callEnemy[id]++;
+    };
+
+    Game_Troop.prototype.getCallEnemy = function(id) {
+        if (!this._callEnemy[id]) {
+            this._callEnemy[id] = 0;
+        }
+        return this._callEnemy[id];
     };
 
     Game_Troop.prototype.isCallEnemy = function(enemyId, maxEnemyNum) {

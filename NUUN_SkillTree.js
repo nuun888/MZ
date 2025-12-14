@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.3
+ * @version 1.5.4
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 12/14/2025 Ver.1.5.4
+ * Fixed an issue where the value of a variable would not change after consuming it.
+ * Fixed an issue where the value of another variable would change after consuming it.
  * 12/13/2025 Ver.1.5.3
  * Fixed an issue where the branch lines were not displayed in "NUUN_SkillTreeFreeArrangement".
  * 12/7/2025 Ver.1.5.2
@@ -1681,7 +1684,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.3
+ * @version 1.5.4
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1765,6 +1768,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/12/14 Ver.1.5.4
+ * 変数での消費後の数値が変更されない問題を修正。
+ * 変数での消費後の別の変数の数値が変更されてしまう問題を修正。
  * 2025/12/13 Ver.1.5.3
  * NUUN_SkillTreeFreeArrangementでの派生線が表示されない問題を修正。
  * 2025/12/7 Ver.1.5.2
@@ -3564,8 +3570,9 @@ Imported.NUUN_SkillTree = true;
         const list = data.var;
         for (let i = 0; i < list.length; i++) {
             if (!isNaN(list[i])) {
-                const value = $gameVariables.value(list[i]);
-                $gameVariables.setValue(value - data.varCost[i]);
+                const val = list[i];
+                const value = $gameVariables.value(val);
+                $gameVariables.setValue(val, value - data.varCost[i]);
             }
         }
     };
@@ -4084,8 +4091,9 @@ Imported.NUUN_SkillTree = true;
                 $gameParty.loseGold(this.getCostGold());
             }
             if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) >= this.getVariablesNum()) {
-                const value = $gameVariables.value(this.getCostVariables());
-                $gameVariables.setValue(value - this.getVariablesNum());
+                const val = this.getCostVariables();
+                const value = $gameVariables.value(val);
+                $gameVariables.setValue(val, value - this.getVariablesNum());//MISS
             }
         }
 

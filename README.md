@@ -375,6 +375,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md) | [NUUN_UserKey](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js) | 共 | 1.2.8 |
 | ┗ [アナログ移動](https://github.com/nuun888/MZ/blob/master/README/RealMoveLeftStick.md) | [NUUN_realMoveLeftStick](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js) |  | 1.0.3 |
 | [特徴パフォーマンス改善](https://github.com/nuun888/MZ/blob/master/README/TraitsFPSImprovement.md) | [TraitsFPSImprovement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TraitsFPSImprovement.js) |  | 1.0.0 |
+| [装備画面特徴キャッシュ化](https://github.com/nuun888/MZ/blob/master/README/CacheFeature.md) | [CacheFeature](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CacheFeature.js) |  | 1.0.0 |
 |  |  |  |  |
 
 | 不具合修正　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |

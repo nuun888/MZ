@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.4
+ * @version 1.6.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 12/26/2025 Ver.1.6.0
+ * Added a feature that can only be learned when the prerequisite skills for multiple-learn skills have been learned the maximum number of times.
+ * Fixed the display processing of prerequisite skills.
  * 12/14/2025 Ver.1.5.4
  * Fixed an issue where the value of a variable would not change after consuming it.
  * Fixed an issue where the value of another variable would change after consuming it.
@@ -1565,6 +1568,13 @@
  * @default 
  * @parent LearnSetting
  * 
+ * @param MaxCountSkillRequired
+ * @desc Allows skills to be learned even if the prerequisite skill for multi-level learning has not reached its maximum learning level.
+ * @text Enables learning of multi-acquisition skills even when below the maximum learning level
+ * @type boolean
+ * @default false
+ * @parent LearnSetting
+ * 
  * @param LearnSkillIcon
  * @text Learning skill icon
  * @desc Skill item icon after acquisition. (0 is the default)
@@ -1684,7 +1694,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.5.4
+ * @version 1.6.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1768,6 +1778,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2025/12/26 Ver.1.6.0
+ * 複数回習取得スキルの前提スキルで最大習得回数を習得した場合のみ習得できる機能を追加。
+ * 前提スキルの表示処理の修正。
  * 2025/12/14 Ver.1.5.4
  * 変数での消費後の数値が変更されない問題を修正。
  * 変数での消費後の別の変数の数値が変更されてしまう問題を修正。
@@ -3252,6 +3265,13 @@
  * @default 
  * @parent LearnSetting
  * 
+ * @param MaxCountSkillRequired
+ * @desc 習得回数が複数回の前提スキルが最大習得回数未満でもスキルを習得できるようにします。
+ * @text 最大習得回数時派生スキル習得可能
+ * @type boolean
+ * @default false
+ * @parent LearnSetting
+ * 
  * @param LearnCondText
  * @text 習得条件のテキスト
  * @desc コストウィンドウに表示させる習得条件のテキスト。制御文字使用可能
@@ -3590,9 +3610,9 @@ Imported.NUUN_SkillTree = true;
         });
     };
 
-    NuunManager.getSkillTreeReqSkillListId = function(list, skillId) {
-        return this.getSkillTreeReqSkillList(list, skillId).map(t => t.SkillId);
-    };
+    //NuunManager.getSkillTreeReqSkillListId = function(list, skillId) {
+    //    return this.getSkillTreeReqSkillList(list, skillId).map(t => t.SkillId);
+    //};
 
     NuunManager.getSkillTreeData = function(data, type, actor) {
         return new SkillTreeData(data, type, actor);
@@ -3635,6 +3655,7 @@ Imported.NUUN_SkillTree = true;
             this._se = !!data.LearnSe && !!data.LearnSe.LearnSE ? data.LearnSe : params.LearnSESetting;
             this._commonEvent = data.LearnCommonEvent || 0;
             this._immediateCommonEvent = data.ImmediateCommonEvent;
+            this._maxCountSkillRequired = data.MaxCountSkillRequired;
             this.setCountLearnSkillData();
             const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
@@ -3895,6 +3916,14 @@ Imported.NUUN_SkillTree = true;
             return this._isPrerequisiteSkill;
         }
 
+        getMaxCountSkillRequired() {
+            return this._maxCountSkillRequired;
+        }
+
+        isCountSkillRequired() {
+            return this.getMaxCount() > 1 ? !this._maxCountSkillRequired : false;
+        }
+
         getLearn() {
             if (!!this._countLearnSkillData && !!this._countLearnSkillData.LearnCond) {
                 return this._countLearnSkillData.LearnCond || this._learnCond;
@@ -3948,6 +3977,28 @@ Imported.NUUN_SkillTree = true;
                 }
             }
             return null
+        }
+
+        getCountLearnSkill() {
+            if (!Imported.NUUN_SkillTreeLearnEx) return null;
+            const list = NuunManager.getSkillTreeLearnExSetting();
+            if (!list) return null;
+            return list.find(data => this.isLearnExData(data));
+        }
+
+        getDisplayRequiredSkill() {
+            if (!Imported.NUUN_SkillTreeLearnEx) return $dataSkills[this.getLearnSkill()];
+            const data = this.getCountLearnSkill();
+            if (!data || data.LearnDisplayMode === "nowSkill" || !data.SkillLearnExList) return $dataSkills[this.getLearnSkill()];
+            let maxCount = 0;
+            let skillId = 0;
+            for (const d of data.SkillLearnExList) {
+                if (d.Count > maxCount) {
+                    maxCount = d.Count;
+                    skillId = d.LearnSkillId;
+                }
+            }
+            return skillId > 0 ? $dataSkills[skillId] : $dataSkills[this.getLearnSkill()];
         }
 
         isLearnExData(data) {
@@ -6446,9 +6497,17 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isSkillTreeReqSkill = function(list, skillId) {
-        const reqList = NuunManager.getSkillTreeReqSkillListId(list, skillId);
+        const reqList = NuunManager.getSkillTreeReqSkillList(list, skillId);
         if (reqList.length === 0) return true;
-        return reqList.every(id => this.isSkillTreeLearned(id));
+        return reqList.every(data => this.isSkillTreeLearned(data.SkillId) && this.isCountSkillRequired(data));
+    };
+
+    Game_Actor.prototype.isCountSkillRequired = function(data) {
+        if ((data.MaxCount || 1) > 1) {
+            return data.MaxCountSkillRequired ? true : (this.getSkillTreeCount([data.SkillId]) >= (data.MaxCount || 1));
+        } else {
+            return true;
+        }
     };
 
     Game_Actor.prototype.benchMembersSkillPoint = function() {

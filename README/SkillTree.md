@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.5.4
+# Ver.1.6.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -279,6 +279,9 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2025/12/26 Ver.1.6.0  
+複数回習取得スキルの前提スキルで最大習得回数を習得した場合のみ習得できる機能を追加。  
+前提スキルの表示処理の修正。  
 2025/12/14 Ver.1.5.4  
 変数での消費後の数値が変更されない問題を修正。  
 変数での消費後の別の変数の数値が変更されてしまう問題を修正。  

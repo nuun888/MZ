@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Passive skill
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * 
  * @help
@@ -85,6 +85,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/17/2026 Ver.1.6.4
+ * Fixed an issue where HP and MP conditions were not referenced correctly.
  * 8/23/2025 Ver.1.6.3
  * Fixed an issue where some passive skills were not being applied in the differential parameters on the equipment screen.
  * 8/17/2025 Ver.1.6.2
@@ -303,7 +305,7 @@
  * @target MZ
  * @plugindesc パッシブスキル
  * @author NUUN
- * @version 1.6.3
+ * @version 1.6.4
  * @base NUUN_Base
  * 
  * @help
@@ -368,6 +370,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/1/17 Ver.1.6.4
+ * HP、MPの条件が正常に参照されない問題を修正。
  * 2025/8/23 Ver.1.6.3
  * 装備画面の差分パラメータで一部パッシブスキルが適用されない問題を修正。
  * 2025/8/17 Ver.1.6.2
@@ -788,6 +792,7 @@ Imported.NUUN_PassiveSkill = true;
         if (!list) {
             return true;
         }
+        this.resetRassiveParam();
         switch (list.ParamConditions) {
         case 'HP':
             if (!this._pmhp) {

@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.1.4
+ * @version 2.1.5
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/17/2026 Ver.2.1.5
+ * Fixed an issue where an error would occur when changing team members during battle when installing the new free version of "NUUN_SupportActor".
  * 5/4/2025 Ver.2.1.4
  * Fixed "NUUN_SaveMembers" to be able to be executed during battle.
  * 4/23/2025 Ver.2.1.3
@@ -766,7 +768,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.1.4
+ * @version 2.1.5
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -778,6 +780,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/1/17 Ver.2.1.5
+ * 無償版新サポートアクタープラグインを導入時に、戦闘中にメンバー変更を行うとエラーが出る問題を修正。
  * 2025/5/4 Ver.2.1.4
  * NUUN_SaveMembersを戦闘中に実行できるように修正。
  * 2025/4/23 Ver.2.1.3
@@ -1602,7 +1606,7 @@ Imported.NUUN_SceneBattleFormation = true;
 
     Game_Party.prototype.formationMakeActions = function() {
         if ($gameTemp.formationRefresh) {
-            if (Imported.NUUN_SupportActor) {
+            if (Imported.NUUN_SupportActor && $gameParty.setWithSupportActorMember) {
                 $gameParty.setWithSupportActorMember();
             }
             for (const member of this.members()) {
@@ -1781,7 +1785,7 @@ Imported.NUUN_SceneBattleFormation = true;
             $gameTemp.formationRefresh = false;
             if (this.isTpb()) {
                 if (this._currentActor) {
-                    if (Imported.NUUN_SupportActor) {
+                    if (Imported.NUUN_SupportActor && $gameParty.setWithSupportActorMember) {
                         $gameParty.setWithSupportActorMember();
                     }
                     const index = $gameParty.battleMembers().indexOf(this._currentActor);
@@ -1792,8 +1796,9 @@ Imported.NUUN_SceneBattleFormation = true;
                     }
                 }
             } else {
-                if (this._currentActor)
-                this._currentActor = null;
+                if (this._currentActor) {
+                    this._currentActor = null;
+                }
             }
         }  
     };

@@ -1,5 +1,5 @@
 # [パーティメンバーの保存、呼び出し](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)
-# Ver.1.0.6   
+# Ver.1.0.7   
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,6 +14,9 @@
 当プラグインのSceneFormation登録画面表示をtrueに設定することでNUUN_SceneFormationからQキー(デフォルト)で開くことが出来ます。  
 
 ## 更新履歴
+2026/1/17 Ver.1.0.7  
+NUUN_SceneBattleFormationを導入していないと、戦闘開始時にエラーが出る問題を修正。  
+NUUN_FeaturesBindでの甲でき出来ないアクターがパーティ内に存在する場合、実行できないように修正。  
 2025/10/19 Ver.1.0.6  
 表示アクター数を1以上に設定した場合に、セーブメンバー画面を表示するとエラーが出る問題を修正。  
 2025/5/23 Ver.1.0.5  

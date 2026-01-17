@@ -8,16 +8,18 @@
  */
 /*:
  * @target MZ
- * @plugindesc Features you can't escape from
+ * @plugindesc Member Exchange or No Escape Features
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * You can set a feature that prevents you from changing members or escaping.
  * 
  * Notes with Features
+ * <FeaturesFixed>
+ * Actors with this characteristic cannot change team members.
  * <FeaturesBind>
  * Actors with this characteristic cannot change team members.
  * If an actor with this characteristic is included in the combat team, they cannot flee.
@@ -27,6 +29,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/17/2026 Ver.1.1.0
+ * Added a setting that prevents members from being replaced.
+ * Fixed an issue that could cause players to be unable to escape.
  * 6/28/2024 Ver.1.0.1
  * The bind effect also applies to enemies.
  * 6/22/2024 Ver.1.0.0
@@ -41,16 +46,18 @@
  */
 /*:ja
  * @target MZ
- * @plugindesc 逃げられない特徴
+ * @plugindesc 交代または逃げられない特徴
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 交代できない及び逃走出来なくなる特徴を設定できます。
  * 
  * 特徴を有するメモ欄
+ * <FeaturesFixed>
+ * この特徴のあるアクターはメンバー変更がすることが出来ません。
  * <FeaturesBind>
  * この特徴のあるアクターはメンバー変更がすることが出来ません。
  * この特徴のあるアクターが戦闘メンバーに含まれている場合、逃走することが出来ません。
@@ -60,6 +67,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/1/17 Ver.1.1.0
+ * 交代のみ出来なくなる特徴の設定を追加。
+ * 逃走できなくなる問題を修正。
  * 2024/6/28 Ver.1.0.1
  * バインドの効果を敵にも適用。
  * 2024/6/22 Ver.1.0.0
@@ -89,9 +99,10 @@ Imported.NUUN_FeaturesBind = true;
 
     const _Game_Battler_escape = Game_Battler.prototype.escape;
     Game_Battler.prototype.escape = function() {
-        if (this.isBind()) {
+        const bind = this.isBind();
+        if (!!bind) {
             if (this.isEnemy()) {
-                this._result.escapeMissedBind = true;
+                this._result.escapeMissedBind = !!bind.meta.FeaturesBind;
             }
             return;
         }
@@ -102,12 +113,12 @@ Imported.NUUN_FeaturesBind = true;
         return !this.isBind();
     };
 
-    Game_Battler.prototype.isBind = function() {
-        return this.isBind();
+    Game_Battler.prototype.isEscapeBind = function() {
+        return this.traitObjects().find(trait => trait.meta.FeaturesBind);
     };
 
     Game_Battler.prototype.isBind = function() {
-        return this.traitObjects().find(trait => trait.meta.FeaturesBind);
+        return this.traitObjects().find(trait => trait.meta.FeaturesBind || trait.meta.FeaturesFixed);
     };
 
     const _Game_Actor_isFormationChangeOk = Game_Actor.prototype.isFormationChangeOk;
@@ -117,7 +128,7 @@ Imported.NUUN_FeaturesBind = true;
 
     Game_Party.prototype.isBind = function() {
         for (const member of this.battleMembers()) {
-            if (member.isNoBind()) {
+            if (member.isEscapeBind()) {
                 return 0.0;
             }
         }

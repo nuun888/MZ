@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.6
+ * @version 1.0.7
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -27,6 +27,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 1/17/2026 Ver.1.0.7
+ * Fixed an issue where an error would occur at the start of battle if "NUUN_SceneBattleFormation" was not installed.
+ * When "NUUN_FeaturesBind" is installed, if there is an actor in the party that cannot be replaced, the replacement will not be possible.
  * 10/19/2025 Ver.1.0.6
  * Fixed an issue where an error would occur when displaying the Save Member screen if "Number of Actors Displayed" was set to 1 or higher.
  * 5/23/2025 Ver.1.0.5
@@ -389,7 +392,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.6
+ * @version 1.0.7
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -406,6 +409,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/1/17 Ver.1.0.7
+ * NUUN_SceneBattleFormationを導入していないと、戦闘開始時にエラーが出る問題を修正。
+ * NUUN_FeaturesBindでの甲でき出来ないアクターがパーティ内に存在する場合、実行できないように修正。
  * 2025/10/19 Ver.1.0.6
  * 表示アクター数を1以上に設定した場合に、セーブメンバー画面を表示するとエラーが出る問題を修正。
  * 2025/5/23 Ver.1.0.5
@@ -876,14 +882,27 @@ Imported.NUUN_SaveMembers = true;
 
     Game_System.prototype.isSavePartyMembersEvery = function(index) {
         const members = this._saveMembers[index];
-        return !!members && members.every(member => $gameParty._actors.includes(member));
+        return !!members && members.every(member => {
+            const actor = $gameActors.actor(member);
+            return $gameParty._actors.includes(member) &&
+            (!!actor.isNoBind ? actor.isNoBind() : true)
+        });
     };
 
     Game_System.prototype.isSavePartyMembersSome = function(index) {
         const members = this._saveMembers[index];
-        return !!members && members.some(member => $gameParty._actors.includes(member));
+        if (!members) return false;
+        let result = false;
+        for (const member of members) {
+            const actor = $gameActors.actor(member);
+            result = $gameParty._actors.includes(member);
+            if ((!!actor.isNoBind ? actor.isNoBind() : false)) {
+                return false;
+            }
+        }
+        return result;
     };
- 
+
 
     const _Scene_Menu_createCommandWindow = Scene_Menu.prototype.createCommandWindow;
     Scene_Menu.prototype.createCommandWindow = function() {
@@ -1173,8 +1192,8 @@ Imported.NUUN_SaveMembers = true;
 
     Scene_Battle.prototype.isSaveMemberActive = function() {
         const f = this._formation;
-        return (f._saveMembersCommandWindow && f._saveMembersCommandWindow.active) ||
-        (f._saveMembersWindow && f._saveMembersWindow.active)
+        return !!f && ((f._saveMembersCommandWindow && f._saveMembersCommandWindow.active) ||
+        (f._saveMembersWindow && f._saveMembersWindow.active));
     };
 
     const _Scene_Battle_needsInputWindowChange = Scene_Battle.prototype.needsInputWindowChange;

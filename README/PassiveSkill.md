@@ -1,5 +1,5 @@
 # [パッシブスキル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
-# Ver.1.6.3
+# Ver.1.6.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PassiveSkill.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -97,6 +97,8 @@ NRP_TraitsPlusへの特徴適用
 DynamicEquipParamへの競合対応は行いません。  
 
 ## 更新履歴
+2026/1/17 Ver.1.6.4  
+HP、MPの条件が正常に参照されない問題を修正。  
 2025/8/23 Ver.1.6.3  
 装備画面の差分パラメータで一部パッシブスキルが適用されない問題を修正。  
 2025/8/17 Ver.1.6.2  

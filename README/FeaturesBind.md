@@ -1,5 +1,5 @@
-# [逃げられない特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FeaturesBind.js)
-# Ver.1.0.1
+# [交代または逃げられない特徴](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FeaturesBind.js)
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FeaturesBind.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -8,12 +8,17 @@
 
 ## 設定
 特徴を有するメモ欄  
+`<FeaturesFixed>`  
+この特徴のあるアクターはメンバー変更がすることが出来ません。  
 `<FeaturesBind>`   
 この特徴のあるアクターはメンバー変更がすることが出来ません。  
 この特徴のあるアクターが戦闘メンバーに含まれている場合、逃走することが出来ません。  
 この特徴がある敵は逃走することが出来ません。  
 
 ## 更新履歴
+2026/1/17 Ver.1.1.0  
+交代のみ出来なくなる特徴の設定を追加。  
+逃走できなくなる問題を修正。  
 2024/6/28 Ver.1.0.1  
 バインドの効果を敵にも適用。  
 2024/6/22 Ver.1.0.0  

@@ -896,7 +896,7 @@ Imported.NUUN_SaveMembers = true;
         for (const member of members) {
             const actor = $gameActors.actor(member);
             result = $gameParty._actors.includes(member);
-            if ((!!actor.isNoBind ? actor.isNoBind() : false)) {
+            if ((!!actor.isNoBind ? actor.isBind() : false)) {
                 return false;
             }
         }
@@ -1372,4 +1372,5 @@ Imported.NUUN_SaveMembers = true;
 
     window.Window_SaveMembers = Window_SaveMembers;
     
+
 })();

@@ -1,5 +1,5 @@
 # [メンバー変更画面(戦闘)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
-# Ver.2.1.4
+# Ver.2.1.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneBattleFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -13,6 +13,8 @@
 ※アクターコマンドの並び替え条件は選択不可時のときは現在、暫定的に不透明に表示する仕様にしてあります。  
 
 ## 更新履歴
+2026/1/17 Ver.2.1.5  
+無償版新サポートアクタープラグインを導入時に、戦闘中にメンバー変更を行うとエラーが出る問題を修正。  
 2025/5/4 Ver.2.1.4  
 NUUN_SaveMembersを戦闘中に実行できるように修正。  
 2025/4/23 Ver.2.1.3  

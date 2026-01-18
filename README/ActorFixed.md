@@ -1,5 +1,5 @@
 # [アクター並び替え固定](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js)
-# Ver.1.2.2
+# Ver.1.2.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorFixed.js)  
 
 アクターの並び替えを固定します。  
@@ -15,6 +15,10 @@
 アクターIDを0に指定している場合は指定できません。  
 
 ## 更新履歴
+2026/1/18 Ver.1.2.4  
+プラグインパラメータを外部プラグインから参照させるための定義を追加。  
+2024/12/15 Ver.1.2.3  
+固定アクター戦闘メンバーへの移動可をONにしている場合、メンバー交代時にエラーが起きる問題を修正。  
 2024/10/22 Ver.1.2.2  
 NUUN_SceneFormationを使用していない場合に、エラーが出る問題を修正。  
 2023/7/24 Ver.1.2.1  

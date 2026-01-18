@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Fixed actor formation
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * Fixes the actor's formation.
@@ -27,7 +27,9 @@
  * Terms of Use
  * This plugin is distributed under the MIT license.
  * 
- * 更新履歴
+ * Log
+ * 1/18/2026 Ver.1.2.4
+ * Added definitions to reference plugin parameters from external plugins.
  * 12/15/2024 Ver.1.2.3
  * Fixed an issue where an error would occur when switching members if movement to fixed actor battle members was turned on.
  * 8/17/2021 Ver.1.0.0
@@ -72,7 +74,7 @@
  * @target MZ
  * @plugindesc アクター並び替え固定
  * @author NUUN
- * @version 1.2.3
+ * @version 1.2.4
  * 
  * @help
  * アクターの並び替えを固定します。
@@ -90,6 +92,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/1/18 Ver.1.2.4
+ * プラグインパラメータを外部プラグインから参照させるための定義を追加。
  * 2024/10/22 Ver.1.2.3
  * 固定アクター戦闘メンバーへの移動可をONにしている場合、メンバー交代時にエラーが起きる問題を修正。
  * 2024/10/22 Ver.1.2.2
@@ -197,6 +201,10 @@ Game_Actor.prototype.setFixedRelease = function() {
 
 Game_Actor.prototype.isFixed = function() {
   return this._fixed || this.actor().meta.FixedActor;
+};
+
+Game_Actor.prototype.isFixedMovable = function() {
+    return ActorFixedMovable;
 };
 
 const _Game_Actor_isFormationChangeOk = Game_Actor.prototype.isFormationChangeOk;

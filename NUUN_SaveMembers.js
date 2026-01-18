@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.7
+ * @version 1.0.8
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -27,6 +27,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 1/18/2026 Ver.1.0.8
+ * Compatible with "NUUN_ActorFixed". If the position of the fixed member does not match the saved party, it will no longer be selectable.
  * 1/17/2026 Ver.1.0.7
  * Fixed an issue where an error would occur at the start of battle if "NUUN_SceneBattleFormation" was not installed.
  * When "NUUN_FeaturesBind" is installed, if there is an actor in the party that cannot be replaced, the replacement will not be possible.
@@ -392,7 +394,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.7
+ * @version 1.0.8
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -409,9 +411,13 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/1/18 Ver.1.0.8
+ * NUUN_ActorFixedの対応。固定メンバーの位置が保存パーティと一致しない場合は、選択できないように修正。
+ * 2026/1/17 Ver.1.0.8
+ * 固定アクターがパーティ内にいる場合の処理を追加。
  * 2026/1/17 Ver.1.0.7
  * NUUN_SceneBattleFormationを導入していないと、戦闘開始時にエラーが出る問題を修正。
- * NUUN_FeaturesBindでの甲でき出来ないアクターがパーティ内に存在する場合、実行できないように修正。
+ * NUUN_FeaturesBindでの交代出来ないアクターがパーティ内に存在する場合、実行できないように修正。
  * 2025/10/19 Ver.1.0.6
  * 表示アクター数を1以上に設定した場合に、セーブメンバー画面を表示するとエラーが出る問題を修正。
  * 2025/5/23 Ver.1.0.5
@@ -882,10 +888,25 @@ Imported.NUUN_SaveMembers = true;
 
     Game_System.prototype.isSavePartyMembersEvery = function(index) {
         const members = this._saveMembers[index];
-        return !!members && members.every(member => {
+        return !!members && members.every((member, i) => {
             const actor = $gameActors.actor(member);
-            return $gameParty._actors.includes(member) &&
-            (!!actor.isNoBind ? actor.isNoBind() : true)
+            const id = $gameParty._actors.indexOf(member);
+            if (id < 0) return false;
+            if ((!!actor.isNoBind ? actor.isBind() : false)) {
+                return false;
+            }
+            if (actor.isSaveMemberFixed()) {
+                if (actor.isFixedMovable()) {
+                    if (i >= $gameParty.maxBattleMembers()) {
+                        return false;
+                    }
+                } else {
+                    if (i !== id) {
+                        return false;
+                    }
+                }
+            }
+            return true;
         });
     };
 
@@ -893,14 +914,31 @@ Imported.NUUN_SaveMembers = true;
         const members = this._saveMembers[index];
         if (!members) return false;
         let result = false;
-        for (const member of members) {
+        for (let i = 0; i < members.length; i++) {
+            const member = members[i];
             const actor = $gameActors.actor(member);
-            result = $gameParty._actors.includes(member);
+            result = $gameParty._actors.indexOf(member);
             if ((!!actor.isNoBind ? actor.isBind() : false)) {
                 return false;
             }
+            if (actor.isSaveMemberFixed()) {
+                if (actor.isFixedMovable()) {
+                    if (i >= $gameParty.maxBattleMembers()) {
+                        return false;
+                    }
+                } else {
+                    if (i !== result) {
+                        return false;
+                    }
+                }
+            }
         }
-        return result;
+        return result >= 0;
+    };
+
+    Game_Actor.prototype.isSaveMemberFixed = function() {
+        if (!Imported.NUUN_ActorFixed) return false;
+        return this.isFixed();
     };
 
 
@@ -1372,5 +1410,4 @@ Imported.NUUN_SaveMembers = true;
 
     window.Window_SaveMembers = Window_SaveMembers;
     
-
 })();

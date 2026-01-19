@@ -1,5 +1,5 @@
 # [メンバー変更画面](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
-# Ver.2.1.11
+# Ver.2.1.12
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SceneFormation.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -31,6 +31,9 @@
 `Window_FormationStatus` アクターステータスウィンドウ  
 
 ## 更新履歴
+2026/1/19 Ver.2.1.12  
+各ウィンドウのスキン画像を透明にする機能を追加。  
+ステータスウィンドウを非表示にする機能を追加。  
 2025/10/19 Ver.2.1.11  
 可変メンバーの初期処理を修正。  
 可変メンバー設定時にフォロワーが表示されない問題を修正。​  

@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.11
+ * @version 2.1.12
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -43,6 +43,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 1/19/2026 Ver.2.1.12
+ * Added the ability to make each window's skin image transparent.
+ * Added the ability to hide the status window.
  * 10/19/2025 Ver.2.1.11
  * Fixed initial processing of "Variable combat members".
  * Fixed an issue where followers were not displayed when "Variable combat members" was set.
@@ -324,6 +327,13 @@
  * @min -9999
  * @parent BattleMemberNameSetting
  * 
+ * @param BattleMemberNameTransparent
+ * @desc Make the battle member name window image transparent.
+ * @text Battle member name window transparency
+ * @type boolean
+ * @default false
+ * @parent BattleMemberNameSetting
+ * 
  * @param MemberNameSetting
  * @text Standby Member Name Window Settings
  * @default ------------------------------
@@ -349,6 +359,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent MemberNameSetting
+ * 
+ * @param MemberNameTransparent
+ * @desc Make the waiting member name window image transparent.
+ * @text Waiting member name window transparency
+ * @type boolean
+ * @default false
  * @parent MemberNameSetting
  * 
  * @param BattleMemberSetting
@@ -387,6 +404,13 @@
  * @min -9999
  * @parent BattleMemberSetting
  * 
+ * @param BattleMemberTransparent
+ * @desc Make the battle member window image transparent.
+ * @text Make battle member window transparent
+ * @type boolean
+ * @default false
+ * @parent BattleMemberSetting
+ * 
  * @param MemberSetting
  * @text Standby member window settings
  * @default ------------------------------
@@ -422,9 +446,23 @@
  * @min -9999
  * @parent MemberSetting
  * 
+ * @param MemberTransparent
+ * @desc Made the standby member window image transparent.
+ * @text Standby member window is now transparent.
+ * @type boolean
+ * @default false
+ * @parent MemberSetting
+ * 
  * @param StatusSetting
  * @text Status Window Settings
  * @default ------------------------------
+ * 
+ * @param ShowStatusWindow
+ * @desc Do not display the status window.
+ * @text Status window hidden
+ * @type boolean
+ * @default false
+ * @parent StatusSetting
  * 
  * @param Status_X
  * @text Status window X coordinate
@@ -456,6 +494,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent StatusSetting
+ * 
+ * @param StatusTransparent
+ * @desc Make status window images transparent.
+ * @text Status window transparency
+ * @type boolean
+ * @default false
  * @parent StatusSetting
  * 
  * @param ContentsSetting
@@ -1097,6 +1142,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/1/19 Ver.2.1.12
+ * 各ウィンドウのスキン画像を透明にする機能を追加。
+ * ステータスウィンドウを非表示にする機能を追加。
  * 2025/10/19 Ver.2.1.11
  * 可変メンバーの初期処理を修正。
  * 可変メンバー設定時にフォロワーが表示されない問題を修正。​
@@ -1378,6 +1426,13 @@
  * @min -9999
  * @parent BattleMemberNameSetting
  * 
+ * @param BattleMemberNameTransparent
+ * @desc 戦闘メンバー名称ウィンドウ画像を透明化。
+ * @text 戦闘メンバー名称ウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent BattleMemberNameSetting
+ * 
  * @param MemberNameSetting
  * @text 待機メンバー名称ウィンドウ設定設定
  * @default ------------------------------
@@ -1403,6 +1458,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent MemberNameSetting
+ * 
+ * @param MemberNameTransparent
+ * @desc 待機メンバー名称ウィンドウ画像を透明化。
+ * @text 待機メンバー名称ウィンドウ透明化
+ * @type boolean
+ * @default false
  * @parent MemberNameSetting
  * 
  * @param BattleMemberSetting
@@ -1441,6 +1503,13 @@
  * @min -9999
  * @parent BattleMemberSetting
  * 
+ * @param BattleMemberTransparent
+ * @desc 戦闘メンバーウィンドウ画像を透明化。
+ * @text 戦闘メンバーウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent BattleMemberSetting
+ * 
  * @param MemberSetting
  * @text 待機メンバーウィンドウ設定
  * @default ------------------------------
@@ -1476,9 +1545,23 @@
  * @min -9999
  * @parent MemberSetting
  * 
+ * @param MemberTransparent
+ * @desc 待機メンバーウィンドウ画像を透明化。
+ * @text 待機メンバーウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent MemberSetting
+ * 
  * @param StatusSetting
  * @text ステータスウィンドウ設定
  * @default ------------------------------
+ * 
+ * @param ShowStatusWindow
+ * @desc ステータスウィンドウを表示しない。
+ * @text ステータスウィンドウ非表示
+ * @type boolean
+ * @default false
+ * @parent StatusSetting
  * 
  * @param Status_X
  * @text ステータスウィンドウX座標
@@ -1510,6 +1593,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent StatusSetting
+ * 
+ * @param StatusTransparent
+ * @desc ステータスウィンドウ画像を透明化。
+ * @text ステータスウィンドウ透明化
+ * @type boolean
+ * @default false
  * @parent StatusSetting
  * 
  * @param ContentsSetting
@@ -2528,6 +2618,12 @@ Imported.NUUN_SceneFormation = true;
             paramList.ActorImg_Y = paramData.ActorImg_Y;
             paramList.BeforeMemberButton_X = paramData.BeforeMemberButton_X;
             paramList.BeforeMemberButton_Y = paramData.BeforeMemberButton_Y;
+            paramList.BattleMemberNameTransparent = paramData.BattleMemberNameTransparent;
+            paramList.MemberNameTransparent = paramData.MemberNameTransparent;
+            paramList.BattleMemberTransparent = paramData.BattleMemberTransparent;
+            paramList.MemberTransparent = paramData.MemberTransparent;
+            paramList.StatusTransparent = paramData.StatusTransparent;
+            paramList.ShowStatusWindow = paramData.ShowStatusWindow;
         }
         
         setParamData() {
@@ -2562,6 +2658,12 @@ Imported.NUUN_SceneFormation = true;
             paramList.ActorsImgList = params.ActorsImgList;
             paramList.BeforeMemberButton_X = params.BeforeMemberButton_X;
             paramList.BeforeMemberButton_Y = params.BeforeMemberButton_Y;
+            paramList.BattleMemberNameTransparent = params.BattleMemberNameTransparent;
+            paramList.MemberNameTransparent = params.MemberNameTransparent;
+            paramList.BattleMemberTransparent = params.BattleMemberTransparent;
+            paramList.MemberTransparent = params.MemberTransparent;
+            paramList.StatusTransparent = params.StatusTransparent;
+            paramList.ShowStatusWindow = params.ShowStatusWindow;
         }
 
         create() {
@@ -2632,6 +2734,9 @@ Imported.NUUN_SceneFormation = true;
             } else {
                 battleMemberWindow.activate();
             }
+            if (paramList.BattleMemberTransparent) {
+                this._battleMemberWindow.opacity = 0;
+            }
         }
         
         createBattleMemberNameWindow() {
@@ -2641,6 +2746,9 @@ Imported.NUUN_SceneFormation = true;
             this._battleMemberNameWindow = battleMemberNameWindow;
             if (this._isBattle) {
                 battleMemberNameWindow.openness = 0;
+            }
+            if (paramList.BattleMemberNameTransparent) {
+                this._battleMemberNameWindow.opacity = 0;
             }
         }
     
@@ -2656,6 +2764,9 @@ Imported.NUUN_SceneFormation = true;
             if (this._isBattle) {
                  memberWindow.openness = 0;
             }
+            if (paramList.MemberTransparent) {
+                this._memberWindow.opacity = 0;
+            }
         }
           
         createMemberNameWindow() {
@@ -2666,9 +2777,13 @@ Imported.NUUN_SceneFormation = true;
             if (this._isBattle) {
                 memberNameWindow.openness = 0;
             }
+            if (paramList.MemberNameTransparent) {
+                this._memberNameWindow.opacity = 0;
+            }
         }
           
         createMemberStatusWindow() {
+            if (paramList.ShowStatusWindow) return;
             const scene = this._scene;
             const rect = this.memberStatusWindowRect();
             const memberStatusWindow = new Window_FormationStatus(rect, this);
@@ -2676,6 +2791,9 @@ Imported.NUUN_SceneFormation = true;
             this._memberStatusWindow = memberStatusWindow;
             if (this._isBattle) {
                 memberStatusWindow.openness = 0;
+            }
+            if (paramList.StatusTransparent) {
+                this._memberStatusWindow.opacity = 0;
             }
         }
 
@@ -2695,6 +2813,7 @@ Imported.NUUN_SceneFormation = true;
             if (this._isBattle) {
                 commandWindow.openness = 0;
             }
+            commandWindow.setWindowOpacity();
             commandWindow.hide();
             commandWindow.deactivate();
         }
@@ -2713,6 +2832,7 @@ Imported.NUUN_SceneFormation = true;
             if (this._isBattle) {
                 saveMembersWindow.openness = 0;
             }
+            saveMembersWindow.setWindowOpacity();
             saveMembersWindow.hide();
         }
 
@@ -2920,7 +3040,9 @@ Imported.NUUN_SceneFormation = true;
             this._saveMembersWindow.show();
             this._saveMembersCommandWindow.activate();
             this._saveMembersCommandWindow.select(0);
-            this._memberStatusWindow.hide();
+            if (!!this._memberStatusWindow) {
+                this._memberStatusWindow.hide();
+            }
         }
 
         onSaveMembersSelectOk() {
@@ -2978,7 +3100,9 @@ Imported.NUUN_SceneFormation = true;
                 this._memberWindow.activate();
                 this._memberWindow.select(0);
             }
-            this._memberStatusWindow.show();
+            if (!!this._memberStatusWindow) {
+                this._memberStatusWindow.show();
+            }
         }
         
         selectOrder(index) {
@@ -3185,12 +3309,14 @@ Imported.NUUN_SceneFormation = true;
             this._memberNameWindow.open();
             this._battleMemberWindow.open();
             this._memberWindow.open();
-            this._memberStatusWindow.open();
             this._battleMemberNameWindow.show();
             this._memberNameWindow.show();
             this._battleMemberWindow.show();
             this._memberWindow.show();
-            this._memberStatusWindow.show();
+            if (!!this._memberStatusWindow) {
+                this._memberStatusWindow.open();
+                this._memberStatusWindow.show();
+            }
             this._battleMemberWindow.refresh();
             this._memberWindow.refresh();
             this._battleMemberWindow.activate();
@@ -3208,7 +3334,9 @@ Imported.NUUN_SceneFormation = true;
             this._memberNameWindow.close();
             this._battleMemberWindow.close();
             this._memberWindow.close();
-            this._memberStatusWindow.close();
+            if (!!this._memberStatusWindow) {
+                this._memberStatusWindow.close();
+            }
             this._battleMemberWindow.deselect();
             this._memberWindow.deselect();
             this._commandWindow.show();

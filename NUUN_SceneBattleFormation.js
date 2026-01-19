@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Screen Formation (battle)
  * @author NUUN
- * @version 2.1.5
+ * @version 2.1.6
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/19/2026 Ver.2.1.6
+ * Added the ability to make each window's skin image transparent.
+ * Added the ability to hide the status window.
  * 1/17/2026 Ver.2.1.5
  * Fixed an issue where an error would occur when changing team members during battle when installing the new free version of "NUUN_SupportActor".
  * 5/4/2025 Ver.2.1.4
@@ -258,6 +261,13 @@
  * @min -9999
  * @parent BattleMemberSetting
  * 
+ * @param BattleMemberTransparent
+ * @desc Make the battle member window image transparent.
+ * @text Make battle member window transparent
+ * @type boolean
+ * @default false
+ * @parent BattleMemberSetting
+ * 
  * @param MemberSetting
  * @text Standby member window settings
  * @default ------------------------------
@@ -294,10 +304,24 @@
  * @min -9999
  * @parent MemberSetting
  * 
+ * @param MemberTransparent
+ * @desc Made the standby member window image transparent.
+ * @text Standby member window is now transparent.
+ * @type boolean
+ * @default false
+ * @parent MemberSetting
+ * 
  * @param StatusSetting
  * @text Status Window Settings
  * @default ------------------------------
  * @parent BattleMemberWindowSetting
+ * 
+ * @param ShowStatusWindow
+ * @desc Do not display the status window.
+ * @text Status window hidden
+ * @type boolean
+ * @default false
+ * @parent StatusSetting
  * 
  * @param Status_X
  * @text Status window X coordinate
@@ -329,6 +353,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent StatusSetting
+ * 
+ * @param StatusTransparent
+ * @desc Make status window images transparent.
+ * @text Status window transparency
+ * @type boolean
+ * @default false
  * @parent StatusSetting
  * 
  * @param ContentsSetting
@@ -768,7 +799,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面(戦闘)
  * @author NUUN
- * @version 2.1.5
+ * @version 2.1.6
  * @base NUUN_SceneFormation
  * @orderAfter NUUN_SceneFormation
  * 
@@ -780,6 +811,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/1/19 Ver.2.1.6
+ * 各ウィンドウのスキン画像を透明にする機能を追加。
+ * ステータスウィンドウを非表示にする機能を追加。
  * 2026/1/17 Ver.2.1.5
  * 無償版新サポートアクタープラグインを導入時に、戦闘中にメンバー変更を行うとエラーが出る問題を修正。
  * 2025/5/4 Ver.2.1.4
@@ -958,6 +992,13 @@
  * @min -9999
  * @parent BattleMemberNameSetting
  * 
+ * @param BattleMemberNameTransparent
+ * @desc 戦闘メンバー名称ウィンドウ画像を透明化。
+ * @text 戦闘メンバー名称ウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent BattleMemberNameSetting
+ * 
  * @param MemberNameSetting
  * @text 待機メンバー名称ウィンドウ設定設定
  * @default ------------------------------
@@ -977,6 +1018,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent MemberNameSetting
+ * 
+ * @param MemberNameTransparent
+ * @desc 待機メンバー名称ウィンドウ画像を透明化。
+ * @text 待機メンバー名称ウィンドウ透明化
+ * @type boolean
+ * @default false
  * @parent MemberNameSetting
  * 
  * @param BattleMemberSetting
@@ -1016,6 +1064,13 @@
  * @min -9999
  * @parent BattleMemberSetting
  * 
+ * @param BattleMemberTransparent
+ * @desc 戦闘メンバーウィンドウ画像を透明化。
+ * @text 戦闘メンバーウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent BattleMemberSetting
+ * 
  * @param MemberSetting
  * @text 待機メンバーウィンドウ設定
  * @default ------------------------------
@@ -1052,10 +1107,24 @@
  * @min -9999
  * @parent MemberSetting
  * 
+ * @param MemberTransparent
+ * @desc 待機メンバーウィンドウ画像を透明化。
+ * @text 待機メンバーウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent MemberSetting
+ * 
  * @param StatusSetting
  * @text ステータスウィンドウ設定
  * @default ------------------------------
  * @parent BattleMemberWindowSetting
+ * 
+ * @param ShowStatusWindow
+ * @desc ステータスウィンドウを表示しない。
+ * @text ステータスウィンドウ非表示
+ * @type boolean
+ * @default false
+ * @parent StatusSetting
  * 
  * @param Status_X
  * @text ステータスウィンドウX座標
@@ -1087,6 +1156,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent StatusSetting
+ * 
+ * @param StatusTransparent
+ * @desc ステータスウィンドウ画像を透明化。
+ * @text ステータスウィンドウ透明化
+ * @type boolean
+ * @default false
  * @parent StatusSetting
  * 
  * @param ContentsSetting
@@ -1732,7 +1808,9 @@ Imported.NUUN_SceneBattleFormation = true;
         this._formation._memberNameWindow.hide();
         this._formation._battleMemberWindow.hide();
         this._formation._memberWindow.hide();
-        this._formation._memberStatusWindow.hide();
+        if (!!this._formation._memberStatusWindow) {
+            this._formation._memberStatusWindow.hide();
+        }
     };
 
     Game_Party.prototype.useFormationActor = function() {

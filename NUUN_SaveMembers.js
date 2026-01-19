@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.8
+ * @version 1.0.9
  * 
  * @help
  * Implement a function to register and call parties in a specified party order.
@@ -27,6 +27,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 1/19/2026 Ver.1.0.9
+ * Added the ability to make each window's skin image transparent.
  * 1/18/2026 Ver.1.0.8
  * Compatible with "NUUN_ActorFixed". If the position of the fixed member does not match the saved party, it will no longer be selectable.
  * 1/17/2026 Ver.1.0.7
@@ -212,6 +214,13 @@
  * @default 0
  * @parent CommandWindowSetting
  * 
+ * @param SavePartyCommandTransparent
+ * @desc Make command window image transparent.
+ * @text Command window transparency
+ * @type boolean
+ * @default false
+ * @parent CommandWindowSetting
+ * 
  * @param SaveMembersWindowSetting
  * @text Registration Party Window Settings
  * @default ------------------------------
@@ -238,6 +247,13 @@
  * @type number
  * @default 4
  * @min 1
+ * @parent SaveMembersWindowSetting
+ * 
+ * @param SaveMembersTransparent
+ * @desc Made the registration party window image transparent.
+ * @text Make the registration party window transparent
+ * @type boolean
+ * @default false
  * @parent SaveMembersWindowSetting
  * 
  * @param SceneFormationSetting
@@ -313,6 +329,13 @@
  * @default 0
  * @parent SceneFormationCommandWindowSetting
  * 
+ * @param BattleCommandTransparent
+ * @desc Make the command window image transparent during battle.  
+ * @text Command window transparency during battle
+ * @type boolean
+ * @default false
+ * @parent SceneFormationCommandWindowSetting
+ * 
  * @param SceneFormationSaveMembersWindowSetting
  * @text In-battle registration party window settings
  * @default ------------------------------
@@ -332,6 +355,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent SceneFormationSaveMembersWindowSetting
+ * 
+ * @param BattleSaveMembersTransparent
+ * @desc Make the registered party window image transparent during battle."
+ * @text Transparency of registered party window during battle
+ * @type boolean
+ * @default false
  * @parent SceneFormationSaveMembersWindowSetting
  * 
  * @param SceneFormationSaveMembersButtonSetting
@@ -394,7 +424,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.8
+ * @version 1.0.9
  * 
  * @help
  * 指定のパーティの並び順をパーティを登録、呼び出しする機能を実装します。
@@ -411,6 +441,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/1/19 Ver.1.0.9
+ * 各ウィンドウのスキン画像を透明にする機能を追加。
  * 2026/1/18 Ver.1.0.8
  * NUUN_ActorFixedの対応。固定メンバーの位置が保存パーティと一致しない場合は、選択できないように修正。
  * 2026/1/17 Ver.1.0.8
@@ -599,6 +631,13 @@
  * @default 0
  * @parent CommandWindowSetting
  * 
+ * @param SavePartyCommandTransparent
+ * @desc コマンドウィンドウ画像を透明化。
+ * @text コマンドウィンドウ透明化
+ * @type boolean
+ * @default false
+ * @parent CommandWindowSetting
+ * 
  * @param SaveMembersWindowSetting
  * @text 登録パーティウィンドウ設定
  * @default ------------------------------
@@ -625,6 +664,13 @@
  * @type number
  * @default 4
  * @min 1
+ * @parent SaveMembersWindowSetting
+ * 
+ * @param SaveMembersTransparent
+ * @desc 登録パーティウィンドウ画像を透明化。
+ * @text 登録パーティウィンドウ透明化
+ * @type boolean
+ * @default false
  * @parent SaveMembersWindowSetting
  * 
  * @param SceneFormationSetting
@@ -700,6 +746,13 @@
  * @default 0
  * @parent SceneFormationCommandWindowSetting
  * 
+ * @param BattleCommandTransparent
+ * @desc 戦闘中コマンド画像を透明化。
+ * @text 戦闘中コマンド透明化
+ * @type boolean
+ * @default false
+ * @parent SceneFormationCommandWindowSetting
+ * 
  * @param SceneFormationSaveMembersWindowSetting
  * @text 戦闘中登録パーティウィンドウ設定
  * @default ------------------------------
@@ -719,6 +772,13 @@
  * @type number
  * @default 0
  * @min -9999
+ * @parent SceneFormationSaveMembersWindowSetting
+ * 
+ * @param BattleSaveMembersTransparent
+ * @desc 戦闘中登録パーティウィンドウ画像を透明化。
+ * @text 戦闘中登録パーティウィンドウ透明化
+ * @type boolean
+ * @default false
  * @parent SceneFormationSaveMembersWindowSetting
  * 
  * @param SceneFormationSaveMembersButtonSetting
@@ -1028,6 +1088,9 @@ Imported.NUUN_SaveMembers = true;
         commandWindow.setHandler("cancel", this.popScene.bind(this));
         this.addWindow(commandWindow);
         this._commandWindow = commandWindow;
+        if (params.SavePartyCommandTransparent) {
+            commandWindow.opacity = 0;
+        }
     };
 
     Scene_SavePartyMembers.prototype.commandWindowRect = function() {
@@ -1045,6 +1108,9 @@ Imported.NUUN_SaveMembers = true;
         this._saveMembersWindow.setHandler("cancel", this.onSaveMembersCancel.bind(this));
         this._saveMembersWindow.setHandler(NuunManager.getSaveMembersEraseSymbol(), this.onSaveMembersEraseOk.bind(this));
         this.addWindow(this._saveMembersWindow);
+        if (params.SaveMembersTransparent) {
+            this._saveMembersWindow.opacity = 0;
+        }
     };
 
     Scene_SavePartyMembers.prototype.commandSelectMembers = function() {
@@ -1287,6 +1353,12 @@ Imported.NUUN_SaveMembers = true;
             Window_Base.prototype.playOkSound.apply(this, arguments);
         }
     };
+
+    Window_SavePartyCommand.prototype.setWindowOpacity = function() {
+        if (params.BattleCommandTransparent) {
+            this.opacity = 0;
+        }
+    };
     
     Window_SavePartyCommand.prototype.selectLast = function() {
         this.selectSymbol(Window_SavePartyCommand._lastCommandSymbol);
@@ -1406,6 +1478,12 @@ Imported.NUUN_SaveMembers = true;
         rect.height = Math.min(rect.height, params.MemberHeight);
         rect.y += this.rowSpacing();
         return rect;
+    };
+
+    Window_SaveMembers.prototype.setWindowOpacity = function() {
+        if (params.BattleSaveMembersTransparent) {
+            this.opacity = 0;
+        }
     };
 
     window.Window_SaveMembers = Window_SaveMembers;

@@ -1,5 +1,5 @@
 # [パーティメンバーの保存、呼び出し](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)
-# Ver.1.0.8   
+# Ver.1.0.9   
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SaveMembers.js)  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -14,6 +14,8 @@
 当プラグインのSceneFormation登録画面表示をtrueに設定することでNUUN_SceneFormationからQキー(デフォルト)で開くことが出来ます。  
 
 ## 更新履歴
+2026/1/19 Ver.1.0.9  
+各ウィンドウのスキン画像を透明にする機能を追加。  
 2026/1/18 Ver.1.0.8  
 NUUN_ActorFixedの対応。固定メンバーの位置が保存パーティと一致しない場合は、選択できないように修正。  
 2026/1/17 Ver.1.0.7  

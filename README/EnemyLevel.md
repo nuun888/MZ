@@ -1,5 +1,5 @@
 # [敵レベル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js)
-# Ver.1.1.2
+# Ver.1.1.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -63,6 +63,8 @@
 他作者様のモンスター図鑑プラグインへの競合サポートは行いませんのでご了承ください。  
 
 ## 更新履歴
+2025/1/28 Ver 1.1.3  
+ステータスのパラメータを整数になるように修正。  
 2025/4/28 Ver 1.1.2  
 指定のレベルで開始させるとエラーが出る問題を修正。  
 NUUN_EnemyBookを導入している場合、エラーが出る問題を修正。  

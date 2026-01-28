@@ -2,6 +2,8 @@
  * NUUN_EnemyLevel.js
  * 
  * Copyright (C) 2024 NUUN
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
  */ 
@@ -11,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * Sets the enemy's level.
@@ -44,14 +46,11 @@
  * Enemy memo field > List data enemy level variable level > Overall enemy level variable level > Map level
  * 
  * Terms of Use
- * Credit: Optional
- * Commercial use: Possible
- * Adult content: Possible
- * Modifications: Possible
- * Redistribution: Possible
- * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
+ * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/28/2025 Ver.1.1.3
+ * Fixed status parameters to be integers.
  * 4/28/2025 Ver.1.1.2
  * Fixed an issue where an error would occur when starting at a specified level.
  * Fixed an issue where an error would occur if "NUUN_EnemyBook" was installed.
@@ -319,7 +318,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * 敵にレベルを設定します。
@@ -352,14 +351,11 @@
  * 敵のメモ欄 > リストデータの敵レベル変数のレベル > 全体の敵レベル変数のレベル > マップで設定したレベル
  * 
  * 利用規約
- * クレジット表記：任意
- * 商業利用：可能
- * 成人向け：可能
- * 改変：可能
- * 再配布：可能
- * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
+ * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2025/1/28 Ver 1.1.3
+ * ステータスのパラメータを整数になるように修正。
  * 2025/4/28 Ver 1.1.2
  * 指定のレベルで開始させるとエラーが出る問題を修正。
  * NUUN_EnemyBookを導入している場合、エラーが出る問題を修正。
@@ -661,6 +657,7 @@ Imported.NUUN_EnemyLevel = true;
     Game_Enemy.prototype.setupLevel = function(enemyId) {
         if (this._levelData === 0) return;
         const data = params.EnemyLevelData[this._levelData - 1];
+        if (!data) return;
         const enemy = $dataEnemies[enemyId];
         let level = 1;
         if (enemy && enemy.meta.Level) {
@@ -688,24 +685,23 @@ Imported.NUUN_EnemyLevel = true;
     Game_Enemy.prototype.getParamEnemyLevel = function(base, paramId) {
         if (this._levelData === 0) return 0;
         const data = params.EnemyLevelData[this._levelData - 1];
-        
         switch (paramId) {
             case 0:
-                return (base * (data.HpIncreaseRate / 100) - base) * (this._level - 1) + data.FixedHpIncrease * (this._level - 1);
+                return (Math.floor(base * (data.HpIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedHpIncrease * (this._level - 1);
             case 1:
-                return (base * (data.MpIncreaseRate / 100) - base) * (this._level - 1) + data.FixedMpIncrease * (this._level - 1);
+                return (Math.floor(base * (data.MpIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMpIncrease * (this._level - 1);
             case 2:
-                return (base * (data.AtkIncreaseRate / 100) - base) * (this._level - 1) + data.FixedAtkIncrease * (this._level - 1);
+                return (Math.floor(base * (data.AtkIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedAtkIncrease * (this._level - 1);
             case 3:
-                return (base * (data.DefIncreaseRate / 100) - base) * (this._level - 1) + data.FixedDefIncrease * (this._level - 1);
+                return (Math.floor(base * (data.DefIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedDefIncrease * (this._level - 1);
             case 4:
-                return (base * (data.MatIncreaseRate / 100) - base) * (this._level - 1) + data.FixedMdfIncrease * (this._level - 1);
+                return (Math.floor(base * (data.MatIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMdfIncrease * (this._level - 1);
             case 5:
-                return (base * (data.MdfIncreaseRate / 100) - base) * (this._level - 1) + data.FixedMatIncrease * (this._level - 1);
+                return (Math.floor(base * (data.MdfIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMatIncrease * (this._level - 1);
             case 6:
-                return (base * (data.AgiIncreaseRate / 100) - base) * (this._level - 1) + data.FixedAgiIncrease * (this._level - 1);
+                return (Math.floor(base * (data.AgiIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedAgiIncrease * (this._level - 1);
             case 7:
-                return (base * (data.LukIncreaseRate / 100) - base) * (this._level - 1) + data.FixedLukIncrease * (this._level - 1);
+                return (Math.floor(base * (data.LukIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedLukIncrease * (this._level - 1);
             default:
                 break;
         }
@@ -743,13 +739,13 @@ Imported.NUUN_EnemyLevel = true;
     Game_Enemy.prototype.getExpEnemyLevel = function(base) {
         if (this._levelData === 0) return 0;
         const data = params.EnemyLevelData[this._levelData - 1];
-        return (base * (data.ExpIncreaseRate / 100) - base) * (this._level - 1) + data.FixedExpIncrease * (this._level - 1);
+        return (Math.floor(base * (data.ExpIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedExpIncrease * (this._level - 1);
     };
 
     Game_Enemy.prototype.getGoldEnemyLevel = function(base) {
         if (this._levelData === 0) return 0;
         const data = params.EnemyLevelData[this._levelData - 1];
-        return (base * (data.GoldIncreaseRate / 100) - base) * (this._level - 1) + data.FixedGoldIncrease * (this._level - 1);
+        return (Math.floor(base * (data.GoldIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedGoldIncrease * (this._level - 1);
     };
 
     Game_Enemy.prototype.getIndividualEnemyLevel = function(enemy) {

@@ -1,5 +1,5 @@
 # [サポートアクター](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
-# Ver.2.0.6
+# Ver.2.0.7
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SupportActor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.7.10以降  
@@ -15,7 +15,7 @@
 
 
 ## 設定方法
-アクターのメモ欄  
+アクター、職業のメモ欄  
 `<SupportActor>`　このタグがあるアクターはサポートアクターとなります。
   
  サポートアクターのサイドビューは通常アクターの背後に表示されます。
@@ -27,6 +27,8 @@
  MV用のプラグインとの競合対応は行いません。  
   
 ## 更新履歴
+2026/1/29 Ver.2.0.7  
+サポートアクターを職業から設定できるように修正。  
 2024/12/24 Ver.2.0.6  
 サイドビュー時のサポートアクターとアクターとの重なり表示を修正。  
 2024/12/21 Ver.2.0.5  

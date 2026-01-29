@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Supported Actor
  * @author NUUN
- * @version 2.0.6
+ * @version 2.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 1/29/2024 Ver.2.0.7
+ * Fixed so that support actors can be set from classes.
  * 12/24/2024 Ver.2.0.6
  * Fixed the overlapping display between support actors and actors in side view.
  * 12/21/2024 Ver.2.0.5
@@ -118,7 +120,7 @@
  * @target MZ
  * @plugindesc サポートアクタープラグイン
  * @author NUUN
- * @version 2.0.6
+ * @version 2.0.7
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -135,6 +137,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/1/29 Ver.2.0.7
+ * サポートアクターを職業から設定できるように修正。
  * 2024/12/24 Ver.2.0.6
  * サイドビュー時のサポートアクターとアクターとの重なり表示を修正。
  * 2024/12/21 Ver.2.0.5
@@ -353,7 +357,7 @@ Imported.NUUN_SupportActor = true;
     };
   
     Game_Actor.prototype.isSupportActor = function() {
-        return !!this.actor().meta.SupportActor;
+        return !!this.actor().meta.SupportActor || !!this.currentClass().meta.SupportActor;
     };
 
     Game_Actor.prototype.getSupportActor = function() {

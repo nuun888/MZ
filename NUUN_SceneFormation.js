@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.12
+ * @version 2.1.13
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -43,6 +43,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 2/7/2026 Ver.2.1.13
+ * Fixed an issue where players could not leave the party when moving an actor to the bench with variable members.
  * 1/19/2026 Ver.2.1.12
  * Added the ability to make each window's skin image transparent.
  * Added the ability to hide the status window.
@@ -1108,7 +1110,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.11
+ * @version 2.1.13
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1142,6 +1144,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/2/7 Ver.2.1.13
+ * 可変メンバーでアクターを控えに移動した際に、パーティから離脱できなくなる問題を修正。
  * 2026/1/19 Ver.2.1.12
  * 各ウィンドウのスキン画像を透明にする機能を追加。
  * ステータスウィンドウを非表示にする機能を追加。
@@ -2353,7 +2357,7 @@ Imported.NUUN_SceneFormation = true;
 
     Game_Party.prototype.withdrawalOrder = function(index) {
         const withdrawalActor = this._actors.splice(index, 1);
-        Array.prototype.push.apply(this._actors, [withdrawalActor]);
+        Array.prototype.push.apply(this._actors, withdrawalActor);
     };
 
     Game_Party.prototype.entryOrder = function(index) {

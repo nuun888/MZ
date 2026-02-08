@@ -674,12 +674,7 @@ Imported.NUUN_MenuParamListBase = true;
             if (actor && this.nuun_IsContents(data, actor)) {
                 this.setTepmData(data, this._exParams);
                 const method = 'nuun_DrawContents' + data.DateSelect;
-                try {
-                    this[method](data, x, y, width, actor);
-                } catch (error) {
-                    const log = ($gameSystem.isJapanese() ? "無効なIDが設定されています。" : "An invalid ID has been configured.") + data.DateSelect;
-                    throw ["DataError", log];
-                }
+                this[method](data, x, y, width, actor);
             }
         }
     

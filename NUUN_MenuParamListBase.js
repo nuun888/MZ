@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.12
+ * @version 1.1.13
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/11/2026 Ver.1.1.13
+ * Fixed an issue where dynamic number fonts were not being applied.
+ * Fixed an issue where an error occurred when used in conjunction with "VanguardAndRearguard".
  * 8/30/2025 Ver.1.1.12
  * Fixed an issue where an error occurred when setting "Original parameter".
  * 8/15/2025 Ver.1.1.11
@@ -145,7 +148,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.12
+ * @version 1.1.13
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -156,6 +159,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/2/11 Ver.1.1.13
+ * 動的数値のフォントが適用されない問題を修正。
+ * VanguardAndRearguardとの併用時にエラーが出る問題を修正。
  * 2025/8/30 Ver.1.1.12
  * 独自パラメータを設定した場合に、エラーが出る問題を修正。
  * 2025/8/15 Ver.1.1.11
@@ -1529,9 +1535,6 @@ Imported.NUUN_MenuParamListBase = true;
             if (this.isActorPictureEXApp()) {
                 this._window.actorPictureEXDrawFace(actor, x + 1, y + 1, width, height);
             } else {
-                if (actor.isRearguard && actor.isRearguard()) {
-                    this._window += this._window.shiftWidth;
-                }
                 this._window.drawActorFace(actor, x + 1, y + 1, width, height);
             }
             if (opacityMode) {
@@ -2393,7 +2396,7 @@ Imported.NUUN_MenuParamListBase = true;
     };
     
     Sprite_DynamicParam.prototype.valueFontFace = function() {
-        return this._paramData.alueFontFace ? this._paramData.alueFontFace : $gameSystem.mainFontFace();
+        return this._paramData.ValueFontFace ? this._paramData.ValueFontFace : $gameSystem.mainFontFace();
     };
 
     window.Sprite_DynamicParam = Sprite_DynamicParam;

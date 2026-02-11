@@ -1,5 +1,5 @@
 # [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)
-# Ver.1.1.12
+# Ver.1.1.13
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -27,6 +27,9 @@ Y座標:Y表示列位置からの相対座標。
 記述欄、個別指定画像タグ名:記述欄、画像（個別指定画像）に紐づけするタグ名  
 
 ## 更新履歴
+2026/2/11 Ver.1.1.13  
+動的数値のフォントが適用されない問題を修正。  
+VanguardAndRearguardとの併用時にエラーが出る問題を修正。  
 2025/8/30 Ver.1.1.12  
 独自パラメータを設定した場合に、エラーが出る問題を修正。  
 2025/8/15 Ver.1.1.11  

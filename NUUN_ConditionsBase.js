@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc 条件付きベース
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -260,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/2/24 Ver.1.4.1
+ * 装備のパーティメンバー条件を指定時にエラーが出る問題を修正。
  * 2025/8/15 Ver.1.4.0
  * 指定の数値、指定のID、文字列を配列で指定できるように修正。
  * 2024/6/27 Ver.1.3.3
@@ -1180,7 +1182,7 @@ function equipTriggerConditions(data, target, mode) {
     if (mode === 'Party') {
       return unit.members().some(member => equipArmor(getIdList(data), member));
     } else {
-      return equipArmorn(getIdList(data), target);
+      return equipArmor(getIdList(data), target);
     }
   } else if (data.EquipConditionsType === 'WeaponType') {
     if (mode === 'Party') {

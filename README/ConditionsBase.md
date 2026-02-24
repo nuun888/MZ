@@ -1,5 +1,5 @@
 # [条件付きベース](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionsBase.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -253,6 +253,8 @@
 [エンカウント条件](https://github.com/nuun888/MZ/blob/master/README/EncounterCondition.md)  
 
 ## 更新履歴
+2026/2/24 Ver.1.4.1  
+装備のパーティメンバー条件を指定時にエラーが出る問題を修正。  
 2025/8/15 Ver.1.4.0  
 指定の数値、指定のID、文字列を配列で指定できるように修正。  
 2024/6/27 Ver.1.3.3  

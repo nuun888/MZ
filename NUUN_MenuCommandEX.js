@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * Any background image or command image can be displayed on the menu command.
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/24/2026 Ver.1.2.3
+ * Fixed the problem where command images shift and update incorrectly when scrolling after a specific operation.
  * 5/11/2025 Ver.1.2.2
  * Fixed an issue where the command would not move if the number of movement frames was set higher than the destination coordinates.
  * 8/19/2024 Ver.1.2.1
@@ -244,7 +246,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @url https://github.com/nuun888/MZ/blob/master/README/MenuCommandEX.md
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * メニューコマンドに任意の背景画像、コマンド画像を表示することができます。
@@ -258,6 +260,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/2/24 Ver.1.2.3
+ * 特定の処理後、スクロールを行うとコマンド画像の表示がずれて更新される問題を修正。
  * 2025/5/11 Ver.1.2.2
  * 移動フレーム数を移動先座標以上に設定するとコマンドが移動しない問題を修正。
  * 2024/8/19 Ver.1.2.1
@@ -717,14 +721,12 @@ Imported.NUUN_MenuCommandEX = true;
     };
 
     Sprite_MenuCommand.prototype.setPosition = function(x, y, symbol, lastSymbol) {
-        if (symbol !== lastSymbol) {
-            x += (this._data ? this._data.ContentsImgX : 0) || 0;
-            y += (this._data ? this._data.ContentsImgY : 0) || 0;
-            this._homeX = x;
-            this._homeY = y;
-            this.x = x;
-            this.y = y;
-        }
+        x += (this._data ? this._data.ContentsImgX : 0) || 0;
+        y += (this._data ? this._data.ContentsImgY : 0) || 0;
+        this._homeX = x;
+        this._homeY = y;
+        this.x = x;
+        this.y = y;
     };
 
     Sprite_MenuCommand.prototype.moveCommand = function() {

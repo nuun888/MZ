@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 2/24/2026 Ver.1.6.1
+ * Added a setting to hide the display of earned skill points at the end of battle.
  * 12/26/2025 Ver.1.6.0
  * Added a feature that can only be learned when the prerequisite skills for multiple-learn skills have been learned the maximum number of times.
  * Fixed the display processing of prerequisite skills.
@@ -448,6 +450,13 @@
  * @desc Specify the switch to display in the menu command. 
  * @type switches
  * @default 0
+ * @parent BasicSetting
+ * 
+ * @param DisplayShowResultMessage
+ * @desc Messages are hidden when the battle ends.
+ * @text The message about skill points obtained at the end of battle will not be displayed.
+ * @type boolean
+ * @default false
  * @parent BasicSetting
  * 
  * @param DisplayResultMessage
@@ -1694,7 +1703,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.0
+ * @version 1.6.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1778,6 +1787,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/2/24 Ver.1.6.1
+ * 戦闘終了時に獲得スキルポイントを表示させないようにする設定を追加。
  * 2025/12/26 Ver.1.6.0
  * 複数回習取得スキルの前提スキルで最大習得回数を習得した場合のみ習得できる機能を追加。
  * 前提スキルの表示処理の修正。
@@ -2131,6 +2142,13 @@
  * @desc メニューコマンドに表示するスイッチを指定します。0で表示
  * @type switches
  * @default 0
+ * @parent BasicSetting
+ * 
+ * @param DisplayShowResultMessage
+ * @desc 戦闘終了時メッセージ非表示。
+ * @text 戦闘終了時に表示されるスキルポイントの入手メッセージを表示しません。
+ * @type boolean
+ * @default false
  * @parent BasicSetting
  * 
  * @param DisplayResultMessage
@@ -6574,7 +6592,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     BattleManager.displaySkillPoint = function() {
-        if (params.DisplayResultMessage) {
+        if (!params.DisplayShowResultMessage && !!params.DisplayResultMessage) {
             const sp = this._rewards.skillPoint;
             if (sp > 0) {
                 const text = params.DisplayResultMessage.format(sp, params.SkillPointName);

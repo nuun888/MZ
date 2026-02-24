@@ -1,5 +1,5 @@
 # [メニューコマンド表示EX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
-# Ver.1.2.2
+# Ver.1.2.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuCommandEX.js)
 #### 必須、前提プラグイン
 ※[メニュー画面](https://github.com/nuun888/MZ/blob/master/README/MenuScreen_default.md)   
@@ -12,6 +12,8 @@
 ![画像](img/MenuCommandEX1.png)   
 
 ## 更新履歴
+2026/2/24 Ver.1.2.3  
+特定の処理後、スクロールを行うとコマンド画像の表示がずれて更新される問題を修正。  
 2025/5/11 Ver.1.2.2  
 移動フレーム数を61以上に設定するとコマンドが移動しない問題を修正。  
 2024/8/19 Ver.1.2.1

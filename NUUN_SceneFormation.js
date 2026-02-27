@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Screen Formation
  * @author NUUN
- * @version 2.1.13
+ * @version 2.1.14
  * @base NUUN_Base
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
@@ -43,6 +43,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 2/27/2026 Ver.2.1.14
+ * Added the ability to specify background colors for specific states.
  * 2/7/2026 Ver.2.1.13
  * Fixed an issue where players could not leave the party when moving an actor to the bench with variable members.
  * 1/19/2026 Ver.2.1.12
@@ -181,6 +183,13 @@
  * @type color
  * @default 17
  * @min -1
+ * @parent BasicSetting
+ * 
+ * @param ActorStateColor
+ * @text State Background Color
+ * @desc Background color when a specific state is given. Priority is given to the top of the list (common to menus and battles)
+ * @default []
+ * @type struct<StateColorList>[]
  * @parent BasicSetting
  * 
  * @param MemberHeight
@@ -1076,6 +1085,23 @@
  * @max 9999
  *  
  */
+/*~struct~StateColorList:
+ * 
+ * @param State
+ * @text State
+ * @desc Specify the state.
+ * @type state
+ * @default 0
+ * 
+ * @param StateColor
+ * @text background color
+ * @desc Background color when state is applied. -1 is no color.
+ * @type color
+ * @default -1
+ * @min -1
+ * 
+ *  
+ */
 /*~struct~SoundEffect:
  * 
  * @param name
@@ -1110,7 +1136,7 @@
  * @target MZ
  * @plugindesc メンバー変更画面
  * @author NUUN
- * @version 2.1.13
+ * @version 2.1.14
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -1144,6 +1170,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/2/27 Ver.2.1.14
+ * 特定のステートで背景色を指定できる機能を追加。
  * 2026/2/7 Ver.2.1.13
  * 可変メンバーでアクターを控えに移動した際に、パーティから離脱できなくなる問題を修正。
  * 2026/1/19 Ver.2.1.12
@@ -1282,6 +1310,13 @@
  * @type color
  * @default 17
  * @min -1
+ * @parent BasicSetting
+ * 
+ * @param ActorStateColor
+ * @text ステート背景色
+ * @desc 特定のステートが付与されている時の背景色。リスト上位優先(メニュー、戦闘共通)
+ * @default []
+ * @type struct<StateColorList>[]
  * @parent BasicSetting
  * 
  * @param MemberHeight
@@ -2181,6 +2216,23 @@
  * 
  *  
  */
+/*~struct~StateColorList:ja
+ * 
+ * @param State
+ * @text ステート
+ * @desc ステートを指定します。
+ * @type state
+ * @default 0
+ * 
+ * @param StateColor
+ * @text 背景色
+ * @desc ステートが付与されている時の背景色。-1で無色。
+ * @type color
+ * @default -1
+ * @min -1
+ * 
+ *  
+ */
 /*~struct~SoundEffect:ja
  * 
  * @param name
@@ -2584,6 +2636,7 @@ Imported.NUUN_SceneFormation = true;
         setBattleParamData(paramData) {
             paramList.CommandShowMode = paramData.CommandShowMode;
             paramList.FormationActorState = paramData.FormationActorState;
+            paramList.FormationActorStateEx = paramData.FormationActorStateEx;
             paramList.EndTurnAfteExecution = paramData.EndTurnAfteExecution;
             if (paramData.MenuFormationLayout) {
                 this.setParamData();
@@ -3238,17 +3291,13 @@ Imported.NUUN_SceneFormation = true;
             let changeOk = false;
             $gameParty.battleMembers().forEach(member => {
                 if (!this._changeMembers.includes(member)) {
-                    if (paramList.FormationActorState > 0 && member.isStateAddable(paramList.FormationActorState)) {
-                        member.addState(paramList.FormationActorState);
-                    }
+                    this.addChangeFormationState(member);
                     changeOk = true;
                 }
             })
             this._changeMembers.forEach(member => {
                 if (!$gameParty.battleMembers().includes(member)) {
-                    if (member.isStateAffected(paramList.FormationActorState)) {
-                        member.removeState(paramList.FormationActorState);
-                    }
+                    this.removeChangeFormationState(member);
                     changeOk = true;
                 }
             })
@@ -3354,6 +3403,45 @@ Imported.NUUN_SceneFormation = true;
                 (this._battleMemberWindow.isOpen() || this._battleMemberWindow.isOpening())
             )
         }
+
+        addChangeFormationState(member) {
+            if (!!paramList.FormationActorStateEx) {
+                const find = paramList.FormationActorStateEx.find(data => {
+                    if (data.ActorId === 0 || data.ActorId === member.actorId()) {
+                        if (data.State > 0 && member.isStateAddable(data.State) && this.isChangeStateEvaluation(data, member)) {
+                            return true;
+                        }
+                    }
+                })
+                if (!!find) {
+                    member.addState(find.State);
+                    return;
+                }
+            }
+            if (paramList.FormationActorState > 0 && member.isStateAddable(paramList.FormationActorState)) {
+                member.addState(paramList.FormationActorState);
+            }
+        }
+
+        removeChangeFormationState(member) {
+            if (!!paramList.FormationActorStateEx) {
+                for (const data of paramList.FormationActorStateEx) {
+                    if ((data.ActorId === 0 || data.ActorId === member.actorId()) && member.isStateAffected(data.State)) {
+                        member.removeState(data.State);
+                    }
+                }
+            }
+            if (paramList.FormationActorState > 0 && member.isStateAffected(paramList.FormationActorState)) {
+                member.removeState(paramList.FormationActorState);
+            }
+        }
+
+        isChangeStateEvaluation(data, actor) {
+            if (!data.Cond) return true;
+            const v = $gameVariables._data;
+            return eval(data.Cond);
+        }
+        
     };
 
     Window_StatusBase.prototype.drawBackGroundActor = function(index) {
@@ -3373,6 +3461,11 @@ Imported.NUUN_SceneFormation = true;
             } else if (Imported.NUUN_SceneFormation_SupportActor && params.SupportActorBackColor >= 0 && actor && actor.getSupportActor()) {
                 const supportcolor = NuunManager.getColorCode(params.SupportActorBackColor);
                 this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, supportcolor);
+            } else if (!!actor) {
+                const stateColor = this.isFormationStateColor(actor);
+                if (stateColor >= 0) {
+                    this.contentsBack.fillRect(rect.x + 1, rect.y + 1, rect.width - 2, rect.height - 2, NuunManager.getColorCode(stateColor));
+                }
             }
             this.contentsBack.paintOpacity = 255;
         }
@@ -3437,6 +3530,12 @@ Imported.NUUN_SceneFormation = true;
 
     Window_StatusBase.prototype.activeSaveMembersWindow = function() {
         return (this._saveMembersWindow && this._saveMembersWindow.active) || (this._saveMembersCommandWindow && this._saveMembersCommandWindow.active);
+    };
+
+    Window_StatusBase.prototype.isFormationStateColor = function(actor) {
+        if (!params.ActorStateColor) return -1;
+        const find = params.ActorStateColor.find(data => data.State > 0 && data.StateColor >= 0 && (actor.isStateAffected(data.State)));
+        return !!find ? find.StateColor : -1;
     };
 
 

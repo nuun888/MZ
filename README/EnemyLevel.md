@@ -1,5 +1,5 @@
 # [敵レベル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js)
-# Ver.1.1.3
+# Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -63,6 +63,9 @@
 他作者様のモンスター図鑑プラグインへの競合サポートは行いませんのでご了承ください。  
 
 ## 更新履歴
+2026/2/28 Ver 1.1.4  
+レベルの分散度が設定されていないと、正しくレベルが設定されない問題を修正。  
+スキルのレベル使用範囲が正常に適用されていなかった問題を修正。  
 2025/1/28 Ver 1.1.3  
 ステータスのパラメータを整数になるように修正。  
 2025/4/28 Ver 1.1.2  

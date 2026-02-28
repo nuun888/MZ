@@ -13,7 +13,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Sets the enemy's level.
@@ -40,7 +40,7 @@
  * <MapEnemyLevel[EnemyId]:[level], [variance]> You will start the battle at the specified level.
  * [EnemyId]:Ennemy level
  * [level]:Level
- * [variance]:Variance
+ * [variance]:Variance (Can be omitted)
  * 
  * The priority applied is
  * Enemy memo field > List data enemy level variable level > Overall enemy level variable level > Map level
@@ -49,6 +49,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 2/28/2026 Ver.1.1.4
+ * Fixed an issue where levels would not be set correctly if level dispersion was not set.
+ * Fixed the issue where the skill's level application range was not being applied correctly.
  * 1/28/2025 Ver.1.1.3
  * Fixed status parameters to be integers.
  * 4/28/2025 Ver.1.1.2
@@ -318,7 +321,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * 敵にレベルを設定します。
@@ -345,7 +348,7 @@
  * <MapEnemyLevel[EnemyId]:[level], [variance]> 戦闘開始時に指定のレベルで開始します。
  * [EnemyId]:敵ID
  * [level]:レベル
- * [variance]:分散度
+ * [variance]:分散度 ※省略可能
  * 
  * 適用される優先度は
  * 敵のメモ欄 > リストデータの敵レベル変数のレベル > 全体の敵レベル変数のレベル > マップで設定したレベル
@@ -354,6 +357,9 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/2/28 Ver 1.1.4
+ * レベルの分散度が設定されていないと、正しくレベルが設定されない問題を修正。
+ * スキルのレベル使用範囲が正常に適用されていなかった問題を修正。
  * 2025/1/28 Ver 1.1.3
  * ステータスのパラメータを整数になるように修正。
  * 2025/4/28 Ver 1.1.2
@@ -728,7 +734,7 @@ Imported.NUUN_EnemyLevel = true;
         const tag = "EnemyLevelLearnSkill" + action.skillId;
         const data = NuunManager.getMetaCodeList(this.enemy(), tag);
         if (!data) return true;
-        return Number(data[0]) <= this._level && (data[1] ? Number(data[1]) <= this._level : true);
+        return Number(data[0]) <= this._level && (data[1] ? Number(data[1]) >= this._level : true);
     };
 
     const _Game_Enemy_allSkillActions = Game_Enemy.prototype.allSkillActions;
@@ -751,7 +757,7 @@ Imported.NUUN_EnemyLevel = true;
     Game_Enemy.prototype.getIndividualEnemyLevel = function(enemy) {
         const data = NuunManager.getMetaCodeList(enemy, "Level");//レベル, 分散度
         if (!data) return 1;
-        return this.enemyLevelVariance(Number(data[0]), Number(data[1]));
+        return this.enemyLevelVariance(Number(data[0]), Number(data[1] || 0));
     };
 
     Game_Enemy.prototype.mapEnemyLevel = function() {
@@ -761,7 +767,7 @@ Imported.NUUN_EnemyLevel = true;
         const tag = 'MapEnemyLevel' + this.enemyId();
         const data = NuunManager.getMetaCodeList(map, tag);//レベル, 分散度
         if (!data) return 1;
-        return this.enemyLevelVariance(Number(data[0]), Number(data[1]));
+        return this.enemyLevelVariance(Number(data[0]), Number(data[1] || 0));
     };
 
     Game_Enemy.prototype.enemyLevelVariance = function(level, variance = 0) {

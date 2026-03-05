@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.3
+ * @version 2.23.4
  * 
  * @help
  * Implement an enemy book.
@@ -88,6 +88,8 @@
  * <SeeThrough> Register the picture book without opening the analyze screen. Skill attacks, encyclopedia registration, and information registration are treated as analysis.
  * 
  * <EnemyInfo> Displays enemy information.
+ * 
+ * <EnemyBookHideAction> Does not display on enemy skills.
  * 
  * Item notes
  * <NoDropProbability>
@@ -229,6 +231,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/4/2026 Ver.2.23.4
+ * Added a feature that allows you to set skills that are not displayed in enemy skills.
  * 8/8/2025 Ver.2.23.3
  * Changed the specifications for how parameter names are displayed on the radar chart.
  * Fixed so that evaluation formulas can be applied to radar chart values.
@@ -3224,7 +3228,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 2.23.3
+ * @version 2.23.4
  * 
  * @help
  * モンスター図鑑を実装します。
@@ -3301,6 +3305,8 @@
  * <SeeThrough> アナライズ画面を開かずに図鑑登録します。スキルの攻撃、図鑑登録、情報登録はアナライズ扱いとなります。
  * 
  * <EnemyInfo> 敵の情報を表示します。
+ * 
+ * <EnemyBookHideAction> 敵のスキルに表示させません。
  * 
  * アイテムのメモ欄
  * <NoDropProbability>
@@ -3445,6 +3451,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/3/4 Ver.2.23.4
+ * 敵のスキルに表示しないスキルを設定できる機能を追加。
  * 2025/8/8 Ver.2.23.3
  * レーダーチャートのパラメータ名の表示方法の仕様を変更。
  * レーダーチャートの数値に評価式を適用できるように修正。
@@ -10910,7 +10918,10 @@ Window_EnemyBook.prototype.condDropItems = function(list, enemy, x, y, width) {
 Window_EnemyBook.prototype.enemyAction = function(list, enemy, x, y, width) {
     this.contents.fontSize = $gameSystem.mainFontSize() + list.FontSize + EnemyBookDefaultFontSize;
     this.changeTextColor(NuunManager.getColorCode(list.NameColor));
-    const action = enemy.allSkillActions(this._enemy.actions);
+    const action = enemy.allSkillActions(this._enemy.actions).filter(a => {
+        const skill = $dataSkills[a.skillId];
+        return !skill.meta.EnemyBookHideAction;
+    });
     const lineHeight = this.lineHeight();
     let x2 = 0;
     let y2 = 0;

@@ -7,6 +7,8 @@
 [獲得経験値数値画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultExpValue.js)  
 [リザルト時ウィンドウスプライト非表示](https://github.com/nuun888/MZ/blob/master/README/ResultSpriteHide.md) Ver.1.0.0  
 [MVPアクター](https://github.com/nuun888/MZ/blob/master/README/ResultMVPActor.md) Ver.1.1.4  
+#### 有償版プラグイン
+[販売先](https://booth.pm/ja/items/8046406)  
 
 ## 概要
 戦闘終了時にリザルト画面を表示します。  

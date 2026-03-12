@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.0
+ * @version 1.6.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 3/13/2026 Ver.1.6.2
+ * Fixed an issue where the initial skill points for actors and professions were not being applied.
+ * Fixed an issue where hiding menu commands on the Switch was not working.
  * 2/24/2026 Ver.1.6.1
  * Added a setting to hide the display of earned skill points at the end of battle.
  * 12/26/2025 Ver.1.6.0
@@ -448,7 +451,7 @@
  * @param ShowCommandSkillTreeSwitch
  * @text Menu command display switch ID
  * @desc Specify the switch to display in the menu command. 
- * @type switches
+ * @type switch
  * @default 0
  * @parent BasicSetting
  * 
@@ -1703,7 +1706,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.1
+ * @version 1.6.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1787,6 +1790,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/3/13 Ver.1.6.2
+ * アクター及び職業を行ったスキルポイントの初期値が適用されていなかった問題を修正。
+ * スイッチでのメニューコマンド非表示が機能していなかった問題を修正。
  * 2026/2/24 Ver.1.6.1
  * 戦闘終了時に獲得スキルポイントを表示させないようにする設定を追加。
  * 2025/12/26 Ver.1.6.0
@@ -2140,7 +2146,7 @@
  * @param ShowCommandSkillTreeSwitch
  * @text メニューコマンド表示スイッチID
  * @desc メニューコマンドに表示するスイッチを指定します。0で表示
- * @type switches
+ * @type switch
  * @default 0
  * @parent BasicSetting
  * 
@@ -3615,6 +3621,12 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    function _isShowCommandSkillTree() {
+        return params.ShowSkillTreeCommand && 
+        (params.ShowCommandSkillTreeSwitch === 0 ||
+        $gameSwitches.value(params.ShowCommandSkillTreeSwitch));
+    };
+
     NuunManager.getSkillPointParamName = function() {
         return params.SkillPointName;
     };
@@ -4221,15 +4233,9 @@ Imported.NUUN_SkillTree = true;
     const _Scene_Menu_createCommandWindow = Scene_Menu.prototype.createCommandWindow;
     Scene_Menu.prototype.createCommandWindow = function() {
         _Scene_Menu_createCommandWindow.apply(this, arguments);
-        if (this.isShowCommandSkillTree()) {
+        if (_isShowCommandSkillTree()) {
             this._commandWindow.setHandler("skillTree", this.commandPersonal.bind(this));
         }
-    };
-
-    Scene_Menu.prototype.isShowCommandSkillTree = function() {
-        return params.ShowSkillTreeCommand && 
-        params.ShowCommandSkillTreeSwitch === 0 ||
-        $gameSwitches.value(params.ShowCommandSkillTreeSwitch);
     };
 
     Scene_Menu.prototype.commandSkillTree = function() {
@@ -4252,7 +4258,7 @@ Imported.NUUN_SkillTree = true;
     const _Window_MenuCommand_addOriginalCommands = Window_MenuCommand.prototype.addOriginalCommands;
     Window_MenuCommand.prototype.addOriginalCommands = function() {
         _Window_MenuCommand_addOriginalCommands.apply(this, arguments);
-        if (params.ShowSkillTreeCommand) {
+        if (_isShowCommandSkillTree()) {
             this.addCommand(params.SkillTreeCommandName, "skillTree",true);
         }
     };
@@ -4472,7 +4478,12 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeType.setActor(actor);
         this._skillTreeWindow.setActor(actor);
         this._skillTreeCostWindow.setActor(actor);
-        this._skillTreeStatusWindow.setActor(actor);
+        this._skillTreeStatusWindow.setActor(actor);//SkipSkillTypeWindow
+        //EX以降記述
+        if (!this._skillTreeType.isSkillTreeTypeList()) {
+            this._skillTreeType.deactivate();
+            this.onSkillTreeTypeOk();
+        }
     };
 
     Scene_SkillTree.prototype.onSkillTreeTypeOk = function() {
@@ -4631,6 +4642,10 @@ Imported.NUUN_SkillTree = true;
         if (this._skillTreeWindow) {
             this._skillTreeWindow.setSkillTreeId(this.currentExt());
         }
+    };
+
+    Window_SkillTreeType.prototype.isSkillTreeTypeList = function() {
+        return this._list.length > 1;
     };
 
 
@@ -6066,7 +6081,7 @@ Imported.NUUN_SkillTree = true;
     const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
     Game_Actor.prototype.initMembers = function() {
         _Game_Actor_initMembers.call(this);
-        this._nsp = 0;
+        this._nsp = NaN;
         this._cnsp = [];
         this._skillTreeList = null;
         this._learnSkillTreeSkillList = null;
@@ -6113,6 +6128,8 @@ Imported.NUUN_SkillTree = true;
         if (params.IsClassSp && !this._cnsp) {
             this._cnsp = [];
         }
+
+
         const sp = params.IsClassSp ? this._cnsp[this._classId] : this._nsp;
         if (isNaN(sp)) {
             this.setSkillPoint(params.IsClassSp && this._cnsp.length > 0 ? 0 : this.initBattlerSkillPoint(this.actorId()), this._classId);

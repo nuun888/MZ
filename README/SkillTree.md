@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.6.1
+# Ver.1.6.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -284,6 +284,9 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2026/3/13 Ver.1.6.2  
+アクター及び職業を行ったスキルポイントの初期値が適用されていなかった問題を修正。  
+スイッチでのメニューコマンド非表示が機能していなかった問題を修正。  
 2026/2/24 Ver.1.6.1  
 戦闘終了時に獲得スキルポイントを表示させないようにする設定を追加。  
 2025/12/26 Ver.1.6.0  

@@ -32,6 +32,8 @@ https://github.com/nuun888/MZ/blob/master/README/CircularGauge.md
 アクターの表示に動きを付ける場合は、プラグインパラメータのアクター演出で設定します。  
 アクター演出の一番上は初期状態の表示位置を指定します。フレーム数は無視されます。  
 設定方法はベントコマンドのピクチャと同じです。  
+立ち絵、顔グラ表示EXプラグイン対応です。  
+https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md  
 
 #### APNG
 勝利時のアクター、レベルアップ時に表示するアクターにAPNGで表示できます。  

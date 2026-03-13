@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * Display the item category on the purchase screen of the shop.
@@ -30,6 +30,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/14/2026 Ver.1.1.3
+ * Fixed an issue where an error would occur when using "NUUN_ItemCategory" in conjunction with "allItems" to display the category.
  * 8/25/2023 Ver.1.1.2
  * Fixed an issue that resulted in an error when opening the shop.
  * 8/23/2023 Ver.1.1.1
@@ -113,7 +115,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.2
+ * @version 1.1.3
  * 
  * @help
  * ショップの購入画面にアイテムカテゴリーを表示します。
@@ -132,6 +134,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/3/14 Ver.1.1.3
+ * NUUN_ItemCategoryで併用で、allItemsのカテゴリーを表示するとエラーが表示される問題を修正。
  * 2023/8/25 Ver.1.1.2
  * ショップを開くとエラーが出る問題を修正。
  * 2023/8/23 Ver.1.1.1
@@ -406,6 +410,10 @@ Imported.NUUN_PurchaseCategory = true;
 
     Window_ShopBuy.prototype.includes = function(item) {
         return isBuyCategorySwitch() ? Window_ItemList.prototype.includes.call(this, item) : true;
+    };
+
+    Window_ShopBuy.prototype.secretItem = function(item) {
+        return Window_ItemList.prototype.secretItem.call(this, item);
     };
 
     Window_ShopBuy.prototype.isConstructor = function() {

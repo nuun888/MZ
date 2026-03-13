@@ -14,7 +14,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
  * @orderAfter NUUN_SkillTree
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * You can customize the status window in the skill tree screen.
@@ -29,6 +29,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 3/13/2026 Ver.1.0.1
+ * Fixed an issue where an error would occur when attempting to display an actor that did not have actor data set.
  * 8/15/2025 Ver.1.0.0
  * First edition.
  * 
@@ -500,8 +502,12 @@
  * @plugindesc スキルツリーステータス画面カスタマイズ
  * @author NUUN
  * @base NUUN_Base
+ * @base NUUN_MenuParamListBase
+ * @base NUUN_SkillTree
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @orderAfter NUUN_MenuParamListBase
+ * @orderAfter NUUN_SkillTree
+ * @version 1.0.1
  * 
  * @help
  * スキルツリー画面のステータスウィンドウをカスタマイズできます。
@@ -516,6 +522,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/3/13 Ver.1.0.1
+ * アクターデータを設定していないアクターを標示しようとする場合にエラーが出る問題を修正。
  * 2025/8/15 Ver.1.0.0
  * 初版
  * 
@@ -1044,7 +1052,7 @@ Imported.NUUN_SkillTreeStausWindowEx = true;
             this.setupActorImg();
         }
         const data = this.getActorImgData(this._actor);
-        this._actorBitmap = this.getActorGraphicImg(data);
+        this._actorBitmap = !!data ? this.getActorGraphicImg(data) : null;
     };
 
     const _Window_SkillTree_drawAllItems = Window_SkillTree.prototype.drawAllItems;

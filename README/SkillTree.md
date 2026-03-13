@@ -187,6 +187,8 @@ $gameActors
 [スキルツリーステータス画面カスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTreeStausWindowEx.js)  
 
 #### 更新履歴
+2026/3/13 Ver.1.0.1  
+アクターデータを設定していないアクターを標示しようとする場合にエラーが出る問題を修正。  
 2025/8/15 Ver.1.0.0  
 初版  
 

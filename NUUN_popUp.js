@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Pop up
  * @author NUUN
- * @version 2.0.7
+ * @version 2.0.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -68,6 +68,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/14/2026 Ver 2.0.8
+ * Correction of processing.
  * 3/29/2025 Ver 2.0.7
  * Fixed skill learning popup target.
  * 9/14/2024 Ver 2.0.6
@@ -429,7 +431,7 @@
  * @target MZ
  * @plugindesc ポップアップ
  * @author NUUN
- * @version 2.0.7
+ * @version 2.0.8
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  *            
@@ -487,6 +489,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/3/14 Ver 2.0.8
+ * 処理の修正。
  * 2025/3/29 Ver 2.0.7
  * スキルラーニングのポップアップ対象を修正。
  * 2024/9/14 Ver 2.0.6
@@ -919,11 +923,11 @@ class PopUpData {
   const _Game_Battler_initMembers = Game_Battler.prototype.initMembers;
   Game_Battler.prototype.initMembers = function() {
     _Game_Battler_initMembers.call(this);
-    this.nuun_popupData = false;
+    this.nuun_popupData = null;
   };
 
   Game_Battler.prototype.isStatePopupRequested = function() {
-    return !!this.nuun_popupData && this.nuun_popupData.isPopup();
+    return !!this.nuun_popupData && !!this.nuun_popupData.isPopup && this.nuun_popupData.isPopup();
   };
   
   Game_Battler.prototype.clearStatePopup = function() {

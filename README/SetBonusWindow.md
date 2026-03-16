@@ -1,5 +1,5 @@
 # [セットボーナスツールチップウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js)
-# Ver.1.0.6
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -10,6 +10,9 @@
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
+2026/3/16 Ver.1.1.0  
+テキストが重複して表示される問題を修正。  
+制御文字を適用していない場合は、リスト毎に改行を行うように修正。  
 2025/4/13 Ver.1.0.6  
 設定されていないIDが指定されている場合は表示しないように修正。  
 2024/8/20 Ver.1.0.5  

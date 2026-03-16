@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.13
+ * @version 1.1.14
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/16/2026 Ver.1.1.14
+ * Corrected the vertical display size of dynamic actor names.
  * 2/11/2026 Ver.1.1.13
  * Fixed an issue where dynamic number fonts were not being applied.
  * Fixed an issue where an error occurred when used in conjunction with "VanguardAndRearguard".
@@ -148,7 +150,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.13
+ * @version 1.1.14
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -159,6 +161,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/3/16 Ver.1.1.14
+ * 動的アクター名の表示縦幅の修正。
  * 2026/2/11 Ver.1.1.13
  * 動的数値のフォントが適用されない問題を修正。
  * VanguardAndRearguardとの併用時にエラーが出る問題を修正。
@@ -2262,7 +2266,7 @@ Imported.NUUN_MenuParamListBase = true;
     };
       
     Sprite_DynamicName.prototype.bitmapHeight = function() {
-        return 26;
+        return this._paramData.GaugeHeight || 26;
     };
       
     Sprite_DynamicName.prototype.fontSize = function() {

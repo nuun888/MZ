@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -96,6 +96,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 3/16/2026 Ver.1.6.4
+ * Added a feature to hide the message indicating that you have gained skill points upon leveling up.
  * 3/15/2026 Ver.1.6.3
  * Fixed an issue where the message indicating the acquisition of skill points upon leveling up would not be displayed if the message was set to blank.
  * 3/13/2026 Ver.1.6.2
@@ -570,6 +572,13 @@
  * @desc Skill points gained when leveling up.
  * @type number
  * @default 1
+ * @parent SkillPointSetting
+ * 
+ * @param DisplayShowLevelUpMessage
+ * @text Messages are hidden when the level up
+ * @desc This will not display the message indicating the acquisition of skill points when leveling up.
+ * @type boolean
+ * @default false
  * @parent SkillPointSetting
  * 
  * @param DisplayLevelUpMessage
@@ -1708,7 +1717,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.6.3
+ * @version 1.6.4
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1792,6 +1801,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/3/16 Ver.1.6.4
+ * レベルアップスキルポイント獲得メッセージを表示しない機能を追加。
  * 2026/3/15 Ver.1.6.3
  * レベルアップスキルポイント獲得メッセージが空白で設定している場合、レベルアップ時の獲得メッセージを表示しないように修正。
  * 2026/3/13 Ver.1.6.2
@@ -2267,6 +2278,13 @@
  * @desc レベルアップ時の取得スキルポイント。
  * @type number
  * @default 1
+ * @parent SkillPointSetting
+ * 
+ * @param DisplayShowLevelUpMessage
+ * @text レベルアップ時メッセージ非表示。
+ * @desc レベルアップ時に表示されるスキルポイントの入手メッセージを表示しません。
+ * @type boolean
+ * @default false
  * @parent SkillPointSetting
  * 
  * @param DisplayLevelUpMessage
@@ -6329,7 +6347,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.displayLevelUpSkillPoint = function(sp) {
-        if (!!params.DisplayLevelUpMessage) {
+        if (!params.DisplayShowLevelUpMessage && !!params.DisplayLevelUpMessage) {
             if (sp > 0) {
                 const text = params.DisplayLevelUpMessage.format(this._name, sp, params.SkillPointName);
                 $gameMessage.add(text);

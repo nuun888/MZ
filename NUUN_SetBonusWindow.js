@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Set bonus tooltip window
  * @author NUUN
- * @version 1.0.6
+ * @version 1.1.0
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -22,6 +22,9 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/16/2026 Ver.1.1.0
+ * Fixed an issue where text was displayed multiple times.
+ * Corrected the code to insert a line break after each list item if control characters are not applied.
  * 4/13/2024 Ver.1.0.6
  * Fixed so that it will not be displayed if an ID that is not set is specified.
  * 8/20/2024 Ver.1.0.5
@@ -82,7 +85,7 @@
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 1.0.6
+ * @version 1.1.0
  * @base NUUN_Base
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_Base
@@ -91,6 +94,9 @@
  * 装備画面で装備スロット選択中の装備で現在適用しているセットボーナスを表示します。
  * 
  * 更新履歴
+ * 2026/3/16 Ver.1.1.0
+ * テキストが重複して表示される問題を修正。
+ * 制御文字を適用していない場合は、リスト毎に改行を行うように修正。
  * 2025/4/13 Ver.1.0.6
  * 設定されていないIDが指定されている場合は表示しないように修正。
  * 2024/8/20 Ver.1.0.5
@@ -159,6 +165,7 @@ const WindowDuration = Number(parameters['WindowDuration'] || 0);
 const WindowWidth = Number(parameters['WindowWidth'] || 400);
 const HelpOver = eval(parameters['HelpOver'] || 'false');
 const IsTextCode = eval(parameters['IsTextCode'] || 'false');
+const TextPunctuation = eval(parameters['TextPunctuation'] || 'false');
 
 const _Scene_Equip_create = Scene_Equip.prototype.create;
 Scene_Equip.prototype.create = function() {
@@ -296,16 +303,19 @@ Window_SetBounsEquip.prototype.refresh = function() {
                 y += lineHeight;
                 data.SetBonusNumberEquipment.forEach(numberEquip => {
                     if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && numberEquip.SetNumberEquip <= setBonusSum) {
-                        y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
-                        contentsRows++;
+                        const rows = this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
+                        y += lineHeight * rows;
+                        contentsRows += rows;
                     } else if (!(data.SetBonusEquip && data.SetBonusEquip.length > 1) && numberEquip.SetNumberEquip <= setBonusSum) {
-                        y += lineHeight * this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
-                        contentsRows++;
+                        const rows = this.drawSetBonusNumberEquipment(numberEquip, rect.x, y, rect.width);
+                        y += lineHeight * rows
+                        contentsRows += rows;
                     }
                 });
                 if (data.SetBonusEquip && data.SetBonusEquip.length > 1 && data.SetBonusEquip.length === setBonusSum) {
-                    y += lineHeight * this.drawSetBonusParam(data, rect.x, y, rect.width);
-                    contentsRows++;
+                    const rows = this.drawSetBonusParam(data, rect.x, y, rect.width);
+                    y += lineHeight * rows;
+                    contentsRows += rows;
                 }
                 this.height = this.fittingHeight(contentsRows + 2);
                 
@@ -331,9 +341,11 @@ Window_SetBounsEquip.prototype.drawSetBonusName = function(name, x, y, width) {
 
 Window_SetBounsEquip.prototype.drawSetBonusParam = function(data, x, y, width) {
     const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);
+    let line = 0;
     if (equip) {
         let text = '';
         let textWidth = 0;
+        const lineHeight = this.getFontSize();
         if (data.SetBonusText) {
             this.changeTextColor(this.systemColor());
             this.drawText(data.SetBonusText, x, y, width);
@@ -342,26 +354,34 @@ Window_SetBounsEquip.prototype.drawSetBonusParam = function(data, x, y, width) {
         this.resetTextColor();
         const setBonusParamText = data.SetBonusParamText || [];
         setBonusParamText.forEach(textData => {
-            if (textData) {
-                text += text ? ','+ textData : textData;
-            }
-            if (!!text) {
-                if (IsTextCode) {
-                    this.drawTextEx(text, x + textWidth, y, width - textWidth);
-                } else {
-                    this.drawText(text, x + textWidth, y, width - textWidth);
+            if (IsTextCode) {
+                if (textData) {
+                    text += text ? ',' + textData : textData;
+                    line = 1;
+                }
+            } else {
+                if (textData) {
+                    this.drawText(textData, x + textWidth, y + lineHeight * line, width - textWidth);
+                    line++;
                 }
             }
         });
+        if (!!text) {
+            if (IsTextCode) {
+                this.drawTextEx(text, x + textWidth, y, width - textWidth);
+            }
+        }
     }
-    return 1;
+    return line;
 };
 
 Window_SetBounsEquip.prototype.drawSetBonusNumberEquipment = function(data, x, y, width) {
     const equip = this.getSetBonusEquip(data.SetNumberEquipWeaponData, data.SetNumberEquipArmorData);
+    let line = 0;
     if (equip) {
         let text = '';
         let textWidth = 0;
+        const lineHeight = this.getFontSize();
         if (data.SetBonusText) {
             this.changeTextColor(this.systemColor());
             this.drawText(data.SetBonusText, x, y, width);
@@ -370,19 +390,25 @@ Window_SetBounsEquip.prototype.drawSetBonusNumberEquipment = function(data, x, y
         this.resetTextColor();
         const setBonusParamText = data.SetBonusParamText || [];
         setBonusParamText.forEach(textData => {
-            if (textData) {
-                text += text ? ','+ textData : textData;
-            }
-            if (!!text) {
-                if (IsTextCode) {
-                    this.drawTextEx(text, x + textWidth, y, width - textWidth);
-                } else {
-                    this.drawText(text, x + textWidth, y, width - textWidth);
+            if (IsTextCode) {
+                if (textData) {
+                    text += text ? ',' + textData : textData;
+                    line = 1;
+                }
+            } else {
+                if (textData) {
+                    this.drawText(textData, x + textWidth, y + lineHeight * line, width - textWidth);
+                    line++;
                 }
             }
         });
+        if (!!text) {
+            if (IsTextCode) {
+                this.drawTextEx(text, x + textWidth, y, width - textWidth);
+            }
+        }
     }
-    return 1;
+    return line;
 };
 
 Window_SetBounsEquip.prototype.fittingHeight = function(numLines) {

@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc Item category customization
  * @author NUUN
- * @version 1.6.0
+ * @version 1.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -45,6 +45,10 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/20/2026 Ver.1.7.0
+ * Added a feature to specify the number of columns and rows for categories on the selling screen.
+ * Fixed an issue where the category settings were not applied if they were not specified in the selling category field.
+ * We have fixed it so that category settings for the sales category can now be applied even after loading.
  * 9/22/2024 Ver.1.6.0
  * Added a function to display only items of a specified category on the item selection screen.
  * 9/12/2024 Ver.1.5.1
@@ -85,6 +89,18 @@
  * @default []
  * @type struct<ItemCategoryList>[]
  * 
+ * @arg ItemCategoryCols
+ * @desc Number of category cols. Setting this to 0 will use the value set in "CategoryCols".
+ * @text Number of category cols
+ * @type number
+ * @default 0
+ * 
+ * @arg ItemCategoryRows
+ * @desc Number of category rows. Setting this to 0 will use the value set in "CategoryRows".
+ * @text Number of category rows
+ * @type number
+ * @default 0
+ * 
  * @command ResetCategory
  * @desc Returns the category to be displayed.
  * @text Display category reset
@@ -98,6 +114,18 @@
  * @desc Setting up sale category items.
  * @default 
  * @type struct<ItemCategoryList>[]
+ * 
+ * @arg SaleCategoryCols
+ * @desc Number of cols for sale category. Setting this to 0 will use the value set in "SaleCategoryCols".
+ * @text Number of columns for sale category
+ * @type number
+ * @default 0
+ * 
+ * @arg SaleCategoryRows
+ * @desc Number of rows for sale category. Setting this to 0 will use the value set in "SaleCategoryRows".
+ * @text Number of rows in the sales category
+ * @type number
+ * @default 0
  * 
  * @command ResetSaleCategory
  * @desc Change back to the original sales category displayed.
@@ -139,15 +167,27 @@
  * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
  * 
+ * @param SaleCategoryCols
+ * @desc Number of cols for sale category. 0 represents the number of columns in the item category.
+ * @text Number of cols for sale category
+ * @type number
+ * @default 0
+ * 
+ * @param SaleCategoryRows
+ * @desc Number of rows for sale category. 0 represents the number of rows for the item category.
+ * @text Number of rows in the sales category
+ * @type number
+ * @default 0
+ * 
  * @param SaleCategory
  * @text Sale category item
- * @desc Setting of sale category items. If there is no setting, the category set in the category item will be displayed.
+ * @desc Setting of sale category items. If no setting is specified, the "Category item" setting will be applied.
  * @default 
  * @type struct<ItemCategoryList>[]
  * 
  * @param BattleNumVisible
  * @text Hide number during battle
- * @desc Turn off the number display even during battle, and apply the number non-display of category items with the display of the number of important items turned off.
+ * @desc Even during battle, the count of category items with "NumShow" turned OFF will be hidden.
  * @type boolean
  * @default true
  * 
@@ -182,7 +222,7 @@
  * @target MZ
  * @plugindesc アイテムカテゴリーカスタマイズ
  * @author NUUN
- * @version 1.6.0
+ * @version 1.7.0
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ItemNum
@@ -217,6 +257,10 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/3/20 Ver.1.7.0
+ * 売却画面でカテゴリーの列数、行数を指定できる機能を追加。
+ * 売却カテゴリー項目で設定を行ってない場合、カテゴリー項目の設定が適用されなかったもんだを修正。
+ * 売却カテゴリーのカテゴリー指定をセーブをまたいで適用できるように修正。
  * 2024/9/22 Ver.1.6.0
  * アイテム選択画面で指定のカテゴリーアイテムのみを表示させる機能を追加。
  * 2024/9/12 Ver.1.5.1
@@ -257,6 +301,18 @@
  * @default []
  * @type struct<ItemCategoryList>[]
  * 
+ * @arg ItemCategoryCols
+ * @desc カテゴリーの表示列数。0でカテゴリー列数での設定値
+ * @text カテゴリー列数
+ * @type number
+ * @default 0
+ * 
+ * @arg ItemCategoryRows
+ * @desc カテゴリーの表示行数。0でカテゴリー行数での設定値
+ * @text カテゴリー行数
+ * @type number
+ * @default 0
+ * 
  * @command ResetCategory
  * @desc 表示するカテゴリーをもとに戻します。
  * @text 表示カテゴリーリセット
@@ -270,6 +326,18 @@
  * @desc 売却カテゴリー項目の設定。設定がない場合はカテゴリー項目で設定したカテゴリーが表示されます。
  * @default 
  * @type struct<ItemCategoryList>[]
+ * 
+ * @arg SaleCategoryCols
+ * @desc 売却カテゴリーの表示列数。0でカテゴリー列数での設定値
+ * @text 売却カテゴリー列数
+ * @type number
+ * @default 0
+ * 
+ * @arg SaleCategoryRows
+ * @desc 売却カテゴリーの表示行数。0でカテゴリー行数での設定値
+ * @text 売却カテゴリー行数
+ * @type number
+ * @default 0
  * 
  * @command ResetSaleCategory
  * @desc 表示する売却カテゴリーをもとに戻します。
@@ -310,6 +378,18 @@
  * @desc カテゴリー項目の設定。
  * @default ["{\"CategoryName\":\"\",\"Categorykey\":\"'item'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'weapon'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'armor'\",\"NumShow\":\"true\"}","{\"CategoryName\":\"\",\"Categorykey\":\"'keyItem'\",\"NumShow\":\"true\"}"]
  * @type struct<ItemCategoryList>[]
+ * 
+ * @param SaleCategoryCols
+ * @desc 売却カテゴリーの表示列数。0でアイテムカテゴリーの列数
+ * @text 売却カテゴリー列数
+ * @type number
+ * @default 0
+ * 
+ * @param SaleCategoryRows
+ * @desc 売却カテゴリーの表示行数。0でアイテムカテゴリーの行数
+ * @text 売却カテゴリー行数
+ * @type number
+ * @default 0
  * 
  * @param SaleCategory
  * @text 売却カテゴリー項目
@@ -353,242 +433,267 @@ var Imported = Imported || {};
 Imported.NUUN_ItemCategory = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_ItemCategory');
-const CategoryCols = Number(parameters['CategoryCols'] || 4);
-const CategoryRows = Number(parameters['CategoryRows'] || 1);
-const ItemCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['ItemCategory'])) : null) || [];
-const SaleCategory = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['SaleCategory'])) : null) || [];
-const BattleNumVisible = eval(parameters['BattleNumVisible'] || 'true');
-let itemData = null;
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+    const CategoryCols = params.CategoryCols || 4;
+    const CategoryRows = params.CategoryRows || 1;
+    const ItemCategory = params.ItemCategory;
+    const SaleCategory = params.SaleCategory;
+    const BattleNumVisible = params.BattleNumVisible;
+    let itemData = null;
 
-const pluginName = "NUUN_ItemCategory";
-PluginManager.registerCommand(pluginName, 'AddCategory', args => {
-    $gameSystem.itemCategory = DataManager.nuun_structureData(args.ItemCategory) || null;
-});
-
-PluginManager.registerCommand(pluginName, 'ResetCategory', args => {
-    $gameSystem.itemCategory = null;
-});
-
-PluginManager.registerCommand(pluginName, 'SaleCategoryCommand', args => {
-    const data = DataManager.nuun_structureData(args.SaleCategoryList);
-    NuunManager.setSaleCategory(data);
-});
-
-PluginManager.registerCommand(pluginName, 'ResetSaleCategory', args => {
-    NuunManager.resetSaleCategory();
-});
-
-PluginManager.registerCommand(pluginName, 'SelectCategoryItem', args => {
-    Game_Interpreter.prototype.command104([Number(args.CategoryItemIdVariable), getKey(args.Categorykey)]);
-});
-
-function getKey(param) {
-    try {
-        return eval(param)
-    } catch (error) {
-        return String(param);
-    }
-};
-
-NuunManager.setSaleCategory = function(data) {
-    this._saleCategory = data;
-};
-
-NuunManager.resetSaleCategory = function() {
-    this._saleCategory = null;
-};
-
-NuunManager.isSaleCategory = function() {
-    return !!this._saleCategory;
-};
-
-NuunManager.getSaleCategory = function() {
-    return this._saleCategory;
-};
-
-const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
-Scene_Item.prototype.categoryWindowRect = function() {
-    const rect = _Scene_Item_categoryWindowRect.call(this);
-    rect.height = this.calcWindowHeight(CategoryRows, true);
-    return rect;
-};
-
-
-Scene_Shop.prototype.createCategoryWindow = function() {
-    const rect = this.categoryWindowRect();console.log(_isSaleCategory())
-    this._categoryWindow = _isSaleCategory() ? new Window_ItemShopCategory(rect) : new Window_ItemCategory(rect);
-    this._categoryWindow.setHelpWindow(this._helpWindow);
-    this._categoryWindow.hide();
-    this._categoryWindow.deactivate();
-    this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
-    this._categoryWindow.setHandler("cancel", this.onCategoryCancel.bind(this));
-    this.addWindow(this._categoryWindow);
-};
-
-const _Scene_Shop_categoryWindowRect = Scene_Shop.prototype.categoryWindowRect;
-Scene_Shop.prototype.categoryWindowRect = function() {
-    const rect = _Scene_Shop_categoryWindowRect.call(this);
-    rect.height = this.calcWindowHeight(CategoryRows, true);
-    return rect;
-};
-
-Window_Selectable.prototype.getItemCategoryList = function() {
-    return $gameSystem.itemCategory ? $gameSystem.itemCategory : ItemCategory;
-};
-
-Window_ItemCategory.prototype.maxCols = function() {
-  return CategoryCols;
-};
-
-Window_ItemCategory.prototype.makeCommandList = function() {
-    const list = this.getItemCategoryList();
-        if(!list) {
-        return;
-    }
-    list.forEach(names => {
-        if(this.needsCommand(names.Categorykey) && names.Categorykey === 'item') {
-        this.addCommand(TextManager.item, names.Categorykey);
-        } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'weapon') {
-        this.addCommand(TextManager.weapon, names.Categorykey);
-        } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'armor') {
-        this.addCommand(TextManager.armor, names.Categorykey);
-        } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'keyItem') {
-        this.addCommand(TextManager.keyItem, names.Categorykey);
-        } else if (this.needsCommand(names.Categorykey) && names.Categorykey === 'allItems') {
-        this.addCommand(names.CategoryName, names.Categorykey);
-        } else if(this.needsCommand(names.Categorykey) && names.CategoryName) { 
-        this.addCommand(names.CategoryName, names.Categorykey);
-        }
+    PluginManager.registerCommand(pluginName, 'AddCategory', args => {
+        const categoryData = {};
+        categoryData.itemCategory = DataManager.nuun_structureData(args.ItemCategory) || null;
+        categoryData.itemCategoryCols = Number(args.ItemCategoryCols) || CategoryCols;
+        categoryData.itemCategoryRows = Number(args.ItemCategoryRows) || CategoryRows;
+        $gameSystem.itemCategory = categoryData;
     });
-};
 
-const _Window_ItemList_includes = Window_ItemList.prototype.includes;
-Window_ItemList.prototype.includes = function(item) {
-    if (this.isConstructor()) {
-        return _Window_ItemList_includes.call(this, item);
-    }
-    if(this._category === 'allItems' && !this.secretItem(item) && item) {
-        return true;
-    } else if (this._category === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
-        return true;
-    }
-    const type = item ? item.meta.CategoryType : null;
-    const category = _Window_ItemList_includes.call(this, item);
-    if(category && !type) {
-        return category;
-    }
-    if (this._category === type) {
-        return true;
-    }
-    return false;
-};
+    PluginManager.registerCommand(pluginName, 'ResetCategory', args => {
+        $gameSystem.itemCategory = {};
+    });
 
-Window_ItemList.prototype.secretItem = function(item) {
-    if(DataManager.isItem(item) && item.itypeId > 2) {
-        return true;
-    }
-    return false;
-};
+    PluginManager.registerCommand(pluginName, 'SaleCategoryCommand', args => {
+        const categoryData = {};
+        categoryData.saleCategory = DataManager.nuun_structureData(args.SaleCategoryList) || null;
+        categoryData.saleCategoryCols = Number(args.SaleCategoryCols) || $gameSystem.getItemCategoryCols();
+        categoryData.saleCategoryRows = Number(args.SaleCategoryRows) || $gameSystem.getItemCategoryRows();
+        $gameSystem.saleCategory = categoryData;
+    });
 
-const _Window_ItemList_drawItemNumber = Window_ItemList.prototype.drawItemNumber;
-Window_ItemList.prototype.drawItemNumber = function(item, x, y, width) {
-    if (this.allItemsNeedsNumber(item)) {
-        _Window_ItemList_drawItemNumber.call(this, item, x, y, width);
-    }
-};
+    PluginManager.registerCommand(pluginName, 'ResetSaleCategory', args => {
+        $gameSystem.saleCategory = {};
+    });
 
-const _Window_ItemList_drawItem = Window_ItemList.prototype.drawItem;
-Window_ItemList.prototype.drawItem = function(index) {
-    itemData = this.itemAt(index);
-    _Window_ItemList_drawItem.call(this, index);
-};
+    PluginManager.registerCommand(pluginName, 'SelectCategoryItem', args => {
+        Game_Interpreter.prototype.command104([Number(args.CategoryItemIdVariable), getKey(args.Categorykey)]);
+    });
 
-Window_ItemList.prototype.needsNumber = function() {
-    if (BattleNumVisible && itemData && $gameParty.inBattle()) {
-        this._category = itemData.meta.CategoryType ? itemData.meta.CategoryType : (itemData.itypeId === 2 ? "keyItem" : this._needsCategory);
-    }
-    if (this._category === "keyItem") {  
-        return $dataSystem.optKeyItemsNumber;
-    }
-    if (itemData && itemData.meta.NoItemNum) {
-        return false;
-    }
-    return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
-};
+    function getKey(param) {
+        try {
+            return eval(param)
+        } catch (error) {
+            return String(param);
+        }
+    };
 
-Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
-    if (this._category === "allItems") {
-        if (item.itypeId === 2) {
-        return $dataSystem.optKeyItemsNumber;
-        } else if (item.meta.CategoryType) {
+
+    Game_System.prototype.getItemCategory = function() {
+        return this.itemCategory && this.itemCategory.itemCategory && this.itemCategory.itemCategory.length > 0 ? 
+        this.itemCategory.itemCategory : ItemCategory;
+    };
+
+    Game_System.prototype.getItemCategoryCols = function() {
+        return this.itemCategory && this.itemCategory.itemCategoryCols ? 
+        this.itemCategory.itemCategoryCols : CategoryCols;
+    };
+
+    Game_System.prototype.getItemCategoryRows = function() {
+        return this.itemCategory && this.itemCategory.itemCategoryRows ? 
+        this.itemCategory.itemCategoryRows : CategoryRows;
+    };
+
+    Game_System.prototype.getSaleCategory = function() {
+        return this.saleCategory && this.saleCategory.saleCategory && this.saleCategory.saleCategory.length > 0 ? 
+        this.saleCategory.saleCategory : (SaleCategory && SaleCategory.length > 0 ? SaleCategory : ItemCategory);
+    };
+
+    Game_System.prototype.getSaleCategoryCols = function() {
+        return this.saleCategory && this.saleCategory.saleCategoryCols ? 
+        this.saleCategory.saleCategoryCols : params.SaleCategoryCols > 0 ? params.SaleCategoryCols : this.getItemCategoryCols();
+    };
+
+    Game_System.prototype.getSaleCategoryRows = function() {
+        return this.saleCategory && this.saleCategory.saleCategoryRows ? 
+        this.saleCategory.saleCategoryRows : params.SaleCategoryRows > 0 ? params.SaleCategoryRows : this.getItemCategoryRows();
+    };
+
+    Game_System.prototype.isSaleCategory = function() {
+        return (this.saleCategory && this.saleCategory.saleCategory) || (SaleCategory && SaleCategory.length > 0);
+    };
+
+    const _Scene_Item_categoryWindowRect = Scene_Item.prototype.categoryWindowRect;
+    Scene_Item.prototype.categoryWindowRect = function() {
+        const rect = _Scene_Item_categoryWindowRect.call(this);
+        rect.height = this.calcWindowHeight($gameSystem.getItemCategoryRows(), true);
+        return rect;
+    };
+
+
+    Scene_Shop.prototype.createCategoryWindow = function() {
+        const rect = this.categoryWindowRect();
+        this._categoryWindow = $gameSystem.isSaleCategory() ? new Window_ItemShopCategory(rect) : new Window_ItemCategory(rect);
+        this._categoryWindow.setHelpWindow(this._helpWindow);
+        this._categoryWindow.hide();
+        this._categoryWindow.deactivate();
+        this._categoryWindow.setHandler("ok", this.onCategoryOk.bind(this));
+        this._categoryWindow.setHandler("cancel", this.onCategoryCancel.bind(this));
+        this.addWindow(this._categoryWindow);
+    };
+
+    const _Scene_Shop_categoryWindowRect = Scene_Shop.prototype.categoryWindowRect;
+    Scene_Shop.prototype.categoryWindowRect = function() {
+        const rect = _Scene_Shop_categoryWindowRect.call(this);
+        rect.height = this.calcWindowHeight($gameSystem.getSaleCategoryRows(), true);
+        return rect;
+    };
+
+    Window_Selectable.prototype.getItemCategoryList = function() {
+        return $gameSystem.getItemCategory();
+    };
+
+    Window_ItemCategory.prototype.maxCols = function() {
+        return $gameSystem.getItemCategoryCols();
+    };
+
+    Window_ItemCategory.prototype.makeCommandList = function() {
         const list = this.getItemCategoryList();
-        const find = list.find(date => date.Categorykey === item.meta.CategoryType);
-        if (find && find.NumShow !== undefined) {
-            return find.NumShow;
+            if(!list) {
+            return;
+        }
+        list.forEach(names => {
+            if(this.needsCommand(names.Categorykey) && names.Categorykey === 'item') {
+            this.addCommand(TextManager.item, names.Categorykey);
+            } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'weapon') {
+            this.addCommand(TextManager.weapon, names.Categorykey);
+            } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'armor') {
+            this.addCommand(TextManager.armor, names.Categorykey);
+            } else if(this.needsCommand(names.Categorykey) && names.Categorykey === 'keyItem') {
+            this.addCommand(TextManager.keyItem, names.Categorykey);
+            } else if (this.needsCommand(names.Categorykey) && names.Categorykey === 'allItems') {
+            this.addCommand(names.CategoryName, names.Categorykey);
+            } else if(this.needsCommand(names.Categorykey) && names.CategoryName) { 
+            this.addCommand(names.CategoryName, names.Categorykey);
+            }
+        });
+    };
+
+    const _Window_ItemList_includes = Window_ItemList.prototype.includes;
+    Window_ItemList.prototype.includes = function(item) {
+        if (this.isConstructor()) {
+            return _Window_ItemList_includes.call(this, item);
+        }
+        if(this._category === 'allItems' && !this.secretItem(item) && item) {
+            return true;
+        } else if (this._category === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
+            return true;
+        }
+        const type = item ? item.meta.CategoryType : null;
+        const category = _Window_ItemList_includes.call(this, item);
+        if(category && !type) {
+            return category;
+        }
+        if (this._category === type) {
+            return true;
+        }
+        return false;
+    };
+
+    Window_ItemList.prototype.secretItem = function(item) {
+        if(DataManager.isItem(item) && item.itypeId > 2) {
+            return true;
+        }
+        return false;
+    };
+
+    const _Window_ItemList_drawItemNumber = Window_ItemList.prototype.drawItemNumber;
+    Window_ItemList.prototype.drawItemNumber = function(item, x, y, width) {
+        if (this.allItemsNeedsNumber(item)) {
+            _Window_ItemList_drawItemNumber.call(this, item, x, y, width);
+        }
+    };
+
+    const _Window_ItemList_drawItem = Window_ItemList.prototype.drawItem;
+    Window_ItemList.prototype.drawItem = function(index) {
+        itemData = this.itemAt(index);
+        _Window_ItemList_drawItem.call(this, index);
+    };
+
+    Window_ItemList.prototype.needsNumber = function() {
+        if (BattleNumVisible && itemData && $gameParty.inBattle()) {
+            this._category = itemData.meta.CategoryType ? itemData.meta.CategoryType : (itemData.itypeId === 2 ? "keyItem" : this._needsCategory);
+        }
+        if (this._category === "keyItem") {  
+            return $dataSystem.optKeyItemsNumber;
+        }
+        if (itemData && itemData.meta.NoItemNum) {
+            return false;
+        }
+        return this._needsCategory === undefined || this._needsCategory === null ? true : this._needsCategory;
+    };
+
+    Window_ItemList.prototype.allItemsNeedsNumber = function(item) {
+        if (this._category === "allItems") {
+            if (item.itypeId === 2) {
+            return $dataSystem.optKeyItemsNumber;
+            } else if (item.meta.CategoryType) {
+            const list = this.getItemCategoryList();
+            const find = list.find(date => date.Categorykey === item.meta.CategoryType);
+            if (find && find.NumShow !== undefined) {
+                return find.NumShow;
+            }
+            return true;
+            } 
         }
         return true;
-        } 
-    }
-    return true;
-};
+    };
 
-const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
-Window_ItemList.prototype.setCategory = function(category) {
-    if (this._category !== category) {
-        this._needsCategory = true;
-        const list = this.getItemCategoryList();
-        if (list) {
-            const find = list.find(date => date.Categorykey === category);
-            if (find) {
-                this._needsCategory = (find.NumShow === undefined ? true : find.NumShow);
+    const _Window_ItemList_setCategory = Window_ItemList.prototype.setCategory;
+    Window_ItemList.prototype.setCategory = function(category) {
+        if (this._category !== category) {
+            this._needsCategory = true;
+            const list = this.getItemCategoryList();
+            if (list) {
+                const find = list.find(date => date.Categorykey === category);
+                if (find) {
+                    this._needsCategory = (find.NumShow === undefined ? true : find.NumShow);
+                }
             }
         }
+        _Window_ItemList_setCategory.call(this, category);
+    };
+
+
+    function Window_ItemShopCategory() {
+        this.initialize(...arguments);
     }
-    _Window_ItemList_setCategory.call(this, category);
-};
+
+    Window_ItemShopCategory.prototype = Object.create(Window_ItemCategory.prototype);
+    Window_ItemShopCategory.prototype.constructor = Window_ItemShopCategory;
+
+    Window_ItemShopCategory.prototype.initialize = function(rect) {
+        Window_ItemCategory.prototype.initialize.call(this, rect);
+    };
+
+    Window_ItemShopCategory.prototype.getItemCategoryList = function() {
+        return $gameSystem.getSaleCategory();
+    };
+
+    Window_ItemShopCategory.prototype.maxCols = function() {
+        return $gameSystem.getSaleCategoryCols();
+    };
 
 
-function Window_ItemShopCategory() {
-    this.initialize(...arguments);
-}
-
-Window_ItemShopCategory.prototype = Object.create(Window_ItemCategory.prototype);
-Window_ItemShopCategory.prototype.constructor = Window_ItemShopCategory;
-
-Window_ItemShopCategory.prototype.initialize = function(rect) {
-    Window_ItemCategory.prototype.initialize.call(this, rect);
-};
-
-Window_ItemShopCategory.prototype.getItemCategoryList = function() {
-    return NuunManager.isSaleCategory() ? NuunManager.getSaleCategory() : SaleCategory;
-};
-
-
-const _Window_EventItem_includes = Window_EventItem.prototype.includes;
-Window_EventItem.prototype.includes = function(item) {
-    const itypeId = $gameMessage.itemChoiceItypeId();
-    if (DataManager.isItem(item) && isNaN(itypeId)) {
-        if (itypeId === 'allItems' && !this.secretItem(item)) {
-            return true;
-        } else if (itypeId === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
-            return true;
-        } else if (itypeId === this.getItemType(item)) {
-            return true;
+    const _Window_EventItem_includes = Window_EventItem.prototype.includes;
+    Window_EventItem.prototype.includes = function(item) {
+        const itypeId = $gameMessage.itemChoiceItypeId();
+        if (DataManager.isItem(item) && isNaN(itypeId)) {
+            if (itypeId === 'allItems' && !this.secretItem(item)) {
+                return true;
+            } else if (itypeId === 'allItem' && DataManager.isItem(item) && (item.itypeId === 1 || item.itypeId === 2)) {
+                return true;
+            } else if (itypeId === this.getItemType(item)) {
+                return true;
+            }
+            return false;
+        } else {
+            return _Window_EventItem_includes.apply(this, arguments);
         }
-        return false;
-    } else {
-        return _Window_EventItem_includes.apply(this, arguments);
-    }
-};
+    };
 
-Window_EventItem.prototype.getItemType = function(item) {
-    return item.meta.CategoryType;
-};
-
-
-function _isSaleCategory() {
-    return NuunManager.isSaleCategory() || SaleCategory && SaleCategory.length > 0;
-};
+    Window_EventItem.prototype.getItemType = function(item) {
+        return item.meta.CategoryType;
+    };
 
 })();

@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * Display the item category on the purchase screen of the shop.
@@ -30,6 +30,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 3/20/2026 Ver.1.1.4
+ * The plugin parameter "AddBuyCategory" now allows you to specify the number of columns and rows for categories on the purchase screen.
  * 3/14/2026 Ver.1.1.3
  * Fixed an issue where an error would occur when using "NUUN_ItemCategory" in conjunction with "allItems" to display the category.
  * 8/25/2023 Ver.1.1.2
@@ -86,6 +88,19 @@
  * @default []
  * @type struct<ItemBuyCategoryList>[]
  * 
+ * @arg BuyCategoryCols
+ * @desc Number of columns to display for categories.
+ * @text Number of Category Columns
+ * @type number
+ * @default 3
+ * 
+ * @arg BuyCategoryRows
+ * @desc The number of rows displayed for each category.
+ * @text Number of Category Rows
+ * @type number
+ * @default 1
+ * 
+ * 
  * @command ResetBuyCategory
  * @desc Resets the displayed category of purchases.
  * @text Purchase display category reset
@@ -115,7 +130,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.3
+ * @version 1.1.4
  * 
  * @help
  * ショップの購入画面にアイテムカテゴリーを表示します。
@@ -134,6 +149,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/3/20 Ver.1.1.4
+ * プラグインパラメータAddBuyCategoryで、購入画面でカテゴリーの列数、行数を指定できる機能を追加。
  * 2026/3/14 Ver.1.1.3
  * NUUN_ItemCategoryで併用で、allItemsのカテゴリーを表示するとエラーが表示される問題を修正。
  * 2023/8/25 Ver.1.1.2
@@ -190,6 +207,18 @@
  * @default []
  * @type struct<ItemBuyCategoryList>[]
  * 
+ * @arg BuyCategoryCols
+ * @desc カテゴリーの表示列数。
+ * @text カテゴリー列数
+ * @type number
+ * @default 0
+ * 
+ * @arg BuyCategoryRows
+ * @desc カテゴリーの表示行数。
+ * @text カテゴリー行数
+ * @type number
+ * @default 0
+ * 
  * @command ResetBuyCategory
  * @desc 購入時の表示するカテゴリーをもとに戻します。
  * @text 購入表示カテゴリーリセット
@@ -217,24 +246,44 @@ var Imported = Imported || {};
 Imported.NUUN_PurchaseCategory = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_PurchaseCategory');
-    const BuyCategoryCols = Number(parameters['BuyCategoryCols'] || 3);
-    const BuyCategoryRows = Number(parameters['BuyCategoryRows'] || 1);
-    const BuyCategoryWidthMode = eval(parameters['BuyCategoryWidthMode'] || 'true');
-    const ShowKeyItem = eval(parameters['ShowKeyItem'] || 'false');
-    const BuyCategorySwitch = Number(parameters['BuyCategorySwitch'] || 0);
+    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
 
-    const pluginName = "NUUN_PurchaseCategory";
+    const BuyCategoryCols = params.BuyCategoryCols || 3;
+    const BuyCategoryRows = params.BuyCategoryRows || 1;
+    const BuyCategoryWidthMode = params.BuyCategoryWidthMode;
+    const ShowKeyItem = params.ShowKeyItem;
+    const BuyCategorySwitch = params.BuyCategorySwitch || 0;
+
     PluginManager.registerCommand(pluginName, 'AddBuyCategory', args => {
-        $gameSystem.itemBuyCategory = DataManager.nuun_structureData(args.ItemBuyCategory) || null;
+        const categoryData = {};
+        categoryData.buyCategory = DataManager.nuun_structureData(args.ItemBuyCategory) || null;
+        categoryData.buyCategoryCols = Number(args.BuyCategoryCols) || BuyCategoryCols;
+        categoryData.buyCategoryRows = Number(args.BuyCategoryRows) || BuyCategoryRows;
+        $gameSystem.itemBuyCategory = categoryData;
     });
 
     PluginManager.registerCommand(pluginName, 'ResetBuyCategory', args => {
-        $gameSystem.itemBuyCategory = null;
+        $gameSystem.itemBuyCategory = {};
     });
 
     function isBuyCategorySwitch() {
         return BuyCategorySwitch === 0 || BuyCategorySwitch > 0 && $gameSwitches.value(BuyCategorySwitch);
+    };
+
+    Game_System.prototype.getBuyCategory = function() {
+        return this.itemBuyCategory && this.itemBuyCategory.buyCategory && this.itemBuyCategory.buyCategory.length > 0 ? 
+        this.itemBuyCategory.buyCategory : null;
+    };
+
+    Game_System.prototype.getBuyCategoryCols = function() {
+        return this.itemBuyCategory && this.itemBuyCategory.buyCategoryCols ? 
+        this.itemBuyCategory.buyCategoryCols : BuyCategoryCols;
+    };
+
+    Game_System.prototype.getBuyCategoryRows = function() {
+        return this.itemBuyCategory && this.itemBuyCategory.buyCategoryRows ? 
+        this.itemBuyCategory.buyCategoryRows : BuyCategoryRows;
     };
     
     const _Scene_Shop_create = Scene_Shop.prototype.create;
@@ -260,7 +309,7 @@ Imported.NUUN_PurchaseCategory = true;
         const wx = this._buyWindow.x;
         const wy = this._dummyWindow.y;
         const ww = BuyCategoryWidthMode ? this._buyWindow.width : Graphics.boxWidth;
-        const wh = this.calcWindowHeight(BuyCategoryRows , true);
+        const wh = this.calcWindowHeight($gameSystem.getBuyCategoryRows() , true);
         return new Rectangle(wx, wy, ww, wh);
     };
 
@@ -351,11 +400,11 @@ Imported.NUUN_PurchaseCategory = true;
     };
 
     Window_ItemBuyCategory.prototype.maxCols = function() {
-        return BuyCategoryCols;
+        return $gameSystem.getBuyCategoryCols();
     };
 
     Window_ItemBuyCategory.prototype.makeCommandList = function() {
-        const list = $gameSystem.itemBuyCategory;
+        const list = $gameSystem.getBuyCategory();
         if (isBuyCategorySwitch()) {
             if (list && list.length > 0) {
                 for (const command of list) {

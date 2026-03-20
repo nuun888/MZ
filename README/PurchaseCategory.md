@@ -1,5 +1,5 @@
 # [ショップ購入カテゴリー表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PurchaseCategory.js)
-# Ver.1.1.3
+# Ver.1.1.4
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PurchaseCategory.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
@@ -21,6 +21,8 @@
 デフォルトの状態に戻ります。  
 
 ## 更新履歴
+2026/3/20 Ver.1.1.4  
+プラグインパラメータAddBuyCategoryで、購入画面でカテゴリーの列数、行数を指定できる機能を追加。  
 2026/3/14 Ver.1.1.3  
 NUUN_ItemCategoryで併用で、allItemsのカテゴリーを表示するとエラーが表示される問題を修正。  
 2023/8/25 Ver.1.1.2  

@@ -7,6 +7,8 @@
 #### 拡張プラグイン
 [獲得経験値数値画像化](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ResultExpValue.js)  
 #### 有償版プラグイン
+リザルトプラグインのサポートは有償版のみおこないます。  
+なお、無償版と有償版のプラグイン名が異なりますので。プラグインパラメータ等の再設定が必要になります。  
 [販売先](https://booth.pm/ja/items/8046406)  
 
 ※無償版NUUN_Resultの全てのサポートを終了いたしました。今後は有償版のみサポートを行います。  

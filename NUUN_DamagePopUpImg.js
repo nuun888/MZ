@@ -8,9 +8,9 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc ダメージポップアップ画像化
+ * @plugindesc Damage popup image
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderBefore NUUN_DamagePopUpSimulDisplay
@@ -27,6 +27,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * log
+ * 4/9/2026 Ver.1.1.3
+ * Fixed an issue where the number of vertical divisions was fixed at 5.
  * 5/24/2025 Ver.1.1.2
  * Change display language other than Japanese to English.
  * 3/27/2022 Ver.1.1.1
@@ -105,7 +107,7 @@
  * @target MZ
  * @plugindesc ダメージポップアップ画像化
  * @author NUUN
- * @version 1.1.2
+ * @version 1.1.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderBefore NUUN_DamagePopUpSimulDisplay
@@ -122,6 +124,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/4/9 Ver 1.1.3
+ * 縦分割数が5で固定されていた問題を修正。
  * 2025/5/24 Ver 1.1.2
  * 英語対応。
  * 2022/3/27 Ver 1.1.1
@@ -201,119 +205,120 @@ var Imported = Imported || {};
 Imported.NUUN_DamagePopUpImg = true;
 
 (() => {
-  const parameters = PluginManager.parameters('NUUN_DamagePopUpImg');
-  const PopUpDamageImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpDamageImg'])) : null) || [];
-  const HPDamageBaseRow = Number(parameters['HPDamageBaseRow'] || 0);
-  const HPRecoveryBaseRow = Number(parameters['HPRecoveryBaseRow'] || 1);
-  const MPDamageBaseRow = Number(parameters['MPDamageBaseRow'] || 2);
-  const MPRecoveryBaseRow = Number(parameters['MPRecoveryBaseRow'] || 3);
-  const TPDamageBaseRow = Number(parameters['TPDamageBaseRow'] || 0);
-  const TPRecoveryBaseRow = Number(parameters['TPRecoveryBaseRow'] || 1);
-  const MissBaseRow = Number(parameters['MissBaseRow'] || 4);
+    const parameters = PluginManager.parameters('NUUN_DamagePopUpImg');
+    const PopUpDamageImg = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopUpDamageImg'])) : null) || [];
+    const BitmapBaseRows = Number(parameters['BitmapBaseRows'] || 5);
+    const HPDamageBaseRow = Number(parameters['HPDamageBaseRow'] || 0);
+    const HPRecoveryBaseRow = Number(parameters['HPRecoveryBaseRow'] || 1);
+    const MPDamageBaseRow = Number(parameters['MPDamageBaseRow'] || 2);
+    const MPRecoveryBaseRow = Number(parameters['MPRecoveryBaseRow'] || 3);
+    const TPDamageBaseRow = Number(parameters['TPDamageBaseRow'] || 0);
+    const TPRecoveryBaseRow = Number(parameters['TPRecoveryBaseRow'] || 1);
+    const MissBaseRow = Number(parameters['MissBaseRow'] || 4);
 
-  const _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
-  Scene_Boot.prototype.loadSystemImages = function() {
-    _Scene_Boot_loadSystemImages.call(this);
-    if (PopUpDamageImg && PopUpDamageImg[0]) {
-      ImageManager.nuun_LoadPictures(PopUpDamageImg[0]);
-    }
-  };
+    const _Scene_Boot_loadSystemImages = Scene_Boot.prototype.loadSystemImages;
+    Scene_Boot.prototype.loadSystemImages = function() {
+        _Scene_Boot_loadSystemImages.call(this);
+        if (PopUpDamageImg && PopUpDamageImg[0]) {
+            ImageManager.nuun_LoadPictures(PopUpDamageImg[0]);
+        }
+    };
 
 
-  const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
-  Sprite_Damage.prototype.initialize = function() {
-    _Sprite_Damage_initialize.call(this);
-    if (this.constructor === Sprite_Damage) {
-      this._damageBitmap = (PopUpDamageImg && PopUpDamageImg[0]) ? ImageManager.nuun_LoadPictures(PopUpDamageImg[0]) : null;
-    }
-    this._baseRow = 0;
-    this._statusType = null;
-  };
+    const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
+    Sprite_Damage.prototype.initialize = function() {
+        _Sprite_Damage_initialize.call(this);
+        if (this.constructor === Sprite_Damage) {
+            this._damageBitmap = (PopUpDamageImg && PopUpDamageImg[0]) ? ImageManager.nuun_LoadPictures(PopUpDamageImg[0]) : null;
+        }
+        this._baseRow = 0;
+        this._statusType = null;
+    };
 
-  Sprite_Damage.prototype.digitWidth = function() {
-    return this._damageBitmap ? this._damageBitmap.width / 10 : 0;
-  };
+    Sprite_Damage.prototype.digitWidth = function() {
+        return this._damageBitmap ? this._damageBitmap.width / 10 : 0;
+    };
 
-  Sprite_Damage.prototype.digitHeight = function() {
-    return this._damageBitmap ? this._damageBitmap.height / 5 : 0;
-  };
+    Sprite_Damage.prototype.digitHeight = function() {
+        return this._damageBitmap ? this._damageBitmap.height / BitmapBaseRows : 0;
+    };
   
-  const _Sprite_Damage_createBitmap = Sprite_Damage.prototype.createBitmap;
-  Sprite_Damage.prototype.createBitmap = function(width, height) {
-    if (this._damageBitmap) {
-      return ImageManager.nuun_LoadPictures(PopUpDamageImg[0]);
-    } else {
-      return _Sprite_Damage_createBitmap.call(this, width, height);
-    }
-  };
+    const _Sprite_Damage_createBitmap = Sprite_Damage.prototype.createBitmap;
+    Sprite_Damage.prototype.createBitmap = function(width, height) {
+        if (this._damageBitmap) {
+            return ImageManager.nuun_LoadPictures(PopUpDamageImg[0]);
+        } else {
+            return _Sprite_Damage_createBitmap.call(this, width, height);
+        }
+    };
 
-  Sprite_Damage.prototype.destroy = function(options) {//再定義
-    for (const child of this.children) {
-      if (child.bitmap && !child.bitmap._image) {
-          child.bitmap.destroy();
-      }
-    }
-    Sprite.prototype.destroy.call(this, options);
-  };
+    Sprite_Damage.prototype.destroy = function(options) {//再定義
+        for (const child of this.children) {
+            if (child.bitmap && !child.bitmap._image) {
+                child.bitmap.destroy();
+            }
+        }
+        Sprite.prototype.destroy.call(this, options);
+    };
 
-  const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
-  Sprite_Damage.prototype.setup = function(target) {
-    const result = target.result();
-    this._statusType = null;
-    if (result.missed || result.evaded) {
-      this._statusType = 'miss';
-    } else if (result.hpAffected) {
-      this._statusType = 'hp';
-    } else if (result.mpDamage !== 0) {
-      this._statusType = 'mp';
-    } else if (result.tpDamage !== 0) {
-      this._statusType = 'tp';
-    }
-    _Sprite_Damage_setup.call(this, target);
-  };
+    const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
+    Sprite_Damage.prototype.setup = function(target) {
+        const result = target.result();
+        this._statusType = null;
+        if (result.missed || result.evaded) {
+            this._statusType = 'miss';
+        } else if (result.hpAffected) {
+            this._statusType = 'hp';
+        } else if (result.mpDamage !== 0) {
+            this._statusType = 'mp';
+        } else if (result.tpDamage !== 0) {
+            this._statusType = 'tp';
+        }
+        _Sprite_Damage_setup.call(this, target);
+    };
 
-  const _Sprite_Damage_createMiss = Sprite_Damage.prototype.createMiss;
-  Sprite_Damage.prototype.createMiss = function() {
-    if (this._damageBitmap) {
-      const w = this.digitWidth();
-      const h = this.digitHeight();
-      const sprite = this.createChildSprite();
-      sprite.setFrame(0, MissBaseRow * h, 4 * w, h);
-      sprite.dy = 0;
-    } else {
-      _Sprite_Damage_createMiss.call(this);
-    }
-  };
+    const _Sprite_Damage_createMiss = Sprite_Damage.prototype.createMiss;
+    Sprite_Damage.prototype.createMiss = function() {
+        if (this._damageBitmap) {
+            const w = this.digitWidth();
+            const h = this.digitHeight();
+            const sprite = this.createChildSprite();
+            sprite.setFrame(0, MissBaseRow * h, 4 * w, h);
+            sprite.dy = 0;
+        } else {
+            _Sprite_Damage_createMiss.call(this);
+        }
+    };
 
-  const _Sprite_Damage_createDigits = Sprite_Damage.prototype.createDigits;
-  Sprite_Damage.prototype.createDigits = function(value) {
-    if (this._damageBitmap) {
-      const string = Math.abs(value).toString();
-      const row = this.getBaseRow(value);
-      const w = this.digitWidth();
-      const h = this.digitHeight();
-      for (var i = 0; i < string.length; i++) {
-        const sprite = this.createChildSprite();
-        const n = Number(string[i]);
-        sprite.setFrame(n * w, row * h, w, h);
-        sprite.x = (i - (string.length - 1) / 2) * w;
-        sprite.dy = -i;
-      }
-    } else {
-      _Sprite_Damage_createDigits.call(this, value);
-    }
-  };
+    const _Sprite_Damage_createDigits = Sprite_Damage.prototype.createDigits;
+    Sprite_Damage.prototype.createDigits = function(value) {
+        if (this._damageBitmap) {
+            const string = Math.abs(value).toString();
+            const row = this.getBaseRow(value);
+            const w = this.digitWidth();
+            const h = this.digitHeight();
+        for (var i = 0; i < string.length; i++) {
+            const sprite = this.createChildSprite();
+            const n = Number(string[i]);
+            sprite.setFrame(n * w, row * h, w, h);
+            sprite.x = (i - (string.length - 1) / 2) * w;
+            sprite.dy = -i;
+        }
+        } else {
+            _Sprite_Damage_createDigits.call(this, value);
+        }
+    };
 
-  Sprite_Damage.prototype.getBaseRow = function(value) {
-    if (this._statusType === 'hp') {
-      return value > 0 ? HPDamageBaseRow : HPRecoveryBaseRow;
-    } if (this._statusType === 'mp') {
-      return value > 0 ? MPDamageBaseRow : MPRecoveryBaseRow;
-    } else if (this._statusType === 'tp') {
-      return value > 0 ? TPDamageBaseRow : TPRecoveryBaseRow;
-    } else {
-      return value > 0 ? 0 : 1;
-    }
-  };
+    Sprite_Damage.prototype.getBaseRow = function(value) {
+        if (this._statusType === 'hp') {
+        return value > 0 ? HPDamageBaseRow : HPRecoveryBaseRow;
+        } if (this._statusType === 'mp') {
+        return value > 0 ? MPDamageBaseRow : MPRecoveryBaseRow;
+        } else if (this._statusType === 'tp') {
+        return value > 0 ? TPDamageBaseRow : TPRecoveryBaseRow;
+        } else {
+        return value > 0 ? 0 : 1;
+        }
+    };
 
 })();

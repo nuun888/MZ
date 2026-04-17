@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.6.4
+# Ver.1.6.5
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -286,6 +286,8 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2026/4/18 Ver.1.6.5  
+線のタイプでの新タイプ追加による更新。  
 2026/3/16 Ver.1.6.4  
 レベルアップスキルポイント獲得メッセージを表示しない機能を追加。  
 2026/3/15 Ver.1.6.3  

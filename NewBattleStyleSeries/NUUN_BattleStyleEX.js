@@ -12,7 +12,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.23
+ * @version 1.0.24
  * 
  * @help
  * You can change and customize the battle layout.
@@ -87,6 +87,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 4/25/2026 Ver.1.0.24
+ * Support for "NUUN_BattleAnimationEX".
  * 3/16/2026 Ver.1.0.23
  * Fixed an issue where the image of the added actor was not displayed in the battle status when an actor was added.
  * Added a function to specify the vertical display height of the actor name. "NUUN_MenuParamListBase" Ver.1.1.14 and later
@@ -1999,7 +2001,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.23
+ * @version 1.0.24
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2074,6 +2076,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/4/25 Ver.1.0.24
+ * NUUN_BattleAnimationEXの対応。
  * 2026/3/16 Ver.1.0.23
  * アクター追加時にバトルステータスの追加したアクターの画像が表示されない問題を修正。
  * アクター名の表示縦幅を指定できる機能を追加。NUUN_MenuParamListBase Ver.1.1.14以降
@@ -5382,11 +5386,11 @@ Imported.NUUN_BattleStyleEX = true;
 
     BattleManager.statusWindowVisible = function(flag) {
         this._statusWindowVisible = flag;
-    }
+    };
 
     BattleManager.isStatusWindowVisible = function() {
         return this._statusWindowVisible;
-    }
+    };
 
     const _BattleManager_invokeCounterAttack = BattleManager.invokeCounterAttack;
     BattleManager.invokeCounterAttack = function(subject, target) {
@@ -5404,6 +5408,10 @@ Imported.NUUN_BattleStyleEX = true;
             target.result().reflectionEx = true;
         }
         _BattleManager_invokeMagicReflection.apply(this, arguments);
+    };
+
+    BattleManager.bsAnimationShouldMirror = function() {
+        return params.ActorsMirror;
     };
 
 

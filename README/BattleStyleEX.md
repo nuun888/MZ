@@ -23,6 +23,7 @@ NUUN_BattleStyleEXのみ適用
 [戦闘中メッセージウィンドウ背景画像](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 [バトルスタイル拡張サポートアクターVer2.0対応](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
 [バトラーのバトルフィールド表示](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BS_BattleFieldActors.js)   
+[戦闘中のアクターへのアニメーション実行](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleAnimationEX.js)   
 [戦闘バイブレーション]   
 
 

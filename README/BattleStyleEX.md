@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.23  
+# Ver.1.0.24  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 無償ライセンス
 NUUN_BattleStyleEXのみ適用  
@@ -176,6 +176,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 アニメーション製作者様に報告をお願いいたします。  
 
 ## 更新履歴
+2026/4/25 Ver.1.0.24  
+NUUN_BattleAnimationEXの対応。  
 2026/3/16 Ver.1.0.23  
 アクター追加時にバトルステータスの追加したアクターの画像が表示されない問題を修正。  
 アクター名の表示縦幅を指定できる機能を追加。NUUN_MenuParamListBase Ver.1.1.14以降  

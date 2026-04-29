@@ -1,6 +1,6 @@
-# [アクター選択ウィンドウカスタマイズ]
+# [アクター選択ウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorSelectWindow.js)  
 # Ver.1.0.0  
-[ダウンロード]  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ActorSelectWindow.js)  
 #### 無償ライセンス
 クレジット表記：任意   
 商業利用：可能  
@@ -16,4 +16,5 @@
 
 戦闘中のアクターの対象選択ウィンドウをカスタマイズします。  
 ## 更新履歴
-
+2026/4/30 Ver.1.0.0  
+初版  

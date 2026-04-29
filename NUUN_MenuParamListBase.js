@@ -457,6 +457,7 @@ Imported.NUUN_MenuParamListBase = true;
             let bitmap = null;
             const w = this._window;
             const rect = w.itemRect(index >= 0 ? index : 0);
+            const height = (data.ImageHeight || this._window.innerHeight);
             if (this._graphicMode !== 'none') {
                 if (this._graphicMode === 'face') {
                     bitmap = this.getFaceImg(actor);
@@ -471,7 +472,7 @@ Imported.NUUN_MenuParamListBase = true;
             }
             if (bitmap) {
                 bitmap.addLoadListener(function() {
-                    this.drawActorGraphic(data, bitmap, index, rect.x, rect.y, rect.width, this.getFaceHeight(rect) , actor);
+                    this.drawActorGraphic(data, bitmap, index, rect.x, rect.y, rect.width, Math.min(height, this.getFaceHeight(rect)) , actor);
                 }.bind(this));
             }
         }
@@ -1067,8 +1068,9 @@ Imported.NUUN_MenuParamListBase = true;
                 bitmap = ImageManager.loadFace(actor.faceName());
             }
             const rect = this._window.itemRect(0);
+            const height = (data.ImageHeight || this._window.innerHeight);
             bitmap.addLoadListener(function() {
-                this.nuun_ActorFace(data, x, y, Math.min(this.getFaceWidth(rect), ImageManager.faceWidth), Math.min(this.getFaceHeight(rect), ImageManager.faceHeight), actor);
+                this.nuun_ActorFace(data, x, y, Math.min(this.getFaceWidth(rect), ImageManager.faceWidth), Math.min(height, this.getFaceHeight(rect), ImageManager.faceHeight), actor);
             }.bind(this));
         }
 
@@ -1077,8 +1079,9 @@ Imported.NUUN_MenuParamListBase = true;
             if (!faceData) return;
             const bitmap = ImageManager.loadFace(faceData[0]);
             const rect = this._window.itemRect(0);
+            const height = (data.ImageHeight || this._window.innerHeight);
             bitmap.addLoadListener(function() {
-                this.nuun_EnemyFace(data, faceData, x, y, Math.min(this.getFaceWidth(rect), ImageManager.faceWidth), Math.min(this.getFaceHeight(rect), ImageManager.faceHeight), enemy);
+                this.nuun_EnemyFace(data, faceData, x, y, Math.min(this.getFaceWidth(rect), ImageManager.faceWidth), Math.min(height, this.getFaceHeight(rect), ImageManager.faceHeight), enemy);
             }.bind(this));
         }
 
@@ -2266,7 +2269,14 @@ Imported.NUUN_MenuParamListBase = true;
     };
       
     Sprite_DynamicName.prototype.bitmapHeight = function() {
-        return this._paramData.GaugeHeight || 26;
+        return this.getImageHeight() || 26;
+    };
+
+    Sprite_DynamicName.prototype.getImageHeight = function() {
+        if (this._paramData.ImageHeight === undefined) {
+            return this._paramData.GaugeHeight;
+        }
+        return this._paramData.ImageHeight || 26;
     };
       
     Sprite_DynamicName.prototype.fontSize = function() {

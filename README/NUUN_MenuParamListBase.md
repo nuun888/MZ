@@ -1,5 +1,5 @@
 # [ステータス項目ベースプラグイン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)
-# Ver.1.1.14
+# Ver.1.1.15
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_MenuParamListBase.js)  
 #### 必須、前提プラグイン
 [共通処理](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Base.js)  
@@ -27,6 +27,8 @@ Y座標:Y表示列位置からの相対座標。
 記述欄、個別指定画像タグ名:記述欄、画像（個別指定画像）に紐づけするタグ名  
 
 ## 更新履歴
+2026/4/29 Ver.1.1.15  
+画像の縦幅指定に関する処理の追加。  
 2026/3/16 Ver.1.1.14  
 動的アクター名の表示縦幅の修正。  
 2026/2/11 Ver.1.1.13  

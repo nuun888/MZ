@@ -15,15 +15,16 @@ NUUN_BattleStyleEXのみ適用
 #### 対応プラグイン
 [立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)Ver.1.7.2以降   
 #### オプションプラグイン
-[敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
-[戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   
 [バトルエネミーウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemySelectWindow.js)   
 [バトルアクターウィンドウカスタマイズ]  
+[戦闘中のアクターへのアニメーション実行](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleAnimationEX.js)   
+
+[敵の条件画像変更](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_EnemyCondPicture.js)   
+[戦闘中天候適用](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleWeather.js)   
 [バトルアイテム、スキルウィンドウカスタマイズ](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleItemSkillWindowEX.js)   
 [戦闘中メッセージウィンドウ背景画像](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleMessagesBackgroundImg.js)   
 [バトルスタイル拡張サポートアクターVer2.0対応](https://github.com/nuun888/MZ/blob/master/README/BattleStyleEXWithSupportActor.md)  
 [バトラーのバトルフィールド表示](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BS_BattleFieldActors.js)   
-[戦闘中のアクターへのアニメーション実行](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleAnimationEX.js)   
 [戦闘バイブレーション]   
 
 

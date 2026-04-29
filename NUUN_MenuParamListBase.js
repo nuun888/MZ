@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.14
+ * @version 1.1.15
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/29/2026 Ver.1.1.15
+ * Adds processing for specifying the image height.
  * 3/16/2026 Ver.1.1.14
  * Corrected the vertical display size of dynamic actor names.
  * 2/11/2026 Ver.1.1.13
@@ -150,7 +152,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.14
+ * @version 1.1.15
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -161,6 +163,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/4/29 Ver.1.1.15
+ * 画像の縦幅指定に関する処理の追加。
  * 2026/3/16 Ver.1.1.14
  * 動的アクター名の表示縦幅の修正。
  * 2026/2/11 Ver.1.1.13

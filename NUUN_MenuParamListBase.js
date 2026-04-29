@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.15
+ * @version 1.2.0
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 4/30/2026 Ver.1.2.0
+ * Fixed the processing for displaying items with a content background.
  * 4/29/2026 Ver.1.1.15
  * Adds processing for specifying the image height.
  * 3/16/2026 Ver.1.1.14
@@ -152,7 +154,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.1.15
+ * @version 1.2.0
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -163,6 +165,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/4/30 Ver.1.2.0
+ * コンテンツ背景有の項目表示の処理を修正。
  * 2026/4/29 Ver.1.1.15
  * 画像の縦幅指定に関する処理の追加。
  * 2026/3/16 Ver.1.1.14
@@ -573,6 +577,19 @@ Imported.NUUN_MenuParamListBase = true;
             this._window.nuunExTextMode = false;
             this._window.nuunAlign = null;
         }
+
+        isImage(data) {
+            switch (data.DateSelect) {
+                case "Face":
+                case "Charchip":
+                case "SvActor":
+                case "ActorImage":
+                case "Image":
+                    return true;
+                default:
+                    return false;
+            }
+        }
     
         loadCheckBitmap(actor) {
             if (!actor) {
@@ -657,10 +674,20 @@ Imported.NUUN_MenuParamListBase = true;
                 const x_Position = data.X_Position;
                 const y_Position = data.Y_Position;
                 const position = Math.min(x_Position, this.nuun_MaxContentsCols());
-                const x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1) + colSpacing;
-                const y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0) + w.itemPadding();
-                const width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data, itemWidth), rect.width - x);
-                data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);
+                let x = (data.X_Coordinate || 0) + (itemWidth + colSpacing) * (position - 1) + colSpacing;
+                let y = (y_Position - 1) * lineHeight + rect.y + (data.Y_Coordinate || 0);
+                let height = 0;
+                let width = 0;
+                if (!this.isImage(data)) {
+                    x += colSpacing;
+                    y += w.itemPadding();
+                    width = Math.min(data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, rect.width - x) : this.widthMode(data, itemWidth), rect.width - x);
+                    height = rect.height;
+                } else {
+                    width = Math.min((data.ItemWidth || rect.width - x), rect.width - x) - 2;
+                    height = Math.min((data.ImgHeight || rect.height), rect.height - 2);
+                }
+                data._width = data.ItemWidth && data.ItemWidth > 0 ? Math.min(data.ItemWidth, width) : Math.min(width, 128);//ゲージ用
                 this.nuun_DrawContentsBase(data, x + rect.x, y, width - colSpacing / 2, actor);
             }
         }

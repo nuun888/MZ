@@ -1,7 +1,7 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
 # Ver.1.1.0  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
-#### 無償ライセンス
+#### 利用規約
 NUUN_BattleStyleEXのみ適用  
 クレジット表記：任意  
 商業利用：可能  

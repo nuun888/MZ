@@ -25,7 +25,7 @@ NUUN_SkillTreeTooltipsWindow
 ツリーの配置を横型にします。  
 NUUN_SkillTreeWideType  
 スキルツリーのスキルの配置の自由度を拡張します。  
-NUUN_SkillTreeFreeArrangement
+NUUN_SkillTreeFreeArrangement  
 [有償拡張版](https://booth.pm/ja/items/7456298)
 
 ツリー型のスキル習得システムを実装します。  

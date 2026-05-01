@@ -1,13 +1,16 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 # Ver.1.7.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-#### 無償ライセンス
+#### 利用規約
 クレジット表記：任意  
 商業利用：可能  
 成人向け：可能  
 改変：可能  
 再配布：可能  
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
+サポートに関しましては、他作者様プラグインとの競合対応、要望は「有償拡張フルセット」、「拡張プラグイン」購入者のみ対応にさせていただきます。  
+不具合修正に関しましては無償版のみでも対応を行います。  
+
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 

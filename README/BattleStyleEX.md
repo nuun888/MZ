@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.0.24  
+# Ver.1.1.0  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 無償ライセンス
 NUUN_BattleStyleEXのみ適用  
@@ -11,7 +11,7 @@ NUUN_BattleStyleEXのみ適用
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 #### 必須プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
-[ステータス項目ベース](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)  
+[ステータス項目ベース](https://github.com/nuun888/MZ/blob/master/README/NUUN_MenuParamListBase.md)Ver.1.2.0以降   
 #### 対応プラグイン
 [立ち絵、顔グラ表示](https://github.com/nuun888/MZ/blob/master/README/ActorPicture.md)Ver.1.7.2以降   
 #### オプションプラグイン
@@ -178,6 +178,10 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 アニメーション製作者様に報告をお願いいたします。  
 
 ## 更新履歴
+2026/5/1 Ver.1.1.0  
+アクターステータスウィンドウの表示項目に顔グラフィックを追加。  
+画像とゲージの高さ設定を別々に仕様変更。  
+戦闘終了時ウィンドウ閉めをONに設定した場合でも、リザルト終了後にアクターステータスウィンドウが開いてしまう問題を修正。   
 2026/4/25 Ver.1.0.24  
 NUUN_BattleAnimationEXの対応。  
 2026/3/16 Ver.1.0.23  

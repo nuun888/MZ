@@ -12,7 +12,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.24
+ * @version 1.1.0
  * 
  * @help
  * You can change and customize the battle layout.
@@ -87,6 +87,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 5/1/2026 Ver.1.1.0
+ * Add a face graphic to the display items of the actor status window.
+ * The specifications have been changed so that the image height and gauge height can be configured separately.
+ * Fixed an issue where the actor status window would open after the result screen, even when ‘Close Window on Battle End’ was set to ON.
  * 4/25/2026 Ver.1.0.24
  * Support for "NUUN_BattleAnimationEX".
  * 3/16/2026 Ver.1.0.23
@@ -1270,7 +1274,9 @@
  * @value None
  * @option Nane(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
  * @value Name
- * @option Actor name(1)(2)(3)(4)(5)(9)(11)(12)(21)
+ * @option Actor face(1)(2)(3)(4)(h)
+ * @value Face
+ * @option Actor name(1)(2)(3)(4)(5)(9)(11)(12)(21)(h)
  * @value DynamicName
  * @option Nickname(1)(2)(3)(4)(5)(9)(11)(12)
  * @value Nickname
@@ -1306,7 +1312,7 @@
  * @value TpbCircularGauge
  * @option Original gauge(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
  * @value OrgGauge
- * @option Imges(1)(2)(3)(4)(25)
+ * @option Imges(1)(2)(3)(4)(h)
  * @value Imges
  * @option Free text(1)(2)(3)(4)(35)
  * @value Freetext
@@ -2001,7 +2007,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.0.24
+ * @version 1.1.0
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2076,6 +2082,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/5/1 Ver.1.1.0
+ * アクターステータスウィンドウの表示項目に顔グラフィックを追加。
+ * 画像とゲージの高さ設定を別々に仕様変更。
+ * 戦闘終了時ウィンドウ閉めをONに設定した場合でも、リザルト終了後にアクターステータスウィンドウが開いてしまう問題を修正。
  * 2026/4/25 Ver.1.0.24
  * NUUN_BattleAnimationEXの対応。
  * 2026/3/16 Ver.1.0.23
@@ -3266,7 +3276,9 @@
  * @value None
  * @option 名称のみ(1)(2)(3)(4)(5)(7)(8)(9)(11)(12)(14)(15)
  * @value Name
- * @option アクター名(1)(2)(3)(4)(5)(9)(11)(12)(21)
+ * @option 顔グラフィック(1)(2)(3)(4)(h)
+ * @value Face
+ * @option アクター名(1)(2)(3)(4)(5)(9)(11)(12)(21)(h)
  * @value DynamicName
  * @option 二つ名(1)(2)(3)(4)(5)(9)(11)(12)
  * @value Nickname
@@ -3302,7 +3314,7 @@
  * @value TpbCircularGauge
  * @option 独自ゲージ(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
  * @value OrgGauge
- * @option 画像(1)(2)(3)(4)(25)
+ * @option 画像(1)(2)(3)(4)(h)
  * @value Imges
  * @option フリーテキスト(1)(2)(3)(4)(35)
  * @value Freetext
@@ -3461,6 +3473,14 @@
  * @param ImgSetting
  * @text 画像設定
  * @default ------------------------------
+ * 
+ * @param ImageHeight
+ * @desc 画像の縦幅を指定します。
+ * @text 画像の縦幅(h)
+ * @type number
+ * @default 0
+ * @min 0
+ * @max 999
  * 
  * @param ImgData
  * @desc 表示する画像を指定します。
@@ -5683,7 +5703,7 @@ Imported.NUUN_BattleStyleEX = true;
             this._bsBattleEnd = true;
         }
         if (params.BattleEndActorStatusClose) {
-            if (BattleManager.isBattleEnd()) {
+            if (this._bsBattleEnd) {
               this._statusWindow.close();
             }
         } else if (this._bsBattleEnd) {
@@ -5694,10 +5714,12 @@ Imported.NUUN_BattleStyleEX = true;
     Scene_Battle.prototype.updateOpenStatusWindow = function() {
         if (params.BattleEndActorStatusClose && BattleManager.isBattleEnd()) {
             this._statusWindow.bsHide();
+            this._statusWindow.setBsWindowVisible();
             return;
         }
         const result = BattleManager.isStatusWindowVisible();
         this._statusWindow.visible = !result;
+        this._statusWindow.setBsWindowVisible();
         if (!!this._actorImges) {
             this._actorImges.visible = !result;
         }
@@ -5708,14 +5730,16 @@ Imported.NUUN_BattleStyleEX = true;
         for (const hideWindow of params.WindowHideActorStatusWindow) {
             const _window = this[NuunManager.styleData.getWindowMethods(hideWindow)];
             if (_window) {
-                if (_window.isOpen() || _window.isOpening() || _window.isClosing()) {
+                if (_window.isOpen() || _window.isOpening()) {
                     this._statusWindow.visible = !_window.visible;
+                    this._statusWindow.setBsWindowVisible();
                     if (!!this._actorImges) {
                         this._actorImges.visible = !_window.visible;
                     }
                     this._actorStatus.visible = !_window.visible;
                 } else if (_window.visible) {
                     this._statusWindow.visible = !_window.isOpen();
+                    this._statusWindow.setBsWindowVisible();
                     if (!!this._actorImges) {
                         this._actorImges.visible = !_window.isOpen();
                     }
@@ -5727,7 +5751,10 @@ Imported.NUUN_BattleStyleEX = true;
             }
         }
         if (this._statusWindow.visible && (!this._statusWindow.isOpen() || !this._statusWindow.isOpening())) {
-            this._statusWindow.open();
+            this._statusWindow.setBsWindowVisible();
+            if (!this._statusWindow.isOpen()) {
+                this._statusWindow.open();
+            }
         }
     };
 
@@ -6178,6 +6205,7 @@ Imported.NUUN_BattleStyleEX = true;
         this.opacity = NuunManager.styleData.isWindowShow() ? 255 : 0;
         this._opening = true;
         this.visible = true;
+        this._bsWindowVisible = true;//falseの場合はウィンドウを開けないようにする
     };
 
     Window_BsBattleStatus.prototype.loadWindowskin = function() {
@@ -6345,6 +6373,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Window_BsBattleStatus.prototype.open = function() {
+        if (!this.isBsWindowVisible()) return;
         Window_Base.prototype.open.apply(this, arguments);
         if (this._window_battleActorImges) {
             this._window_battleActorImges.open();
@@ -6365,6 +6394,7 @@ Imported.NUUN_BattleStyleEX = true;
     };
     
     Window_BsBattleStatus.prototype.show = function() {
+        if (!this.isBsWindowVisible()) return;
         Window_Base.prototype.show.apply(this, arguments);
         if (this._window_battleActorImges) {
             this._window_battleActorImges.show();
@@ -6387,6 +6417,22 @@ Imported.NUUN_BattleStyleEX = true;
         if (this._window_BattleActorStatus) {
             this._window_BattleActorStatus.hide();
         }
+    };
+
+    Window_BsBattleStatus.prototype.setBsWindowVisible = function() {
+        this._bsWindowVisible = this.visible;
+    };
+
+    Window_BattleStatus.prototype.isBsWindowVisible = function() {
+        return true;
+    };
+
+    Window_BsBattleStatus.prototype.isBsWindowVisible = function() {
+        return this._bsWindowVisible;
+    };
+
+    Window_BsBattleStatus.prototype.isActorPictureEXApp = function() {
+        return _isOnActorPictureEX();
     };
 
 
@@ -6568,8 +6614,9 @@ Imported.NUUN_BattleStyleEX = true;
     };
 
     Window_BattleActorImges.prototype.open = function() {
-        Window_Base.prototype.open.call(this);
+        Window_Base.prototype.open.apply(this, arguments);
         this._actorImgBaseSprite.show();
+        this._count++;
     };
       
     Window_BattleActorImges.prototype.close = function() {
@@ -6642,6 +6689,19 @@ Imported.NUUN_BattleStyleEX = true;
 
     Window_BattleActorStatus.prototype.drawItem = function(index) {
         this._contentsData[index].drawItemContents(index);
+    };
+
+    Window_BattleActorStatus.prototype.open = function() {
+        this.show();
+        Window_Base.prototype.open.apply(this, arguments);
+    };
+
+    Window_BattleActorStatus.prototype.close = function() {
+        Window_Base.prototype.close.call(this);
+    };
+
+    Window_BattleActorStatus.prototype.show = function() {
+        Window_Base.prototype.show.apply(this, arguments);
     };
     
     Window_BattleActorStatus.prototype.hide = function() {

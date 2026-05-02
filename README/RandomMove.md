@@ -1,5 +1,5 @@
 # [方向キーランダム移動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomMove.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomMove.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -34,5 +34,7 @@ https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以
 プラグインパラメータ「無効マップID」で無効にするマップIDを指定してください。複数指定できます。  
 
 ## 更新履歴
+2026/5/2 Ver.1.0.1  
+リージョンIDが0のタイルでは処理を行わないように修正。  
 2026/4/30 Ver.1.0.0  
 初版  

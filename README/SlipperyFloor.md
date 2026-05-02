@@ -13,7 +13,7 @@ https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以
 
 プレイヤー、フォロワー、イベントが滑る床を実装します。  
 指定のリージョンまたは、指定の地形タグで移動を行うと、通行不能箇所または通常タイルまで滑る出します。  
-NUUN_SymbolEncounterを導入している場合は、NUUN_SymbolEncounterVer.1.3.2以降に更新してください。  
+[NUUN_SymbolEncounter](https://booth.pm/ja/items/7504032)を導入している場合は、NUUN_SymbolEncounterVer.1.3.2以降に更新してください。  
 
 ## 設定
 プラグインパラメータのリージョンIDまたは地形タグIDで任意のIDを設定してください。  

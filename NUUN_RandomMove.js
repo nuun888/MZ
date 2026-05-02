@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Randomize directional key inputs during movement.
@@ -37,8 +37,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 5/2/2026 Ver.1.0.1
+ * Modified the behavior so that no processing is performed on tiles with a region ID of 0.
  * 4/30/2026 Ver.1.0.0
- * 初版
+ * First edition.
  * 
  * @param RandomKeySwitch
  * @text Random direction switch
@@ -65,7 +67,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 移動による方向キーの入力をランダム化します。
@@ -93,6 +95,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/5/2 Ver.1.0.1
+ * リージョンIDが0のタイルでは処理を行わないように修正。
  * 2026/4/30 Ver.1.0.0
  * 初版
  * 
@@ -122,6 +126,7 @@
  * @text Region id
  * @desc Specify the region ID.
  * @type number
+ * @max 255
  * @default 0
  * 
  * @param RegionKeySetting
@@ -137,6 +142,7 @@
  * @text リージョンID
  * @desc リージョンIDを指定します。
  * @type number
+ * @max 255
  * @default 0
  * 
  * @param RegionKeySetting
@@ -381,6 +387,7 @@ Imported.NUUN_RandomMove = true;
             return false;
         }
         const region = $gamePlayer.regionId();
+        if (region === 0) return false;
         const find = params.RegionRandomKey.find(data => data.RegionId === region);
         if (!!find) {
             this.setRegionRandomKey(find);//ランダムキーが設定されていても強制的に適用。

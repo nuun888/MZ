@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * I will implement a slippery floor.
@@ -23,6 +23,9 @@
  * Event note field
  * <NoSlipEvent> This event does not slide.
  * 
+ * <SlipEventPattern:[pattern]> It specifies the character chip pattern used when sliding.
+ * [pattern]:pattern 0～2
+ * 
  * 
  * Terms of Use
  * Credit: Optional
@@ -33,6 +36,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 5/9/2026 Ver.1.0.1
+ * Added a feature that allows specifying the character chip pattern for events.
+ * Fixed an issue where direction‑fixed events would move in their original facing direction when sliding on slippery tiles.
  * 5/2/2026 Ver.1.0.0
  * First edition.
  * 
@@ -58,7 +64,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * 滑る床を実装します。
@@ -71,6 +77,8 @@
  * イベントのメモ欄
  * <NoSlipEvent> このイベントは滑りません。
  * 
+ * <SlipEventPattern:[pattern]> 滑るときのキャラクターチップのパターンを指定します。
+ * [pattern]:パターン 0～2
  * 
  * 利用規約
  * クレジット表記：任意
@@ -81,6 +89,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/5/9 Ver.1.0.1
+ * イベントにキャラクターチップのパターンを指定できる機能を追加。
+ * 向き固定のイベントが滑る床を移動する際に、元の向きの方向に移動してしまう問題を修正。
  * 2026/5/2 Ver.1.0.0
  * 初版
  * 
@@ -114,11 +125,20 @@ Imported.NUUN_SlipperyFloor = true;
         return (params.RegionId > 0 && params.RegionId === region) || (params.TerrainTagId >= 0 && params.TerrainTagId === terrainTag);
     };
 
+    const _Game_CharacterBase_moveStraight = Game_CharacterBase.prototype.moveStraight;
+    Game_CharacterBase.prototype.moveStraight = function(d) {
+        _Game_CharacterBase_moveStraight.apply(this, arguments);
+        this._slipDirection = d;
+    };
+
     const _Game_CharacterBase_updateMove = Game_CharacterBase.prototype.updateMove;
     Game_CharacterBase.prototype.updateMove = function() {
         _Game_CharacterBase_updateMove.apply(this, arguments);
         if (!this.isSlipCharacter()) return;
         if (!this.isMoving() && $gameMap.isSlipperyFloor(this._realX, this._realY)) {
+            if (this.isMoveRouteForcing()) {
+                this.processRouteEnd();//スリップしたら予約中の移動ルートの設定を無効にする。
+            }
             this.slipperyMove();
         } else if (this._slipping && !this.isMoving()) {
             this.endSlippingMove();
@@ -134,7 +154,7 @@ Imported.NUUN_SlipperyFloor = true;
     };
 
     Game_CharacterBase.prototype.slipperyMove = function() {
-        this.moveStraight(this.direction());
+        this.moveStraight(this._slipDirection || this.direction());
         this._slipping = true;
     };
 
@@ -152,7 +172,27 @@ Imported.NUUN_SlipperyFloor = true;
 
     const _Game_CharacterBase_pattern = Game_CharacterBase.prototype.pattern;
     Game_CharacterBase.prototype.pattern = function() {
-        return this._slipping ? 2 : _Game_CharacterBase_pattern.apply(this, arguments);
+        return this._slipping ? this.getSlipEventPattern() : _Game_CharacterBase_pattern.apply(this, arguments);
     };
+
+    Game_CharacterBase.prototype.getSlipEventPattern = function() {
+        return 2;
+    };
+
+    Game_Event.prototype.getSlipEventPattern = function() {
+        if (!this.event().meta.SlipEventPattern) return Game_CharacterBase.prototype.getSlipEventPattern.apply(this, arguments);
+        return Number(NuunManager.getMetaCode(this.event(), "SlipEventPattern") || 0);
+    };
+
+
+    Game_Interpreter.prototype.isCharacterSlipping = function(param) {//-1:プレイヤー　0:このイベント 1以上:(イベント
+        if (param < 0) {
+            return $gamePlayer.isSlipping();
+        } else if (this.isOnCurrentMap()) {
+            const event = $gameMap.event(param > 0 ? param : this._eventId);
+            return !!event ? event.isSlipping() : false;
+        }
+    };
+
     
 })();

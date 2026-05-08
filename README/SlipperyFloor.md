@@ -1,5 +1,5 @@
 # [滑る床](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipperyFloor.js)
-# Ver.1.0.0
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipperyFloor.js)
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -24,5 +24,8 @@
 <NoSlipEvent> このイベントは滑りません。  
 
 ## 更新履歴
+2026/5/9 Ver.1.0.1  
+イベントにキャラクターチップのパターンを指定できる機能を追加。  
+向き固定のイベントが滑る床を移動する際に、元の向きの方向に移動してしまう問題を修正。  
 2026/5/2 Ver.1.0.0  
 初版  

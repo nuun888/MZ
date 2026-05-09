@@ -1,5 +1,5 @@
 # [バトルスタイル拡張EX](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)
-# Ver.1.1.0  
+# Ver.1.1.1  
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NewBattleStyleSeries/NUUN_BattleStyleEX.js)  
 #### 利用規約
 NUUN_BattleStyleEXのみ適用  
@@ -178,6 +178,8 @@ APNGピクチャプラグインでのAPNGピクチャリストに先ほど設定
 アニメーション製作者様に報告をお願いいたします。  
 
 ## 更新履歴
+2026/5/9 Ver.1.1.1  
+戦闘開始時にステータスウィンドウが開閉を繰り返す問題を修正。  
 2026/5/1 Ver.1.1.0  
 アクターステータスウィンドウの表示項目に顔グラフィックを追加。  
 画像とゲージの高さ設定を別々に仕様変更。  

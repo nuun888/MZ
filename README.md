@@ -74,6 +74,10 @@ booth:boothで公開、販売しているプラグインの場合
 Ver.1.6以降の対応のみにさせていただきます。  
 それ以前のバージョンでは正常に動作しない場合がございます。  
 
+プラグインの公開サイトは以下となります。  
+[github](https://github.com/nuun888/MZ/edit/master/README.md)  
+素材の販売サイトは以下のサイトでのみ販売しています。  
+[booth](https://nuun888.booth.pm/)  
 
 # 公開プラグイン
 共：要共通処理  

@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.0
+ * @version 1.7.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -99,6 +99,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 5/16/2026 Ver.1.7.1
+ * Fixed an issue where an error occurred when opening the skill tree screen while using "NUUN_SkillTreeStausWindowEx".
  * 4/26/2026 Ver.1.7.0
  * Added a feature that allows skills to be learned based on the number of prerequisite skills learned.
  * 4/18/2026 Ver.1.6.5
@@ -1824,6 +1826,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/5/16 Ver.1.7.1
+ * NUUN_SkillTreeStausWindowExを導入している場合に、スキルツリー画面を開くとエラーが出る問題を修正。
  * 2026/4/26 Ver.1.7.0
  * 習得設定に前提スキルの習得スキル数によりスキルが習得可能になる機能を追加。
  * 2026/4/18 Ver.1.6.5
@@ -5499,11 +5503,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawSkillTreeType4Line = function(contents, x1, y1, x2, y2, thick, color) {//ベージュ曲線
-        this.drawSkillTreeType1Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+        this.drawSkillTreeType1Line(contents, x1, y2, x2, y2, params.LineThick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeType5Line = function(contents, x1, y1, x2, y2, thick, color) {//EX
-        this.drawSkillTreeType1Line(bitmapContents, x, y, x2, y2, params.LineThick, color);
+        this.drawSkillTreeType1Line(contents, x1, y2, x2, y2, params.LineThick, color);
     };
 
     Window_SkillTree.prototype.rowsMarginHeight = function() {

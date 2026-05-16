@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.7.0
+# Ver.1.7.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 利用規約
 クレジット表記：任意  
@@ -276,6 +276,8 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 -1でデフォルトのカーソル移動(デフォルト)  
 
 #### 更新履歴
+2026/5/16 Ver.1.7.1  
+NUUN_SkillTreeStausWindowExを導入している場合に、スキルツリー画面を開くとエラーが出る問題を修正。  
 2026/4/25 Ver.1.1.0  
 ベージュ曲線に対応。  
 2026/4/18 Ver.1.0.4  

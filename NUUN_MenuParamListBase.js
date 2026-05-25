@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 5/25/2026 Ver.1.2.1
+ * Update by displaying "NUUN_BreakShieldGauge".
  * 4/30/2026 Ver.1.2.0
  * Fixed the processing for displaying items with a content background.
  * 4/29/2026 Ver.1.1.15
@@ -154,7 +156,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -165,6 +167,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/5/25 Ver.1.2.1
+ * NUUN_BreakShieldGauge表示による更新。
  * 2026/4/30 Ver.1.2.0
  * コンテンツ背景有の項目表示の処理を修正。
  * 2026/4/29 Ver.1.1.15
@@ -1004,6 +1008,10 @@ Imported.NUUN_MenuParamListBase = true;
                 this.nuun_PlaceGauge(actor, "time", x, y, "actor%1-gauge-%2");
             }
         }
+
+        nuun_DrawContentsShieldGauge(data, x, y, width, actor) {
+            this.nuun_PlaceShieldGauge(actor, "shield", x, y);
+        }
     
         nuun_DrawContentsExpGauge(data, x, y, width, actor) {
             this.setTempType("menuexp");
@@ -1315,6 +1323,10 @@ Imported.NUUN_MenuParamListBase = true;
             sprite.move(x, y);
             sprite.show();
             _tempParams.clear();
+        }
+
+        nuun_PlaceShieldGauge(actor, type, x, y) {
+            this._window.placeShieldGauge(actor, type, x, y);
         }
 
         nuun_placeCircularGauge(actor, type, x, y, fmt) {

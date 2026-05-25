@@ -12,7 +12,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * You can change and customize the battle layout.
@@ -87,6 +87,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 5/25/2026 Ver.1.1.2
+ * Added shield gauge display using "NUUN_BreakShieldGauge".
  * 5/9/2026 Ver.1.1.1
  * Fixed an issue where the status window repeatedly opened and closed at the start of battle.
  * 5/1/2026 Ver.1.1.0
@@ -1315,6 +1317,8 @@
  * @value TpbCircularGauge
  * @option Original gauge(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
  * @value OrgGauge
+ * @option Shield gauge(NUUN_BreakShieldGauge)(1)(2)(3)(4)
+ * @value ShieldGauge
  * @option Imges(1)(2)(3)(4)(h)
  * @value Imges
  * @option Free text(1)(2)(3)(4)(35)
@@ -2010,7 +2014,7 @@
  * @base NUUN_MenuParamListBase
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_ActorPicture
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 戦闘レイアウトを変更、カスタマイズできます。
@@ -2085,6 +2089,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/5/25 Ver.1.1.2
+ * NUUN_BreakShieldGaugeでのシールドゲージの表示を追加。
  * 2026/5/9 Ver.1.1.1
  * 戦闘開始時にステータスウィンドウが開閉を繰り返す問題を修正。
  * 2026/5/1 Ver.1.1.0
@@ -3320,6 +3326,8 @@
  * @value TpbCircularGauge
  * @option 独自ゲージ(1)(2)(3)(4)(5)(7)(16)(18)(20)(21)(22)(23)(24)
  * @value OrgGauge
+ * @option シールドゲージ(NUUN_BreakShieldGauge)(1)(2)(3)(4)
+ * @value ShieldGauge
  * @option 画像(1)(2)(3)(4)(h)
  * @value Imges
  * @option フリーテキスト(1)(2)(3)(4)(35)

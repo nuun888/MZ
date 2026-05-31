@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.5
+ * @version 1.7.6
  * 
  * @help
  * This is a plugin that processes the display of actor graphics and face graphics images.
@@ -38,6 +38,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/1/2025 Ver.1.7.6
+ * Fixed an issue where an error would appear when the "NUUN_ActorPicture" application was turned ON.
  * 4/19/2025 Ver.1.7.5
  * Fixed an issue where job requirements were not being applied.
  * 12/23/2024 Ver.1.7.4
@@ -315,6 +317,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/6/1 Ver.1.7.6
+ * 立ち絵表示EX適用をONにした場合に、エラーが表示される問題を修正。
  * 2025/4/19 Ver.1.7.5
  * 職業条件が適用されない問題を修正。
  * 2024/12/23 Ver.1.7.4
@@ -802,7 +806,7 @@ Imported.NUUN_ActorPicture = true;
             return this._actorGraphicFace || this._battler.faceName();
         }
 
-        getActorGraphicFaceInde() {
+        getActorGraphicFaceIndex() {
             return this._actorImgIndex || this._battler.faceIndex();
         }
 
@@ -946,6 +950,9 @@ Imported.NUUN_ActorPicture = true;
     const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
     Game_Actor.prototype.initMembers = function() {
         _Game_Actor_initMembers.call(this);
+        this._faceImgEx = "";
+        this._faceImdexEx = 0;
+        //旧
         this.nuun_useItemId = -1;
         this._onImgId = -1;//廃止予定
         this.onImgId = [];
@@ -955,8 +962,7 @@ Imported.NUUN_ActorPicture = true;
         this._actorGraphicFace = null;
         this._imgScenes = 'default';
     };
-
-      
+ 
     Game_Actor.prototype.getActorGraphicList = function() {
         return params.ButlerActors.find(data => condActorImg(data, this));
     };

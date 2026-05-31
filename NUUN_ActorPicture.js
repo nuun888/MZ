@@ -38,7 +38,7 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
- * 6/1/2025 Ver.1.7.6
+ * 6/1/2026 Ver.1.7.6
  * Fixed an issue where an error would appear when the "NUUN_ActorPicture" application was turned ON.
  * 4/19/2025 Ver.1.7.5
  * Fixed an issue where job requirements were not being applied.

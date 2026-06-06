@@ -36,7 +36,7 @@
 ![画像](img/SymbolEncounter2.png)   
 
 シンボルエンカウント設定のnormalの設定  
-シンボルエンカウント設定のリストにコピペ  
+シンボルエンカウント設定のリストのテキストタブにコピペ  
 `{"Name":"normal","VictoryDefeatMode":"disappear","EnableSymbolEncountSwitch":"[]","ImpenetrableRegionId":"[\"11\"]","AllCharacterImg":"true","AutoTriggerSettings":"true","EventFreezesFrame":"-1","DefeatEventFreezesFrame":"-1","RoadImpassableContactTrigger":"false","SearchSettings":"------------------------------","SearchMode":"search","SymbolEncountRange":"circle","RangeValue":"[\"6\",\"45\"]","DetectionSettings":"------------------------------","FindMode":"0","WeatherFindMode":"","VehicleFindMode":"","SwitchFindMode":"","NotObstacles":"false","SightBush":"50","PlayerSearch":"10","NoEncounterProgress":"false","SightResistance":"[]","FindState":"0","GoHome":"true","SubDetectionSettings":"------------------------------","ForcedSearchSwitch":"0","ChronusFindMode":"","FindSetting":"------------------------------","FindBalloonId":"1","FindSE":"{\"name\":\"Attack1\",\"volume\":\"90\",\"pitch\":\"100\",\"pan\":\"0\"}","FindTrackingMode":"chase","TrackingSetting":"------------------------------","TrackingSpeed":"4","SightRange":"8","QuitTrackingFrame":"0","EscapeSetting":"------------------------------","EscapeSpeed":"4","SightEscapeRange":"12","SightEscapeEval":"","LoseSetting":"------------------------------","LoseBalloonId":"7","LoseSE":"","LoseFreezesFrame":"-1","FollowerThroughSettings":"フォロワーすり抜けをONに設定している場合のみ","FollowerThroughDisabled":"false","PreemptiveSurpriseValidSettings":"------------------------------","PreemptiveSurpriseValid":"true"}`
 
 #### 追跡中セーブ許可スイッチID

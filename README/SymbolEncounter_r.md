@@ -3,6 +3,7 @@
 #### 必須、前提プラグイン
 
 [販売先](https://booth.pm/ja/items/7504032)  
+[マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/SymbolEncounter.pdf)   
 
 シンボルエンカウントシステムを実装します。  
 ## 設定

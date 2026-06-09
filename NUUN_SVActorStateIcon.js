@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サイドビューアクターステートアイコン
  * @author NUUN
- * @version 1.0.3
+ * @version 1.0.4
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/6/9 Ver.1.0.4
+ * 戦闘中のメンバー変更時にステートアイコンが更新されない問題を修正。
  * 2024/1/3 Ver.1.0.3
  * 処理の修正。
  * 2023/7/11 Ver.1.0.2
@@ -99,18 +101,26 @@ Sprite_Actor.prototype.update = function() {
 };
 
 Sprite_Actor.prototype.updateStateSprite = function() {
-    if (!this._actor || ActorStatePosition === 'none' || this._actor.actor().meta.HideSVStateIcon) {
-      return;
-    }
+    if (ActorStatePosition === 'none') return;
     if (this.battlerOverlay && !this._stateIconSprite) {
       this.createStateIconSprite();
     }
+    this._stateIconSprite.setup(this._actor);
+    if (!this._actor || this._actor.actor().meta.HideSVStateIcon) {
+        if (this._stateIconSprite.visible) {
+            this._stateIconSprite.hide();
+        }
+        return;
+    }
     if (this._stateIconSprite) {
-      const actor = this._actor.actor();
-      const x = (actor.meta.ActorStateX ? Number(actor.meta.ActorStateX) : 0) + State_X;
-      const y = (actor.meta.ActorStateY ? Number(actor.meta.ActorStateY) : 0) + State_Y;
-      this._stateIconSprite.x = x;
-      this._stateIconSprite.y = y - this.getBattlerStatePosition() - 20;
+        const actor = this._actor.actor();
+        const x = (actor.meta.ActorStateX ? Number(actor.meta.ActorStateX) : 0) + State_X;
+        const y = (actor.meta.ActorStateY ? Number(actor.meta.ActorStateY) : 0) + State_Y;
+        this._stateIconSprite.x = x;
+        this._stateIconSprite.y = y - this.getBattlerStatePosition() - 20;
+        if (!this._stateIconSprite.visible) {
+            this._stateIconSprite.show();
+        } 
     }
 };
 

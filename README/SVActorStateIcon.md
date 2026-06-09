@@ -1,5 +1,5 @@
 # [サイドビューアクターステートアイコン](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SVActorStateIcon.js)
-# Ver.1.0.3  
+# Ver.1.0.4  
  [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SVActorStateIcon.js)  
  
 ## 必須、前提プラグイン
@@ -18,6 +18,8 @@
 このプラグインはMITライセンスで配布しています。  
 
 ## 更新履歴
+2026/6/9 Ver.1.0.4  
+戦闘中のメンバー変更時にステートアイコンが更新されない問題を修正。  
 2024/1/3 Ver.1.0.3  
 処理の修正。  
 2023/7/11 Ver.1.0.2  

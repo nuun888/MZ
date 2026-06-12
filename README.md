@@ -53,19 +53,17 @@ MV対応:×
 ツクマテ：×  
 X:返信、DM  
 github:lssues  
-booth:boothで公開、販売しているプラグインの場合  
+booth:メッセージ  
 #### 競合
-公式フォーラム(日本)：スレッド、会話  
+ツクマテ：×  
+X:返信、DM  
+github:メッセージ   
+booth:boothで公開、販売しているプラグインの場合  
+#### 要望 
 ツクマテ：×  
 X:返信、DM  
 github:×  
-booth:boothで公開、販売しているプラグインの場合  
-#### 要望
-公式フォーラム(日本)：スレッド、会話、ユーザーとのメッセージ(booth)  
-ツクマテ：×  
-X:返信、DM  
-github:×  
-booth:boothで公開、販売しているプラグインの場合  
+booth:メッセージ  
 
 [既知の不具合、更新予定](https://github.com/nuun888/MZ/blob/master/bug.md)  
 

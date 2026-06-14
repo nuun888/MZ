@@ -2,10 +2,9 @@
 # Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
 #### 必須、前提プラグイン
-Ver.1.0.2まで Ver.1.1.0以降では必要なし
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 マップの上限数(デフォルト2000)、アニメーションの上限数(デフォルト1000)を超えて設定できるようになります。  
+jsonを直接編集しなくてもプラグインコマンドで編集できます。  
 上限の変更を行うにはプラグインコマンドでテストプレイ中に実行します。  
 実行前にバックアップをとることを推奨いたします。  
 

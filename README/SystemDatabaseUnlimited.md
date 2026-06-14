@@ -1,7 +1,8 @@
 # [マップ、アニメーションデータベース上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
-# Ver.1.0.2
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
 #### 必須、前提プラグイン
+Ver.1.0.2まで Ver.1.1.0以降では必要なし
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 マップの上限数(デフォルト2000)、アニメーションの上限数(デフォルト1000)を超えて設定できるようになります。  
@@ -19,6 +20,8 @@
 アクター、職業、アイテム、武器、防具、ステート、敵キャラ、敵グループ、コモンイベントは設定できる上限が9999なので設定できるプラグインコマンドはありません。  
 
 ## 更新履歴 
+6/14/2026 Ver.1.1.0　
+NUUN_Baseなしで実行できるように修正。　
 2023/8/23 Ver.1.0.2  
 マップ新規追加時にマップJSONファイルを出力するように修正。  
 2023/1/21 Ver.1.0.1  

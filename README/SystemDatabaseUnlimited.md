@@ -1,7 +1,6 @@
 # [マップ、アニメーションデータベース上限突破](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
 # Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js)
-#### 必須、前提プラグイン
 
 RPGツクールMZのエディタは9999までデータが追加できる。  
 しかしアニメーションは1000までしか設定できない。  

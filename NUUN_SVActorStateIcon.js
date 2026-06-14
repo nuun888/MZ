@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc サイドビューアクターステートアイコン
  * @author NUUN
- * @version 1.0.4
+ * @version 1.0.5
  * @base NUUN_BattlerOverlayBase
  * @orderAfter NUUN_BattlerOverlayBase
  * 
@@ -28,6 +28,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/6/15 Ver.1.0.5
+ * <HideSVStateIcon>が機能していなかった問題を修正。
  * 2026/6/9 Ver.1.0.4
  * 戦闘中のメンバー変更時にステートアイコンが更新されない問題を修正。
  * 2024/1/3 Ver.1.0.3
@@ -107,9 +109,7 @@ Sprite_Actor.prototype.updateStateSprite = function() {
     }
     this._stateIconSprite.setup(this._actor);
     if (!this._actor || this._actor.actor().meta.HideSVStateIcon) {
-        if (this._stateIconSprite.visible) {
-            this._stateIconSprite.hide();
-        }
+        this._stateIconSprite.hide();
         return;
     }
     if (this._stateIconSprite) {
@@ -164,7 +164,9 @@ Sprite_StateIcon.prototype.initMembers = function() {
 };
 
 Sprite_StateIcon.prototype.stateActorVisibleInSelect = function() {
-    if (StateVisible === 'select') {
+    if (this._battler && this._battler.isActor() && this._battler.actor().meta.HideSVStateIcon) {
+        return false;
+    } else if (StateVisible === 'select') {
       return this._battler.isSelected();
     }
     return true;

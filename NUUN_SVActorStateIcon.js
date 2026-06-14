@@ -30,6 +30,7 @@
  * 更新履歴
  * 2026/6/15 Ver.1.0.5
  * <HideSVStateIcon>が機能していなかった問題を修正。
+ * 「ウィンドウステートアイコン表示」が機能していなかった問題を修正。
  * 2026/6/9 Ver.1.0.4
  * 戦闘中のメンバー変更時にステートアイコンが更新されない問題を修正。
  * 2024/1/3 Ver.1.0.3
@@ -140,10 +141,10 @@ Sprite_Actor.prototype.createStateIconSprite = function() {
     const sprite = new Sprite_StateIcon();
     this.battlerOverlay.addChild(sprite);
     this._stateIconSprite = sprite;
+    sprite.svMode = true;
     sprite.setup(this._actor);
     sprite.show();
     sprite.move(0, 0);
-    sprite._svMode = true;
 };
 
 Sprite_Actor.prototype.isEnemySpriteStateIcon = function() {
@@ -156,6 +157,7 @@ Sprite_Actor.prototype.isEnemySpriteStateIcon = function() {
     }
 };
 
+
 const _Sprite_StateIcon_initMembers = Sprite_StateIcon.prototype.initMembers;
 Sprite_StateIcon.prototype.initMembers = function() {
     this._isEnemyMode = NuunManager.isEnemyStateIconMode;
@@ -167,20 +169,22 @@ Sprite_StateIcon.prototype.stateActorVisibleInSelect = function() {
     if (this._battler && this._battler.isActor() && this._battler.actor().meta.HideSVStateIcon) {
         return false;
     } else if (StateVisible === 'select') {
-      return this._battler.isSelected();
+        return this._battler.isSelected();
     }
     return true;
 };
   
 Sprite_StateIcon.prototype.stateActorVisible = function() {
-    this.visible = this.stateActorVisibleInSelect();
+    if (this.svMode) {
+        this.visible = this.stateActorVisibleInSelect();
+    }
 };
   
 const _Sprite_StateIcon_update = Sprite_StateIcon.prototype.update;
 Sprite_StateIcon.prototype.update = function() {
     _Sprite_StateIcon_update.call(this);
     if (this._battler && this._battler.isActor()) {
-      this.stateActorVisible();
+        this.stateActorVisible();
     }
 };
 

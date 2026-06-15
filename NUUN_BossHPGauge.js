@@ -7,12 +7,13 @@
  * @target MZ
  * @plugindesc Boss HP Gauge
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * Display the boss gauge.
  * 
- * The vanish effect is applied when the enemy is a boss or has one of the following tags.
+ * Boss gauge display method
+ * Apply the vanish effect when the enemy is a boss or has one of the following tags.
  * 
  * Enemy note field  
  * <BossEnemy> Recognized as a boss enemy, and an HP gauge will be displayed.
@@ -26,6 +27,8 @@
  * Support is not available for unofficial distribution or modified versions.
  * 
  * Log
+ * 6/16/2026 Ver.1.0.2
+ * Added a feature to specify the vertical display spacing of gauges.
  * 6/15/2026 Ver.1.0.1
  * Fixed so that the vanish effect also recognizes bosses as boss enemies.
  * 6/2615/2026 Ver.1.0.0
@@ -78,6 +81,13 @@
  * @desc Specify the horizontal padding of the gauge.
  * @type number
  * @default 64
+ * @parent BasicSettings
+ * 
+ * @param GaugeVerticalSpacing
+ * @text Gauge vertical spacing
+ * @desc Specifies the vertical display spacing of the gauges.
+ * @type number
+ * @default 52
  * @parent BasicSettings
  * 
  * @param NameSettings
@@ -259,7 +269,7 @@
  * @target MZ
  * @plugindesc ボスHPゲージ
  * @author NUUN
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * ボス用のゲージを表示します。
@@ -280,6 +290,8 @@
  * ※正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/6/16 Ver.1.0.2
+ * ゲージの縦の表示間隔を指定できる機能を追加。
  * 2026/6/15 Ver.1.0.1
  * 消滅エフェクトがボスでもボスエネミーとして認識するように修正。
  * 2026/6/15 Ver.1.0.0
@@ -332,6 +344,13 @@
  * @desc ゲージの横方向の余白を指定します。
  * @type number
  * @default 64
+ * @parent BasicSettings
+ * 
+ * @param GaugeVerticalSpacing
+ * @text ゲージ縦間隔
+ * @desc ゲージの縦の表示間隔を指定します。
+ * @type number
+ * @default 52
  * @parent BasicSettings
  * 
  * @param NameSettings
@@ -645,7 +664,7 @@ Imported.NUUN_BossHPGauge = true;
     };
 
     Scene_Battle.prototype.isShowBossHpGauge = function(enemy) {
-        return enemy.enemy().meta.BossEnemy || enemy.collapseType() === 1;
+        return !!enemy.enemy().meta.BossEnemy || enemy.collapseType() === 1;
     };
 
     Scene_Battle.prototype.setupBossEnemyGauge = function(enemy) {
@@ -670,7 +689,7 @@ Imported.NUUN_BossHPGauge = true;
     Scene_Battle.prototype.updateBossHpGauge = function() {
         const x = _getGaugePosition();
         let y = params.BossGaugeY + (Graphics.height - Graphics.boxHeight);
-        const vMargin = params.EnemyWidth * _gaugeVerticalDirection();
+        const vMargin = Math.max(params.EnemyWidth, params.GaugeVerticalSpacing) * _gaugeVerticalDirection();
         let index = 0;
         for (const sprites of this._bossGauge) {
             sprites[0].x = x + (index % params.BossGaugeCols) * (params.GaugeWidth + _getGaugeMargin());

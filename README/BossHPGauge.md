@@ -13,7 +13,7 @@
 [マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/BossHPGauge.pdf)  
 [Manual (English)](https://raw.githubusercontent.com/nuun888/MZ/master/BossHPGauge_en.pdf)  
 
-![画像](img/BossHpGauge.png)   
+![画像](img/BossHpGauge1.png)   
 
 ## 更新履歴
 2026/6/15 Ver.1.0.1  

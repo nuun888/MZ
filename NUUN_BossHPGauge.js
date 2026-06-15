@@ -7,10 +7,12 @@
  * @target MZ
  * @plugindesc Boss HP Gauge
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * Display the boss gauge.
+ * 
+ * The vanish effect is applied when the enemy is a boss or has one of the following tags.
  * 
  * Enemy note field  
  * <BossEnemy> Recognized as a boss enemy, and an HP gauge will be displayed.
@@ -24,7 +26,9 @@
  * Support is not available for unofficial distribution or modified versions.
  * 
  * Log
- * 5/26/2026 Ver.1.0.0
+ * 6/15/2026 Ver.1.0.1
+ * Fixed so that the vanish effect also recognizes bosses as boss enemies.
+ * 6/2615/2026 Ver.1.0.0
  * First edition.
  * 
  * @param BasicSettings
@@ -32,7 +36,7 @@
  * @default ------------------------------
  * 
  * @param GaugePosition
- * @desc Specify the position of the gauge
+ * @desc Specify the position of the gauge.
  * @text Gauge position
  * @type select
  * @option Left
@@ -105,7 +109,7 @@
  * @default ------------------------------
  * 
  * @param GaugeStyle
- * @desc gauge style
+ * @desc Gauge style
  * @text Specifies the style of the gauge.
  * @type select
  * @option Default
@@ -255,10 +259,13 @@
  * @target MZ
  * @plugindesc ボスHPゲージ
  * @author NUUN
- * @version 1.0.0
+ * @version 1.0.1
  * 
  * @help
  * ボス用のゲージを表示します。
+ * 
+ * ボスゲージの表示方法
+ * 消滅エフェクトがボスまたは以下のタグを指定。
  * 
  * 敵キャラのメモ欄
  * <BossEnemy> ボスエネミーとして認識されHPゲージが表示されます。
@@ -273,7 +280,9 @@
  * ※正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2026/5/26 Ver.1.0.0
+ * 2026/6/15 Ver.1.0.1
+ * 消滅エフェクトがボスでもボスエネミーとして認識するように修正。
+ * 2026/6/15 Ver.1.0.0
  * 初版
  * 
  * @param BasicSettings
@@ -629,10 +638,14 @@ Imported.NUUN_BossHPGauge = true;
         this._bossGauge = [];
         const enemies = $gameTroop.members();
         enemies.forEach((enemy, index) => {
-            if (enemy.enemy().meta.BossEnemy) {
+            if (this.isShowBossHpGauge(enemy)) {
                 this.setupBossEnemyGauge(enemy);
             }
         })
+    };
+
+    Scene_Battle.prototype.isShowBossHpGauge = function(enemy) {
+        return enemy.enemy().meta.BossEnemy || enemy.collapseType() === 1;
     };
 
     Scene_Battle.prototype.setupBossEnemyGauge = function(enemy) {
@@ -938,7 +951,7 @@ Imported.NUUN_BossHPGauge = true;
             case "left":
                 return _getGaugeMargin();
             case "center":
-                return Math.floor((Graphics.width - (params.GaugeWidth || 600)) / 2) + _getGaugeMargin();
+                return Math.floor((Graphics.width - (params.GaugeWidth || 600) + _getGaugeMargin()) / 2);
             case "right":
                 return (Graphics.width - (params.GaugeWidth || 600)) - 12;
             default :

@@ -1,5 +1,5 @@
 # [ボスHPゲージ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BossHPGauge.js)
-# Ver.1.0.1
+# Ver.1.0.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BossHPGauge.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -16,6 +16,8 @@
 ![画像](img/BossHpGauge1.png)   
 
 ## 更新履歴
+2026/6/16 Ver.1.0.2  
+ゲージの縦の表示間隔を指定できる機能を追加。  
 2026/6/15 Ver.1.0.1  
 消滅エフェクトがボスでもボスエネミーとして認識するように修正。  
 2026/6/15 Ver.1.0.0  

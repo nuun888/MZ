@@ -9,7 +9,7 @@
 再配布：可能  
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 
-ボス用のゲージを表示します。
+ボス用のゲージを表示します。  
 [マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/BossHPGauge.pdf)  
 [Manual (English)](https://raw.githubusercontent.com/nuun888/MZ/master/BossHPGauge_en.pdf)  
 

@@ -70,8 +70,8 @@
  * @parent BasicSettings
  * 
  * @param BossGaugeY
- * @text Specify the relative Y‑coordinate of the entire boss gauge.
- * @desc Boss gauge Y‑offset (relative)
+ * @text Specify the Y coordinate of the entire boss gauge.
+ * @desc Boss gauge Y-coordinate
  * @type number
  * @default 12
  * @parent BasicSettings
@@ -333,8 +333,8 @@
  * @parent BasicSettings
  * 
  * @param BossGaugeY
- * @text ボスゲージ全体のY座標(相対)を指定します。
- * @desc ボスゲージY座標(相対)
+ * @text ボスゲージ全体のY座標を指定します。
+ * @desc ボスゲージY座標
  * @type number
  * @default 12
  * @parent BasicSettings

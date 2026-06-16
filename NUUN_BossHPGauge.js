@@ -7,7 +7,7 @@
  * @target MZ
  * @plugindesc Boss HP Gauge
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * Display the boss gauge.
@@ -27,6 +27,8 @@
  * Support is not available for unofficial distribution or modified versions.
  * 
  * Log
+ * 6/17/2026 Ver.1.0.3
+ * Fixed an issue where, when "Enemy image display" was set to OFF, the gauge margin could not be set to a value smaller than the enemy image width.
  * 6/16/2026 Ver.1.0.2
  * Added a feature to specify the vertical display spacing of gauges.
  * 6/15/2026 Ver.1.0.1
@@ -70,8 +72,8 @@
  * @parent BasicSettings
  * 
  * @param BossGaugeY
- * @text Specify the Y coordinate of the entire boss gauge.
- * @desc Boss gauge Y-coordinate
+ * @text Boss gauge Y-coordinate
+ * @desc Specify the Y coordinate of the entire boss gauge.
  * @type number
  * @default 12
  * @parent BasicSettings
@@ -269,7 +271,7 @@
  * @target MZ
  * @plugindesc ボスHPゲージ
  * @author NUUN
- * @version 1.0.2
+ * @version 1.0.3
  * 
  * @help
  * ボス用のゲージを表示します。
@@ -290,6 +292,8 @@
  * ※正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/6/17 Ver.1.0.3
+ * 敵キャラ画像表示をOFFにした場合に、ゲージ余白をモンスター表示横幅未満の値でも設定できるように修正。
  * 2026/6/16 Ver.1.0.2
  * ゲージの縦の表示間隔を指定できる機能を追加。
  * 2026/6/15 Ver.1.0.1
@@ -333,8 +337,8 @@
  * @parent BasicSettings
  * 
  * @param BossGaugeY
- * @text ボスゲージ全体のY座標を指定します。
- * @desc ボスゲージY座標
+ * @text ボスゲージY座標
+ * @desc ボスゲージ全体のY座標を指定します。
  * @type number
  * @default 12
  * @parent BasicSettings
@@ -689,7 +693,7 @@ Imported.NUUN_BossHPGauge = true;
     Scene_Battle.prototype.updateBossHpGauge = function() {
         const x = _getGaugePosition();
         let y = params.BossGaugeY + (Graphics.height - Graphics.boxHeight);
-        const vMargin = Math.max(params.EnemyWidth, params.GaugeVerticalSpacing) * _gaugeVerticalDirection();
+        const vMargin = _getVerticalargin() * _gaugeVerticalDirection();
         let index = 0;
         for (const sprites of this._bossGauge) {
             sprites[0].x = x + (index % params.BossGaugeCols) * (params.GaugeWidth + _getGaugeMargin());
@@ -979,7 +983,13 @@ Imported.NUUN_BossHPGauge = true;
     };
 
     function _getGaugeMargin() {
-        return Math.max(params.GaugeMargin, (params.ShowEnemyImage ? params.EnemyWidth : 0));
+        if (!!params.ShowEnemyImage) return Math.max(params.EnemyWidth, params.GaugeMargin);
+        return params.GaugeMargin;
+    };
+
+    function _getVerticalargin() {
+        if (!!params.ShowEnemyImage) return Math.max(params.EnemyWidth, params.GaugeVerticalSpacing);
+        return params.GaugeVerticalSpacing;
     };
 
     function _gaugeVerticalDirection() {

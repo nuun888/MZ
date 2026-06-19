@@ -11,7 +11,7 @@
  * @target MZ
  * @plugindesc  Battle background change
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -39,6 +39,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/20/2026 Ver.1.2.3
+ * Fixed an issue where battle backgrounds were not being retrieved using terrain tags.
  * 9/17/2024 Ver.1.2.2
  * Fixed an issue where battle backgrounds were not being applied for regions and tags.
  * 7/22/2023 Ver.1.2.1
@@ -315,7 +317,7 @@
  * @target MZ
  * @plugindesc  戦闘背景変更プラグイン
  * @author NUUN
- * @version 1.2.2
+ * @version 1.2.3
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * 
@@ -344,6 +346,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/6/20 Ver.1.2.3
+ * 地形タグでの戦闘背景の取得がされていなかった問題を修正。
  * 2024/9/17 Ver.1.2.2
  * リージョン、タグでのバトル背景が適用されていなかった問題を修正。
  * 2023/7/22 Ver.1.2.1
@@ -713,6 +717,7 @@ Game_Troop.prototype.battleBackTroopTag = function() {
   const re = /<(?:battleBack):\s*(\d+)>/;
   const pages = this.troop().pages[0];
   let list = null;
+  if (!pages) return list;
   pages.list.forEach(tag => {
     if ((tag.code === 108 || tag.code === 408) && !list) {
       let match = re.exec(tag.parameters[0]);
@@ -779,7 +784,7 @@ Game_Map.prototype.mapTagBattleBack = function() {
         const back = BattleBackground[Number(data[1]) - 1];
         if (back.Battlebackground) {
             const battlebackground = back.Battlebackground;
-            list.push({Battlebacks1:battlebackground.Battlebacks1, Battlebacks2:battlebackground.Battlebacks2, regionId:data[0]});
+            list.push({Battlebacks1:battlebackground.Battlebacks1, Battlebacks2:battlebackground.Battlebacks2, tagId:data[0]});
         }
       }
     } else {

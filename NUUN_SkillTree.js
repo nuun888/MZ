@@ -10,7 +10,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.1
+ * @version 1.8.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -99,6 +99,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 6/22/2026 Ver.1.8.0
+ * Adds a feature that allows configuring reset skills.
+ * Adds a feature that displays a confirmation window when using a reset skill in the skill tree.
+ * Fixed an issue where skill costs based on currency were not functioning.
  * 5/16/2026 Ver.1.7.1
  * Fixed an issue where an error occurred when opening the skill tree screen while using "NUUN_SkillTreeStausWindowEx".
  * 4/26/2026 Ver.1.7.0
@@ -981,6 +985,50 @@
  * @default "Not Executed"
  * @parent SkillTreeConfirmationSetting
  * 
+ * @param SkillTreeResetConfirmationSetting
+ * @text Reset confirmation setting
+ * @default ------------------------------
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ResetConfirmationWindowTitle
+ * @text Reset confirmation window title
+ * @desc You can specify the title displayed in the reset confirmation window.
+ * @type string
+ * @default "This will reset all skills of this type."
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ResetConfirmatioOkText
+ * @text Reset execution text
+ * @desc Sets the reset text.
+ * @type string
+ * @default "Reset"
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ResetConfirmationCancleText
+ * @text Reset cancel text
+ * @desc Sets the cancel text.
+ * @type string
+ * @default "Cancel"
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param SkillTreeResetSetting
+ * @text Skill tree reset setting
+ * @default If "NUUN_SkillTreeEx" is installed, the cost settings for the skill reset ID will be applied.
+ * 
+ * @param SkillTreeResetSkillId
+ * @desc Specifies the skill ID used for skill reset within the skill tree window.
+ * @text Skill reset id
+ * @type skill
+ * @default 0
+ * @parent SkillTreeResetSetting
+ * 
+ * @param SkillTreeResetItem
+ * @desc Specifies the consumable item used for skill reset within the skill tree window (consumed once).
+ * @text Consumable item
+ * @type item
+ * @default 0
+ * @parent SkillTreeResetSetting
+ * 
  * @param LearnSetting
  * @text Skill learning settings
  * @default ------------------------------
@@ -1739,7 +1787,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.7.0
+ * @version 1.8.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1826,6 +1874,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/6/22 Ver.1.8.0
+ * リセットスキルを設定できる機能を追加。
+ * スキルツリー内のリセットスキルで確認ウィンドウを表示する機能を追加。
+ * 金額によるスキルコストが機能していなかった問題を修正。
  * 2026/5/16 Ver.1.7.1
  * NUUN_SkillTreeStausWindowExを導入している場合に、スキルツリー画面を開くとエラーが出る問題を修正。
  * 2026/4/26 Ver.1.7.0
@@ -2709,6 +2761,50 @@
  * @type string
  * @default "実行しない"
  * @parent SkillTreeConfirmationSetting
+ * 
+ * @param SkillTreeResetConfirmationSetting
+ * @text リセット確認ウィンドウ設定
+ * @default ------------------------------
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ResetConfirmationWindowTitle
+ * @text リセット確認ウィンドウの表示名
+ * @desc リセット確認ウィンドウに表示される表示名を指定します。
+ * @type string
+ * @default "このタイプのスキルをすべてリセットします。"
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ResetConfirmatioOkText
+ * @text リセット確認ウィンドウの実行の表示名
+ * @desc リセット確認ウィンドウに表示される実行の表示名を指定します。
+ * @type string
+ * @default "リセット"
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param ResetConfirmationCancleText
+ * @text リセット確認ウィンドウのキャンセルの表示名
+ * @desc リセット確認ウィンドウに表示されるキャンセルの表示名を指定します。
+ * @type string
+ * @default "キャンセル"
+ * @parent SkillTreeConfirmationSetting
+ * 
+ * @param SkillTreeResetSetting
+ * @text スキルツリーリセット設定
+ * @default NUUN_SkillTreeExを導入している場合は、スキルリセットIDのコスト設定の設定が適用されます。
+ * 
+ * @param SkillTreeResetSkillId
+ * @desc スキルツリーウィンドウ内でのスキルリセットのスキルIDを指定します。
+ * @text スキルリセットID
+ * @type skill
+ * @default 0
+ * @parent SkillTreeResetSetting
+ * 
+ * @param SkillTreeResetItem
+ * @desc スキルツリーウィンドウ内でのスキルリセットの消費アイテムを指定します。(1消費固定)
+ * @text 消費アイテム
+ * @type item
+ * @default 0
+ * @parent SkillTreeResetSetting
  * 
  * @param LearnSetting
  * @text スキル習得時設定
@@ -3753,6 +3849,7 @@ Imported.NUUN_SkillTree = true;
             this._immediateCommonEvent = data.ImmediateCommonEvent;
             this._maxCountSkillRequired = data.MaxCountSkillRequired;
             this._learnPrerequisiteSkillMode = data.LearnPrerequisiteSkillMode || "and";
+            this._skillTreeReset = params.SkillTreeResetSkillId === this._id;
             this.setCountLearnSkillData();
             const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
@@ -3761,6 +3858,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         setSKillPointCost(data) {
+            if (this.isSkillTreeReset()) return 0;//スキルリセットはSPを消費させない。
             const tagCost = _getSkillCostTag($dataSkills[this._id], "SKillPointCost");
             this._costFormula = tagCost !== null ? tagCost : (!!data.Cost ? data.Cost : params.DefaultSkillPointCost);
         }
@@ -4064,6 +4162,10 @@ Imported.NUUN_SkillTree = true;
             return this._force;
         }
 
+        isSkillTreeReset() {
+            return this._skillTreeReset;
+        }
+
         setCountLearnSkillData() {
             this._countLearnSkillData = this.getCountLearnSkillList();
         }
@@ -4239,13 +4341,13 @@ Imported.NUUN_SkillTree = true;
             if (this.getCostArmor() > 0 && $gameParty.numItems($dataArmors[this.getCostArmor()]) >= this.getArmorNum()) {
                 $gameParty.loseItem($dataArmors[this.getCostArmor()], this.getArmorNum());
             }
-            if (this.getCostGold() > 0 && !this.getCanGold($gameParty.gold())) {
+            if (this.getCostGold() > 0 && this.getCanGold($gameParty.gold())) {
                 $gameParty.loseGold(this.getCostGold());
             }
             if (this.getCostVariables() > 0 && $gameVariables.value(this.getCostVariables()) >= this.getVariablesNum()) {
                 const val = this.getCostVariables();
                 const value = $gameVariables.value(val);
-                $gameVariables.setValue(val, value - this.getVariablesNum());//MISS
+                $gameVariables.setValue(val, value - this.getVariablesNum());
             }
         }
 
@@ -4294,6 +4396,13 @@ Imported.NUUN_SkillTree = true;
 
         getLearningLevel() {
             return this._learningLevel;
+        }
+
+        isPaySkillTreeResetCostOk() {
+            if ($gameParty.numItems($dataItems[params.SkillTreeResetItem]) < 1) {
+                return false;
+            }
+            return true;
         }
 
     }
@@ -4356,6 +4465,7 @@ Imported.NUUN_SkillTree = true;
         this.createSkillTreeStatusWindow();
         this.createSkillTreeHelpWindow();
         this.createSkillTreeConfirmationWindow();
+        this.createSkillTreeResetConfirmationWindow();
         this.setupActor();
     };
 
@@ -4426,6 +4536,15 @@ Imported.NUUN_SkillTree = true;
             this._confirmationWindow.hide();
             this._skillTreeWindow.setSkillTreeConfirmationWindow(this._confirmationWindow);
         }
+    };
+
+    Scene_SkillTree.prototype.createSkillTreeResetConfirmationWindow = function() {
+        const rect = this.skillTreeConfirmationWindowRect();
+        this._resetConfirmationWindow = new Window_SkillTreeResetConfirmation(rect);
+        this._resetConfirmationWindow.setHandler("ok", this.onResetConfirmationOk.bind(this));
+        this._resetConfirmationWindow.setHandler("cancel", this.cancelResetConfirmation.bind(this));
+        this.addWindow(this._resetConfirmationWindow);
+        this._resetConfirmationWindow.hide();
     };
 
     Scene_SkillTree.prototype.getSkillTreeBackgroundImage = function() {
@@ -4569,13 +4688,25 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.onSkillTreeOk = function() {
         if (this._skillTreeWindow.isLearnEnabled()) {
-            if (_isConfirmation()) {
+            if (this._skillTreeWindow.skillTreeReset()) {
+                this.skillTreeResetSkillTree();
+            } else if (_isConfirmation()) {
                 SoundManager.playOk();
                 this.openConfirmationWindow();
             } else {
                 this.skillTreeLearnConfirmation();
             }
         } else {
+            this._skillTreeWindow.activate();
+        }
+    };
+
+    Scene_SkillTree.prototype.skillTreeResetSkillTree = function() {
+        if (!!this._resetConfirmationWindow) {
+            SoundManager.playOk();
+            this.openResetConfirmationWindow();
+        } else {
+            this._skillTreeWindow.resetSkillTree();
             this._skillTreeWindow.activate();
         }
     };
@@ -4612,6 +4743,25 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.cancelConfirmation = function() {
         this._confirmationWindow.close();
+        this._skillTreeWindow.activate();
+    };
+
+    Scene_SkillTree.prototype.openResetConfirmationWindow = function() {
+        this._resetConfirmationWindow.show();
+        this._resetConfirmationWindow.open();
+        this._resetConfirmationWindow.activate();
+        this._resetConfirmationWindow.select(0);
+    };
+
+    Scene_SkillTree.prototype.onResetConfirmationOk = function() {
+        this._resetConfirmationWindow.close();
+        this._skillTreeWindow.playOkSound();
+        this._skillTreeWindow.resetSkillTree();
+        this._skillTreeWindow.activate();
+    };
+
+    Scene_SkillTree.prototype.cancelResetConfirmation = function() {
+        this._resetConfirmationWindow.close();
         this._skillTreeWindow.activate();
     };
 
@@ -5301,8 +5451,8 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTree.prototype.drawItemNumber = function(data, x, y, width, align = "right") {
         if (params.SkillTreeNumText) {
             const actor = this._actor;
-            const count = actor.getSkillTreeCount(data._id);
-            const maxCount = data.getMaxCount() || 1;
+            const count = data.isSkillTreeReset() ? this.skillTreeResetCost() : actor.getSkillTreeCount(data._id);
+            const maxCount = data.isSkillTreeReset() ? $gameParty.numItems($dataItems[this.skillTreeResetCostItemId()]) : (data.getMaxCount() || 1);
             const skillId = data._id;
             const d = data;
             const v = $gameVariables._data;
@@ -5503,11 +5653,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.drawSkillTreeType4Line = function(contents, x1, y1, x2, y2, thick, color) {//ベージュ曲線
-        this.drawSkillTreeType1Line(contents, x1, y2, x2, y2, params.LineThick, color);
+        this.drawSkillTreeType1Line(contents, x1, y2, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.drawSkillTreeType5Line = function(contents, x1, y1, x2, y2, thick, color) {//EX
-        this.drawSkillTreeType1Line(contents, x1, y2, x2, y2, params.LineThick, color);
+        this.drawSkillTreeType1Line(contents, x1, y2, x2, y2, thick, color);
     };
 
     Window_SkillTree.prototype.rowsMarginHeight = function() {
@@ -5578,7 +5728,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.isEnabled = function(data) {
-        return !!data && this.isMultipleCount(data) || !!data && this.isPrerequisiteSkill(data) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data);
+        return !!data && (data.isSkillTreeReset() ? this.isSkillTreeResetEnabled(data) : (this.isMultipleCount(data) || this.isPrerequisiteSkill(data) && data.isPaySkillTreeCostOk() && this.isSkillTreeEvalCond(data)));
+    };
+
+    Window_SkillTree.prototype.isSkillTreeResetEnabled = function(data) {
+        return data.isPaySkillTreeResetCostOk() && this.skillTreeLearnedSkills();
     };
 
     Window_SkillTree.prototype.isSkillTreeEvalCond = function(data) {
@@ -5591,6 +5745,11 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.isLearnEnabled = function() {
         return this._learnOk;
+    };
+
+    Window_SkillTree.prototype.skillTreeReset = function() {
+        const data = this.itemAt(this.index());
+        return !!data && data.isSkillTreeReset();
     };
 
     Window_SkillTree.prototype.setIsPrerequisitSkill = function(data) {
@@ -5757,6 +5916,32 @@ Imported.NUUN_SkillTree = true;
         
     };
 
+    Window_SkillTree.prototype.resetSkillTree = function() {
+        SoundManager.playOk();
+        _SkillTreeReset(this._actor, this._skillTreeId + 1, true);
+        this.paySkillTreeResetCost();
+        this._skillTreeStatusWindow.refresh();
+        this._skillTreeCostWindow.refresh();
+    };
+
+    Window_SkillTree.prototype.paySkillTreeResetCost = function() {
+        $gameParty.loseItem($dataItems[this.skillTreeResetCostItemId()], 1);
+    };
+
+    Window_SkillTree.prototype.skillTreeResetCostItemId = function() {
+        return params.SkillTreeResetItem;
+    };
+
+    Window_SkillTree.prototype.skillTreeResetCost = function() {
+        return 1;
+    };
+
+    Window_SkillTree.prototype.skillTreeLearnedSkills = function() {
+        const actor = this._actor;
+        const list = this._data.filter(data => !!data && data._id !== params.SkillTreeResetSkillId).map(data => data._id);
+        return list.some(id => actor.isSkillTreeLearned(id) && actor.notDeletionSkillTreeSkill(id));
+    };
+
 
     function Window_SkillTreeCost() {
         this.initialize(...arguments);
@@ -5833,8 +6018,8 @@ Imported.NUUN_SkillTree = true;
         
     };
 
-    Window_SkillTreeCost.prototype.drawCostList = function(x, y) {
-        const list = this.showCostList(this._treeData);
+    Window_SkillTreeCost.prototype.drawCostList = function(x, y) {//
+        const list = this._treeData.isSkillTreeReset() ? this.getSkillTreeResetCostType() : this.showCostList(this._treeData);
         const lineHeight = this.lineHeight();
         this.setHeightRows(1);
         for (let i = 0; i < list.length; i++) {
@@ -5994,6 +6179,10 @@ Imported.NUUN_SkillTree = true;
         return params.PrerequisiteSkillsName || "前提スキル";
     };
 
+    Window_SkillTreeCost.prototype.getSkillTreeResetCostType = function() {
+        return ['item'];
+    };
+
 
     function Window_SkillTreeStatus() {
         this.initialize(...arguments);
@@ -6100,6 +6289,29 @@ Imported.NUUN_SkillTree = true;
         this.contents.paintOpacity = 48;
         this.contents.fillRect(x, lineY, width, 2, ColorManager.normalColor());
         this.contents.paintOpacity = 255;
+    };
+
+
+    function Window_SkillTreeResetConfirmation() {
+        this.initialize(...arguments);
+    }
+    
+    Window_SkillTreeResetConfirmation.prototype = Object.create(Window_SkillTreeConfirmation.prototype);
+    Window_SkillTreeResetConfirmation.prototype.constructor = Window_SkillTreeResetConfirmation;
+
+    window.Window_SkillTreeResetConfirmation = Window_SkillTreeResetConfirmation;
+
+    Window_SkillTreeResetConfirmation.prototype.makeCommandList = function() {
+        this.addCommand(params.ResetConfirmatioOkText, "ok", true);
+        this.addCommand(params.ResetConfirmationCancleText, "cancel", true);
+    };
+
+    Window_SkillTreeResetConfirmation.prototype.confirmationMessage = function() {
+        const rect = this.itemRect(-4);
+        const lineHeight = this.lineHeight();
+        const width = this.innerWidth - this.colSpacing();
+        this.drawText(params.ResetConfirmationWindowTitle, rect.x, rect.y, width);
+        this.contentsHorzLine(rect.x, rect.y + lineHeight, width);
     };
 
 

@@ -14,7 +14,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
  * @orderAfter NUUN_SkillTree
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * You can customize the status window in the skill tree screen.
@@ -29,6 +29,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 8/7/2026 Ver.1.0.2
+ * Added support for settings configured with the "NUUN_SkillTreeBuilder" plugin.
  * 3/13/2026 Ver.1.0.1
  * Fixed an issue where an error would occur when attempting to display an actor that did not have actor data set.
  * 8/15/2025 Ver.1.0.0
@@ -507,7 +509,7 @@
  * @orderAfter NUUN_Base
  * @orderAfter NUUN_MenuParamListBase
  * @orderAfter NUUN_SkillTree
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * スキルツリー画面のステータスウィンドウをカスタマイズできます。
@@ -522,6 +524,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/8/7 Ver.1.0.2
+ * スキルツリービルダープラグインでの設定を適用できるように修正。
  * 2026/3/13 Ver.1.0.1
  * アクターデータを設定していないアクターを標示しようとする場合にエラーが出る問題を修正。
  * 2025/8/15 Ver.1.0.0
@@ -996,7 +1000,8 @@ var Imported = Imported || {};
 Imported.NUUN_SkillTreeStausWindowEx = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const params = Nuun_PluginParams_SkillTree.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
     const paramList = {};
     paramList.ActorImg_X = params.ActorImg_X;
     paramList.ActorImg_Y = params.ActorImg_Y;
@@ -1005,7 +1010,11 @@ Imported.NUUN_SkillTreeStausWindowEx = true;
 
     function _isActorPictureEXApp() {
         return Imported.NUUN_ActorPicture && params.ActorPictureEXApp;
-    }
+    };
+
+    NuunSkillTreeManager.getSkillTreeStatusWindowExParams = function() {
+        return params;
+    };
 
     Scene_SkillTree.prototype.createWindowLayer = function() {
         this.createSpriteActor();
@@ -1077,6 +1086,7 @@ Imported.NUUN_SkillTreeStausWindowEx = true;
     };
 
     Window_SkillTree.prototype.drawActorImage = function() {
+        if (!this._actor) return;
         if (params.GraphicMode !== 'img_tree') return;
         let bitmap = null;
         const actor = this._actor;
@@ -1092,7 +1102,7 @@ Imported.NUUN_SkillTreeStausWindowEx = true;
     };
 
     Window_SkillTree.prototype.getActorGraphicImg = function(data) {
-        return _isActorPictureEXApp() ? this._actorImgData.loadActorGraphic() : ImageManager.nuun_LoadPictures(data.ActorImg);
+        return _isActorPictureEXApp() ? this._actorImgData.loadActorGraphic() : NuunSkillTreeManager.LoadPictures(data.ActorImg);
     };
 
     Window_SkillTree.prototype.drawActorGraphic = function(data, bitmap, x, y, width, height, actor) {

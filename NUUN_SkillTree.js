@@ -8,9 +8,7 @@
  * @target MZ
  * @plugindesc Skill Tree
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.8.0
+ * @version 1.9.0
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -99,6 +97,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 8/7/2026 Ver.1.9.0
+ * Modified the plugin so it can run without requiring the "NUUN_Base" plugin.
+ * Added support for settings configured with the "NUUN_SkillTreeBuilder" plugin.
+ * Fixed an issue where the Skill Tree window opacity setting was not being applied.
  * 6/22/2026 Ver.1.8.0
  * Adds a feature that allows configuring reset skills.
  * Adds a feature that displays a confirmation window when using a reset skill in the skill tree.
@@ -1660,8 +1662,8 @@
  * @parent LearnSetting
  * 
  * @param MaxCountSkillRequired
- * @desc Allows skills to be learned even if the prerequisite skill for multi-level learning has not reached its maximum learning level.
- * @text Enables learning of multi-acquisition skills even when below the maximum learning level
+ * @desc Allows skills to be learned even if the prerequisite skill for multi-level learning has not reached its maximum learning count.
+ * @text Enables learning of multi-acquisition skills even when below the maximum learning count
  * @type boolean
  * @default false
  * @parent LearnSetting
@@ -1785,9 +1787,7 @@
  * @target MZ
  * @plugindesc スキルツリー
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.8.0
+ * @version 1.9.0
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1874,6 +1874,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/8/7 Ver.1.9.0
+ * 共通処理プラグインの使用なしで実行できるように修正。
+ * スキルツリービルダープラグインでの設定を適用できるように修正。
+ * スキルツリーウィンドウの不透明度の設定が適用されていなかった問題を修正。
  * 2026/6/22 Ver.1.8.0
  * リセットスキルを設定できる機能を追加。
  * スキルツリー内のリセットスキルで確認ウィンドウを表示する機能を追加。
@@ -3594,10 +3598,227 @@ var Imported = Imported || {};
 Imported.NUUN_SkillTree = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_SkillTree {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_SkillTree = Nuun_PluginParams_SkillTree;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                list.forEach(a => {
+                    a = this.getTextCodeMeta(a);
+                });
+                return list;
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_SkillTree.getPluginParams(document.currentScript);
     const pluginName = params.pluginName;
     let _confirmation = false;
     let _setActor = null;
+
+    function NuunSkillTreeManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunSkillTreeManager = NuunSkillTreeManager;
+
+    NuunSkillTreeManager.structureData = function(params){
+        return JSON.parse(JSON.stringify(params, function(key, value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return NuunSkillTreeManager.getEvalCode(value);
+            }
+        }));
+    };
+
+    NuunSkillTreeManager.getEvalCode = function(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    };
+
+    NuunSkillTreeManager.stringCode = function(code){
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return code;
+        }
+    };
+    
+    NuunSkillTreeManager.getMetaCode = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunSkillTreeManager.getMetaCodeList = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta.split(',');
+    };
+
+    NuunSkillTreeManager.LoadPictures = function(filename) {
+        const bitmap = ImageManager.loadBitmap("img/", filename);
+        return bitmap;
+    };
+
+    NuunSkillTreeManager.getColorCode = function(color) {
+        if (typeof(color) === "string" && color.indexOf('#') === 0) {
+            return color;
+        }
+        return ColorManager.textColor(color);
+    };
+
+    NuunSkillTreeManager.numPercentage = function(num, digits, mode) {
+        if (isNaN(num)) { return num }
+        return (mode ? Math.round(num * Math.pow(10, digits + 2)) : Math.floor(num * Math.pow(10, digits + 2))) / Math.pow(10, digits + 2);
+    };
+
+    NuunSkillTreeManager.getSkillTreeData = function(data, type, actor) {
+        return new SkillTreeData(data, type, actor);
+    };
+
+    NuunSkillTreeManager.getCountLearnSkillData = function(contents, data) {
+        return data;
+    };
+
+    NuunSkillTreeManager.getLearnSkillIconFormula = function(data, text) {
+        return text;
+    };
+
+    NuunSkillTreeManager.getSkillPointParamName = function() {
+        return params.SkillPointName;
+    };
+
+    NuunSkillTreeManager.getLearnConfirmation = function() {
+        return params.LearnConfirmation;
+    };
+
+    NuunSkillTreeManager.isConfirmationWindowCenter = function() {
+        return !!params.ConfirmationWindowCenter;
+    };
+
+    NuunSkillTreeManager.getLineDiagonalWidth = function() {
+        return params.LineDiagonalWidth || 30;
+    };
+
+    NuunSkillTreeManager.getSkillTreeParams = function() {
+        return params;
+    };
+
+    NuunSkillTreeManager.getSkillTreeReqSkillList = function(list, skillId) {
+        return list.filter(req => {
+            if (!!req.DerivedSkill) {
+                return req.DerivedSkill.includes(skillId);
+            }
+            return false;
+        });
+    };
+
+    NuunSkillTreeManager.isSpritesheet = function() {
+        return params.SkillFrameType === 'spritesheet';
+    };
+
+    NuunSkillTreeManager.isContentsImage = function() {
+        return params.SkillFrameType === 'image';
+    };
+
+    NuunSkillTreeManager.getSkillTreeReqSkillListId = function(list, skillId) {
+        return this.getSkillTreeReqSkillList(list, skillId).map(t => t.SkillId);
+    };
 
     PluginManager.registerCommand(pluginName, 'ShowSkillTreeWindow', args => {
         SceneManager.push(Scene_SkillTree);
@@ -3676,15 +3897,15 @@ Imported.NUUN_SkillTree = true;
     };
 
     function _getSkillCostTag(method, tag) {
-        return NuunManager.getMetaCode(method, tag);
+        return NuunSkillTreeManager.getMetaCode(method, tag);
     };
 
     function _getSkillCostTagList(method, tag) {
-        return NuunManager.getMetaCodeList(method, tag);
+        return NuunSkillTreeManager.getMetaCodeList(method, tag);
     };
 
     function _getSkillImgTag(method) {
-        return NuunManager.getMetaCode(method, "SKillTreeImageImdex");
+        return NuunSkillTreeManager.getMetaCode(method, "SKillTreeImageImdex");
     };
 
     function _isSpriteSheet() {
@@ -3789,34 +4010,22 @@ Imported.NUUN_SkillTree = true;
         $gameSwitches.value(params.ShowCommandSkillTreeSwitch));
     };
 
-    NuunManager.getSkillPointParamName = function() {
-        return params.SkillPointName;
+    function _getCoordinate(code) {
+        switch (code) {
+            case 0:
+                return !!$dataSkillTree && !!$dataSkillTree.windowData.SkillTypeWindow ? $dataSkillTree.windowData.SkillTypeWindow.SkillTypeCols : params.SkillTypeCols;
+            case 1:
+                return !!$dataSkillTree && !!$dataSkillTree.windowData.SkillTypeWindow ? $dataSkillTree.windowData.SkillTypeWindow.SkillTypeRows : params.SkillTypeRows;
+            case 2:
+                return !!$dataSkillTree && !!$dataSkillTree.windowData.SkillTreeWindow ? $dataSkillTree.windowData.SkillTreeWindow.SkillTreeCols : params.SkillTreeCols;
+            case 4:
+                return !!$dataSkillTree && !!$dataSkillTree.windowData.SkillTreeCostWindow ? $dataSkillTree.windowData.SkillTreeCostWindow.CostWindowCols : params.CostWindowCols;
+            case 9:
+                return !!$dataSkillTree && !!$dataSkillTree.windowData.SkillTreeHelpWindow ? $dataSkillTree.windowData.SkillTreeHelpWindow.SkillTreeHelpRows : params.SkillTreeHelpRows;
+        }
     };
 
-    NuunManager.getSkillTreeReqSkillList = function(list, skillId) {
-        return list.filter(req => {
-            if (!!req.DerivedSkill) {
-                return req.DerivedSkill.includes(skillId);
-            }
-            return false;
-        });
-    };
-
-    //NuunManager.getSkillTreeReqSkillListId = function(list, skillId) {
-    //    return this.getSkillTreeReqSkillList(list, skillId).map(t => t.SkillId);
-    //};
-
-    NuunManager.getSkillTreeData = function(data, type, actor) {
-        return new SkillTreeData(data, type, actor);
-    };
-
-    NuunManager.getCountLearnSkillData = function(contents, data) {
-        return data;
-    };
-
-    NuunManager.getLearnSkillIconFormula = function(data, text) {
-        return text;
-    };
+    
 
 
     class SkillTreeData {
@@ -3851,7 +4060,7 @@ Imported.NUUN_SkillTree = true;
             this._learnPrerequisiteSkillMode = data.LearnPrerequisiteSkillMode || "and";
             this._skillTreeReset = params.SkillTreeResetSkillId === this._id;
             this.setCountLearnSkillData();
-            const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, data);
+            const exLearningData = NuunSkillTreeManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
             this.setupIcon(exLearningData);
             this.updateCost();
@@ -3893,7 +4102,7 @@ Imported.NUUN_SkillTree = true;
 
         refresh() {
             this.setCountLearnSkillData();
-            const exLearningData = NuunManager.getCountLearnSkillData(this._countLearnSkillData, null);
+            const exLearningData = NuunSkillTreeManager.getCountLearnSkillData(this._countLearnSkillData, null);
             if (!!exLearningData) {
                 this.setupCost(exLearningData);
             }
@@ -3978,20 +4187,24 @@ Imported.NUUN_SkillTree = true;
         }
 
         getCode(text) {
-            if (isNaN(text)) {
-                if (text === null || text === "") {
-                    return 0;
+            try {
+                if (isNaN(text)) {
+                    if (text === null || text === "") {
+                        return 0;
+                    }
+                    const actor = this._actor;
+                    const skillId = this._id;
+                    const count = actor.getSkillTreeCount(this._id);
+                    const maxCount = this.getMaxCount() || 1;
+                    const d = this;
+                    const v = $gameVariables._data;
+                    const s = $gameSwitches._data;
+                    return eval(text);
+                } else {
+                    return Number(text) || 0;
                 }
-                const actor = this._actor;
-                const skillId = this._id;
-                const count = actor.getSkillTreeCount(this._id);
-                const maxCount = this.getMaxCount() || 1;
-                const d = this;
-                const v = $gameVariables._data;
-                const s = $gameSwitches._data;
-                return eval(text);
-            } else {
-                return Number(text) || 0;
+            } catch (error) {
+                return 0;
             }
         }
 
@@ -4100,7 +4313,7 @@ Imported.NUUN_SkillTree = true;
         }
 
         getIconIndex() {
-            return NuunManager.getLearnSkillIconFormula(this, this._iconIndex);
+            return NuunSkillTreeManager.getLearnSkillIconFormula(this, this._iconIndex);
         }
 
         setupPrerequisiteSkill(flag) {
@@ -4172,11 +4385,18 @@ Imported.NUUN_SkillTree = true;
 
         getCountLearnSkillList() {
             if (!Imported.NUUN_SkillTreeLearnEx) return null;
-            const list = NuunManager.getSkillTreeLearnExSetting();
-            if (!list) return null;
-            for (const data of list) {
+            if (!!this._data.SkillLearnExList) {
+                const data = {TypeId: this._data.TypeId, LearnDisplayMode: this._data.LearnDisplayMode, SkillLearnExList: this._data.SkillLearnExList};
                 if (this.isLearnExData(data)) {
                     return this.isCountLearnExData(data.SkillLearnExList);
+                }
+            } else {
+                const list = NuunSkillTreeManager.getSkillTreeLearnExSetting();
+                if (!list) return null;
+                for (const data of list) {
+                    if (this.isLearnExData(data)) {
+                        return this.isCountLearnExData(data.SkillLearnExList);
+                    }
                 }
             }
             return null
@@ -4184,7 +4404,11 @@ Imported.NUUN_SkillTree = true;
 
         getCountLearnSkill() {
             if (!Imported.NUUN_SkillTreeLearnEx) return null;
-            const list = NuunManager.getSkillTreeLearnExSetting();
+            if (!!this._data.SkillLearnExList) {
+                const data = {TypeId: this._data.TypeId, LearnDisplayMode: this._data.LearnDisplayMode, SkillLearnExList: this._data.SkillLearnExList};
+                return this.isLearnExData(data);
+            }
+            const list = NuunSkillTreeManager.getSkillTreeLearnExSetting();
             if (!list) return null;
             return list.find(data => this.isLearnExData(data));
         }
@@ -4352,42 +4576,55 @@ Imported.NUUN_SkillTree = true;
         }
 
         isSkillTreeCond() {
-            const cond = this.getCond();
-            if (!cond) return true;
-            const d = this;
-            const v = $gameVariables._data;
-            const s = $gameSwitches._data;
-            const skillId = this._id;
-            const actor = this._actor;
-            const count = actor.getSkillTreeCount(this._id);
-            const maxCount = this.getMaxCount() || 1;
-            return eval(cond);
+            try {
+                const cond = this.getCond();
+                if (!cond) return true;
+                const d = this;
+                const v = $gameVariables._data;
+                const s = $gameSwitches._data;
+                const skillId = this._id;
+                const actor = this._actor;
+                const count = actor.getSkillTreeCount(this._id);
+                const maxCount = this.getMaxCount() || 1;
+                return eval(cond);
+            } catch (error) {
+                return true;
+            }
         }
 
         isSkillTreeSecretCond() {
-            const cond = this.getSecret();
-            if (!cond) return true;
-            const d = this;
-            const v = $gameVariables._data;
-            const s = $gameSwitches._data;
-            const skillId = this._id;
-            const actor = this._actor;
-            const count = actor.getSkillTreeCount(this._id);
-            const maxCount = this.getMaxCount() || 1;
-            return eval(cond);
+            try {
+                const cond = this.getSecret();
+                if (!cond) return true;
+                const d = this;
+                const v = $gameVariables._data;
+                const s = $gameSwitches._data;
+                const skillId = this._id;
+                const actor = this._actor;
+                const count = actor.getSkillTreeCount(this._id);
+                const maxCount = this.getMaxCount() || 1;
+                return eval(cond);
+            } catch (error) {
+                return true;
+            }
+            
         }
 
         isSkillTreeLearnCond() {
-            const cond = this.getLearn();
-            if (!cond) return true;
-            const d = this;
-            const v = $gameVariables._data;
-            const s = $gameSwitches._data;
-            const skillId = this._id;
-            const actor = this._actor;
-            const count = actor.getSkillTreeCount(this._id);
-            const maxCount = this.getMaxCount() || 1;
-            return eval(cond);
+            try {
+                const cond = this.getLearn();
+                if (!cond) return true;
+                const d = this;
+                const v = $gameVariables._data;
+                const s = $gameSwitches._data;
+                const skillId = this._id;
+                const actor = this._actor;
+                const count = actor.getSkillTreeCount(this._id);
+                const maxCount = this.getMaxCount() || 1;
+                return eval(cond);
+            } catch (error) {
+                return true;
+            }
         };
 
         isLearningLevel() {
@@ -4459,8 +4696,8 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.create = function() {
         Scene_MenuBase.prototype.create.call(this);
-        this.createSkillTreeTypeWindow();
         this.createSkillTreeWindow();
+        this.createSkillTreeTypeWindow();
         this.createSkillTreeCostWindow();
         this.createSkillTreeStatusWindow();
         this.createSkillTreeHelpWindow();
@@ -4476,10 +4713,9 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeType.setHandler("cancel", this.popScene.bind(this));
         this._skillTreeType.setHandler("pagedown", this.nextActor.bind(this));
         this._skillTreeType.setHandler("pageup", this.previousActor.bind(this));
+        this._skillTreeType.setSkillTreeWindow(this._skillTreeWindow);
         this.addWindow(this._skillTreeType);
-        if (params.SkillTypeWindowTransparent) {
-            this._skillTreeType.opacity = 0;
-        }
+        this.setWindowOpacity("SkillTypeWindowTransparent", this._skillTreeType);
     };
 
     Scene_SkillTree.prototype.createSkillTreeWindow = function() {
@@ -4488,10 +4724,7 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeWindow.setHandler("ok", this.onSkillTreeOk.bind(this));
         this._skillTreeWindow.setHandler("cancel", this.cancelSkillTree.bind(this));
         this.addWindow(this._skillTreeWindow);
-        this._skillTreeType.setSkillTreeWindow(this._skillTreeWindow);
-        if (params.SkillTreeWindowTransparent) {
-            this._skillTreeType.opacity = 0;
-        }
+        this.setWindowOpacity("SkillTreeWindowTransparent", this._skillTreeWindow);
     };
 
     Scene_SkillTree.prototype.createSkillTreeCostWindow = function() {
@@ -4499,9 +4732,7 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeCostWindow = new Window_SkillTreeCost(rect);
         this.addWindow(this._skillTreeCostWindow);
         this._skillTreeWindow.setSkillTreeCostWindow(this._skillTreeCostWindow);
-        if (params.CostWindowTransparent) {
-            this._skillTreeCostWindow.opacity = 0;
-        }
+        this.setWindowOpacity("CostWindowTransparent", this._skillTreeCostWindow);
     };
 
     Scene_SkillTree.prototype.createSkillTreeStatusWindow = function() {
@@ -4509,9 +4740,7 @@ Imported.NUUN_SkillTree = true;
         this._skillTreeStatusWindow = new Window_SkillTreeStatus(rect);
         this.addWindow(this._skillTreeStatusWindow);
         this._skillTreeWindow.setSkillTreeStatusWindow(this._skillTreeStatusWindow);
-        if (params.StatusWindowTransparent) {
-            this._skillTreeStatusWindow.opacity = 0;
-        }
+        this.setWindowOpacity("StatusWindowTransparent", this._skillTreeStatusWindow);
     };
 
     Scene_SkillTree.prototype.createSkillTreeHelpWindow = function() {
@@ -4520,14 +4749,12 @@ Imported.NUUN_SkillTree = true;
         this.addWindow(this._helpWindow);
         this._skillTreeWindow.setHelpWindow(this._helpWindow);
         this._skillTreeType.setHelpWindow(this._helpWindow);
-        if (params.HelpWindowTransparent) {
-            this._helpWindow.opacity = 0;
-        }
+        this.setWindowOpacity("HelpWindowTransparent", this._helpWindow);
     };
 
     Scene_SkillTree.prototype.createSkillTreeConfirmationWindow = function() {
         _setConfirmation(params.LearnConfirmation);
-        if (params.LearnConfirmation) {
+        if (NuunSkillTreeManager.getLearnConfirmation()) {
             const rect = this.skillTreeConfirmationWindowRect();
             this._confirmationWindow = new Window_SkillTreeConfirmation(rect);
             this._confirmationWindow.setHandler("ok", this.onConfirmationOk.bind(this));
@@ -4557,7 +4784,7 @@ Imported.NUUN_SkillTree = true;
         if (image) {
             const sprite = new Sprite_BackgroundSprite(image);
             sprite.setup(image, params.BackScrollX, params.BackScrollY);
-            const bitmap = ImageManager.nuun_LoadPictures(image);
+            const bitmap = NuunSkillTreeManager.LoadPictures(image);
             sprite.setBitmap(bitmap);
             this.addChild(sprite);
             bitmap.addLoadListener(function() {
@@ -4581,17 +4808,23 @@ Imported.NUUN_SkillTree = true;
         }
     };
 
+    Scene_SkillTree.prototype.setWindowOpacity = function(method, _window) {
+        if (params[method]) {
+            _window.opacity = 0;
+        }
+    };
+
     Scene_SkillTree.prototype.skillTreeTypeWindowRect = function() {
-        const w = _getWindowData("SkillTypeWindow");
+        const w = this.getSkillTreeWindowData("SkillTypeWindow");
         const wy = (w.WindowY || 0) + this.mainAreaTop();
-        const wh = this.calcWindowHeight(params.SkillTypeRows, true);
+        const wh = this.calcWindowHeight(_getCoordinate(1), true);
         const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
         return new Rectangle(wx, wy, ww, wh);
     };
 
     Scene_SkillTree.prototype.skillTreeWindowRect = function() {
-        const w = _getWindowData("SkillTreeWindow");
+        const w = this.getSkillTreeWindowData("SkillTreeWindow");
         const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
@@ -4600,7 +4833,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.skillTreeCostWindowRect = function() {
-        const w = _getWindowData("SkillTreeCostWindow");
+        const w = this.getSkillTreeWindowData("SkillTreeCostWindow");
         const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
@@ -4609,7 +4842,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.skillTreeStatusWindowRect = function() {
-        const w = _getWindowData("SkillTreeStatusWindow");
+        const w = this.getSkillTreeWindowData("SkillTreeStatusWindow");
         const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wx = (w.WindowX || 0);
         const ww = Math.min(Graphics.boxWidth - wx, w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth);
@@ -4618,7 +4851,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.skillTreeHelpWindowRect = function() {
-        const w = _getWindowData("SkillTreeHelpWindow");
+        const w = this.getSkillTreeWindowData("SkillTreeHelpWindow");
         const wy = (w.WindowY || 0) + this.helpAreaTop();
         const wh = Math.min(Graphics.boxHeight - wy, (w.WindowHeight > 0 ? w.WindowHeight : this.skillTreeHelpAreaHeight()));
         const wx = (w.WindowX || 0);
@@ -4627,12 +4860,16 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.skillTreeConfirmationWindowRect = function() {
-        const w = _getWindowData("SkillTreeConfirmationWindow");
+        const w = this.getSkillTreeWindowData("SkillTreeConfirmationWindow");
         const wy = (w.WindowY || 0) + this.mainAreaTop();
         const wh = this.calcWindowHeight(3, true);
         const ww = w.WindowWidth > 0 ? w.WindowWidth : Graphics.boxWidth;
-        const wx = params.ConfirmationWindowCenter ? Math.floor(Graphics.boxWidth / 2) - Math.floor(ww / 2) : (w.WindowX || 0);
+        const wx = NuunSkillTreeManager.isConfirmationWindowCenter() ? Math.floor(Graphics.boxWidth / 2) - Math.floor(ww / 2) : (w.WindowX || 0);
         return new Rectangle(wx, wy, Math.min(Graphics.boxWidth - wx, ww), wh);
+    };
+
+    Scene_SkillTree.prototype.getSkillTreeWindowData = function(method) {
+        return !!$dataSkillTree ? $dataSkillTree.windowData[method] : params[method];
     };
 
     Scene_SkillTree.prototype.helpAreaBottomY = function() {
@@ -4644,7 +4881,8 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.skillTreeHelpAreaHeight = function() {
-        return params.SkillTreeHelpRows > 0 ? this.calcWindowHeight(params.SkillTreeHelpRows, false) : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
+        const rows = _getCoordinate(9);
+        return rows > 0 ? this.calcWindowHeight(rows, false) : Scene_MenuBase.prototype.helpAreaHeight.apply(this, arguments);
     };
 
     Scene_SkillTree.prototype.isBottomHelpMode = function() {
@@ -4830,15 +5068,11 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeType.prototype.maxCols = function() {
-        return params.SkillTypeCols;
+        return _getCoordinate(0);
     };
 
     Window_SkillTreeType.prototype.itemTextAlign = function() {
         return "left";
-    };
-
-    Window_SkillTreeType.prototype.setSkillTreeWindow = function(skillTreeWindow) {
-        this._skillTreeWindow = skillTreeWindow;
     };
 
     Window_SkillTreeType.prototype.setSkillTreeWindow = function(skillTreeWindow) {
@@ -4903,7 +5137,7 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.loadSkillTreeImages = function() {
         if (_isSpriteSheet()) {
-            return ImageManager.nuun_LoadPictures(params.ContentsBackImage);
+            return NuunSkillTreeManager.LoadPictures(params.ContentsBackImage);
         } else if (_isBackgroundImage()) {
             return this.loadSkillTreeImages2();
         }
@@ -4915,7 +5149,7 @@ Imported.NUUN_SkillTree = true;
         if (!parameter) return;
         const imageList = [];
         for (let i = 0; i < parameter.length; i++) {
-            imageList[i] = ImageManager.nuun_LoadPictures(parameter[i]);
+            imageList[i] = NuunSkillTreeManager.LoadPictures(parameter[i]);
         }
         return imageList;
     };
@@ -4928,7 +5162,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.maxCols = function() {
-        return params.SkillTreeCols;
+        return _getCoordinate(2);
     };
 
     Window_SkillTree.prototype.setActor = function(actor) {
@@ -5278,7 +5512,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.initialSkillTreeList = function() {
-        const list = this.getSkillTreeSetting()[this._skillTreeId].SkillTreeList;
+        const list = this.getSkillTreeList();
         const tree = [];
         if (!list) return [];
         for (let i = 0; i < list.length; i++) {
@@ -5330,7 +5564,7 @@ Imported.NUUN_SkillTree = true;
             DerivedSkillX: 0,
             DerivedSkillY: 0,
             Cond: "",
-            Cost: (_getSkillCostTag($dataSkills[id]) || params.DefaultSkillPointCost)
+            Cost: (_getSkillCostTag($dataSkills[id]) || params.DefaultSkillPointCost),
         }
     };
 
@@ -5339,7 +5573,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.getSkillTreeData = function(data) {
-        return _getSkillTreeData(data, this.getSkillTreeType(), this._actor);
+        return new SkillTreeData(data, this.getSkillTreeType(), this._actor);
     };
 
     Window_SkillTree.prototype.itemAt = function(index) {
@@ -5376,12 +5610,16 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.drawItem = function(index) {
         const data = this.itemAt(index);
-        if (data) {
+        this.drawSkillTreeItem(index, data);
+    };
+
+    Window_SkillTree.prototype.drawSkillTreeItem = function(index, data) {
+        if (!!data) {
             const rect = this.itemLineRect(index);
             const skillId = data.getLearnSkill();
             const skill = $dataSkills[skillId];
             const enabled = this.isEnabled(data);
-            const learned = this._actor.isSkillTreeLearned(data._id);
+            const learned = this.isSkillTreeLearned(data._id);
             const secret = data.isSkillTreeSecretCond();
             this.changePaintOpacity(enabled);
             this._learnedSkillColor = this.getSkillTreeLearnedColor(learned);
@@ -5451,7 +5689,7 @@ Imported.NUUN_SkillTree = true;
     Window_SkillTree.prototype.drawItemNumber = function(data, x, y, width, align = "right") {
         if (params.SkillTreeNumText) {
             const actor = this._actor;
-            const count = data.isSkillTreeReset() ? this.skillTreeResetCost() : actor.getSkillTreeCount(data._id);
+            const count = data.isSkillTreeReset() ? this.skillTreeResetCost() : this.getSkillTreeCount(data._id);
             const maxCount = data.isSkillTreeReset() ? $gameParty.numItems($dataItems[this.skillTreeResetCostItemId()]) : (data.getMaxCount() || 1);
             const skillId = data._id;
             const d = data;
@@ -5480,7 +5718,7 @@ Imported.NUUN_SkillTree = true;
         const height = 20;
         const x = rect.x + rect.width + params.SkillCountFrameX;
         const y = rect.y + rect.height - (height / 2) + params.SkillCountFrameY;
-        const color = NuunManager.getColorCode(params.SkillCountFrameColor);
+        const color = NuunSkillTreeManager.getColorCode(params.SkillCountFrameColor);
         this.drawCountBackgroundRect(x, y, width, height);
         this.drawSkillTreeFrame(x, y, width, height, 2, color);
         this.drawSkillTreeCountText(data, x, y, width, height);
@@ -5497,30 +5735,30 @@ Imported.NUUN_SkillTree = true;
 
     Window_SkillTree.prototype.drawSkillTreeCountText = function(data, x, y, width, height) {
         this.contents.fontSize = 16;
-        this.changeTextColor(NuunManager.getColorCode(params.SkillCountFontColor));
-        this.drawText(this._actor.getSkillTreeCount(data._id), x, y - (height / 2) + 2, width, "center");
+        this.changeTextColor(NuunSkillTreeManager.getColorCode(params.SkillCountFontColor));
+        this.drawText(this.getSkillTreeCount(data._id), x, y - (height / 2) + 2, width, "center");
         this.contents.fontSize = $gameSystem.mainFontSize();
     };
 
     Window_SkillTree.prototype.getFrameColor = function(data, learned, enabled) {
         if (learned) {
-            return this.isMultipleCount(data) ? NuunManager.getColorCode(params.LearnedFrameColor) : NuunManager.getColorCode(params.CountFrameColor);
+            return this.isMultipleCount(data) ? NuunSkillTreeManager.getColorCode(params.LearnedFrameColor) : NuunSkillTreeManager.getColorCode(params.CountFrameColor);
         } else if (enabled) {
-            return NuunManager.getColorCode(params.UnlearnedFrameColor);
+            return NuunSkillTreeManager.getColorCode(params.UnlearnedFrameColor);
         } else {
-            return NuunManager.getColorCode(params.NormalFrameColor);
+            return NuunSkillTreeManager.getColorCode(params.NormalFrameColor);
         }
     };
 
-    Window_SkillTree.prototype.getLineColor = function(derivedLearned, enabled, learned) {
+    Window_SkillTree.prototype.getLineColor = function(derivedLearned, enabled, learned, data) {
         if (derivedLearned && learned) {
-            return NuunManager.getColorCode(params.LearnedLineColor);
+            return NuunSkillTreeManager.getColorCode(params.LearnedLineColor);
         } else if (derivedLearned && !learned) {
-            return NuunManager.getColorCode(params.NormalLineColor);
+            return NuunSkillTreeManager.getColorCode(params.NormalLineColor);
         } else if (enabled && learned) {
-            return NuunManager.getColorCode(params.UnlearnedLineColor);
+            return NuunSkillTreeManager.getColorCode(params.UnlearnedLineColor);
         } else {
-            return NuunManager.getColorCode(params.NormalLineColor);
+            return NuunSkillTreeManager.getColorCode(params.NormalLineColor);
         }
     };
 
@@ -5556,14 +5794,14 @@ Imported.NUUN_SkillTree = true;
             const skillId = data._derivedSkill[i];
             const index = this.getSkillTreeDataIndex(skillId);
             const derivedData = this._data[index];
-            const learned = this._actor.isSkillTreeLearned(data._id);
+            const learned = this.isSkillTreeLearned(data._id);
             if (!!derivedData && this.isSkillTreeCond(derivedData)) {
                 const enabled = this.isEnabled(derivedData);
-                const derivedLearned = this._actor.isSkillTreeLearned(derivedData._id);
-                const colorId = this.getLineColor(derivedLearned, enabled, learned);
+                const derivedLearned = this.isSkillTreeLearned(derivedData._id);
+                const colorId = this.getLineColor(derivedLearned, enabled, learned, data);
                 const bitmapContents = this.getSkillTreeLineContents(derivedLearned, enabled, learned);
                 const derivedRect = this.itemRect(index);
-                const color = NuunManager.getColorCode(colorId);
+                const color = NuunSkillTreeManager.getColorCode(colorId);
                 const x2 = this.getDerivedX(derivedRect);
                 const y2 = this.getDerivedY(derivedRect);
                 if (Imported.NUUN_SkillTreeFreeArrangement) {
@@ -5661,7 +5899,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.rowsMarginHeight = function() {
-        return Math.min((params.LineDiagonalWidth || 30), this.rowsMargin() + this.rowSpacing());
+        return Math.min(NuunSkillTreeManager.getLineDiagonalWidth(), this.rowsMargin() + this.rowSpacing());
     };
 
     Window_SkillTree.prototype.getLineX = function(rect) {
@@ -5900,7 +6138,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.getSkillTreeLearnedColor = function(learned) {
-        return learned && params.LearnedColor >= 0 ? NuunManager.getColorCode(params.LearnedColor) : null;
+        return learned && params.LearnedColor >= 0 ? NuunSkillTreeManager.getColorCode(params.LearnedColor) : null;
     };
 
     Window_SkillTree.prototype.playSoundLearnSE = function() {
@@ -5942,6 +6180,14 @@ Imported.NUUN_SkillTree = true;
         return list.some(id => actor.isSkillTreeLearned(id) && actor.notDeletionSkillTreeSkill(id));
     };
 
+    Window_SkillTree.prototype.isSkillTreeLearned = function(id) {
+        return this._actor.isSkillTreeLearned(id);
+    };
+
+    Window_SkillTree.prototype.getSkillTreeCount = function(id) {
+        return this._actor.getSkillTreeCount(id);
+    };
+
 
     function Window_SkillTreeCost() {
         this.initialize(...arguments);
@@ -5974,7 +6220,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.maxCols = function() {
-        return params.CostWindowCols;
+        return _getCoordinate(4);
     };
 
     Window_SkillTreeCost.prototype.maxItems = function() {
@@ -6041,10 +6287,10 @@ Imported.NUUN_SkillTree = true;
         const data = this._treeData;
         if (!!data) {
             if (this.isMultipleCount(data)) {
-                this.changeTextColor(NuunManager.getColorCode(params.LearnedNameColor));
+                this.changeTextColor(NuunSkillTreeManager.getColorCode(params.LearnedNameColor));
                 text = params.LearnedName || "習得済み";
             } else {
-                this.changeTextColor(NuunManager.getColorCode(params.SkillCostSystemColor));
+                this.changeTextColor(NuunSkillTreeManager.getColorCode(params.SkillCostSystemColor));
                 text = params.SkillCostName.format(data.getSkillName());
             }
         }
@@ -6052,14 +6298,14 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.drawCount = function(data, x, y, width) {
-        this.changeTextColor(NuunManager.getColorCode(params.SkillCosTColor));
+        this.changeTextColor(NuunSkillTreeManager.getColorCode(params.SkillCosTColor));
         if (!!data && data.getMaxCount() > 0) {
             this.drawSkillTreeCount(data, x, y, width, "right");
         }
     };
 
     Window_SkillTreeCost.prototype.drawCost = function(type, data, x, y, width) {
-        this.changeTextColor(NuunManager.getColorCode(params.SkillCostNameColor));
+        this.changeTextColor(NuunSkillTreeManager.getColorCode(params.SkillCostNameColor));
         switch (type) {
             case "sp":
                 this.drawSkillCostIconName(params.SkillPointName, params.SkillCostIcon, x, y, width);
@@ -6086,7 +6332,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.drawSkillTreeCost = function(type, data, x, y, width) {
-        this.changeTextColor(NuunManager.getColorCode(params.SkillCosTColor));
+        this.changeTextColor(NuunSkillTreeManager.getColorCode(params.SkillCosTColor));
         switch (params.SkillCostType) {
             case 'type1':
                 this.drawText(data.getCostNum(type), x, y, width, "right");
@@ -6104,7 +6350,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTreeCost.prototype.drawSkillTreeCount = function(data, x, y, width) {
-        this.changeTextColor(NuunManager.getColorCode(params.SkillCosTColor));
+        this.changeTextColor(NuunSkillTreeManager.getColorCode(params.SkillCosTColor));
         switch (params.SkillCostType) {
             case 'type1':
                 this.drawText(this._actor.getSkillTreeCount(data._id), x, y, width, "right");
@@ -6240,6 +6486,10 @@ Imported.NUUN_SkillTree = true;
     
     Window_SkillTreeConfirmation.prototype.initialize = function(rect) {
         Window_HorzCommand.prototype.initialize.call(this, rect);
+        this.initOpenness();
+    };
+
+    Window_SkillTreeConfirmation.prototype.initOpenness = function() {
         this.openness = 0;
     };
 
@@ -6324,7 +6574,7 @@ Imported.NUUN_SkillTree = true;
 
     Game_Action.prototype.skillPointGainItem = function(target) {
         const item = this.item();
-        const point = NuunManager.getMetaCode(item, "GainSkillPoint");
+        const point = NuunSkillTreeManager.getMetaCode(item, "GainSkillPoint");
         if (!!point) {
             target.gainSkillPoint(Number(point));
             this.makeSuccess(target);
@@ -6580,7 +6830,7 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.initBattlerSkillPoint = function(actorId) {
         const actor = $dataActors[actorId];
         const _class = this.currentClass();
-        const cost = NuunManager.getMetaCode(_class, "InitSkillPoint") || NuunManager.getMetaCode(actor, "InitSkillPoint");
+        const cost = NuunSkillTreeManager.getMetaCode(_class, "InitSkillPoint") || NuunSkillTreeManager.getMetaCode(actor, "InitSkillPoint");
         return !!cost && cost >= 0 ? Number(cost) : params.DefaultInitSkillPoint;
     };
 
@@ -6709,7 +6959,7 @@ Imported.NUUN_SkillTree = true;
     Game_Actor.prototype.getLevelSkillPoint = function() {
         const actor = this.actor();
         const _class = this.currentClass();
-        return NuunManager.getMetaCode(_class, "LevelupSkillPoint") || (NuunManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint);
+        return NuunSkillTreeManager.getMetaCode(_class, "LevelupSkillPoint") || (NuunSkillTreeManager.getMetaCode(actor, "LevelupSkillPoint") || params.LevelupGainSkillPoint);
     };
 
     Game_Actor.prototype.skillTreeReset = function(id, r, classId) {
@@ -6815,7 +7065,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Game_Actor.prototype.isSkillTreeReqSkill = function(list, skillId, mode) {
-        const reqList = NuunManager.getSkillTreeReqSkillList(list, skillId);
+        const reqList = NuunSkillTreeManager.getSkillTreeReqSkillList(list, skillId);
         if (reqList.length === 0) return true;
         if (mode === "and" || !mode) {
             return reqList.every(data => this.isSkillTreeLearned(data.SkillId) && this.isCountSkillRequired(data));
@@ -6854,7 +7104,7 @@ Imported.NUUN_SkillTree = true;
 
     Game_Enemy.prototype.getGainSkillPoint = function() {
         const enemy = this.enemy();
-        return NuunManager.getMetaCodeList(enemy, "DropSkillPoint") || [0 ,0];
+        return NuunSkillTreeManager.getMetaCodeList(enemy, "DropSkillPoint") || [0 ,0];
     };
 
     Game_Enemy.prototype.makeDropSkillPoint = function() {

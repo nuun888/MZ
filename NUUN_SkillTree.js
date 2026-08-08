@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Skill Tree
  * @author NUUN
- * @version 1.9.0
+ * @version 1.9.1
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -97,6 +97,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 8/8/2026 Ver.1.9.1
+ * Fixed an issue where an error would occur if "NUUN_SkillTreeFreeArrangement" was not installed.
  * 8/7/2026 Ver.1.9.0
  * Modified the plugin so it can run without requiring the "NUUN_Base" plugin.
  * Added support for settings configured with the "NUUN_SkillTreeBuilder" plugin.
@@ -1787,7 +1789,7 @@
  * @target MZ
  * @plugindesc スキルツリー
  * @author NUUN
- * @version 1.9.0
+ * @version 1.9.1
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1874,6 +1876,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/8/8 Ver.1.9.1
+ * NUUN_SkillTreeFreeArrangementを導入していない場合に、エラーが出る問題を修正。
  * 2026/8/7 Ver.1.9.0
  * 共通処理プラグインの使用なしで実行できるように修正。
  * スキルツリービルダープラグインでの設定を適用できるように修正。
@@ -3688,6 +3692,7 @@ Imported.NUUN_SkillTree = true;
     const pluginName = params.pluginName;
     let _confirmation = false;
     let _setActor = null;
+    $dataSkillTree = null;
 
     function NuunSkillTreeManager() {
         throw new Error("This is a static class");
@@ -4024,8 +4029,6 @@ Imported.NUUN_SkillTree = true;
                 return !!$dataSkillTree && !!$dataSkillTree.windowData.SkillTreeHelpWindow ? $dataSkillTree.windowData.SkillTreeHelpWindow.SkillTreeHelpRows : params.SkillTreeHelpRows;
         }
     };
-
-    
 
 
     class SkillTreeData {

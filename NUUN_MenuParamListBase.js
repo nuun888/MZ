@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/13/2026 Ver.1.2.2
+ * Fixed an issue where an error occurred when setting a line as a display item.
  * 5/25/2026 Ver.1.2.1
  * Update by displaying "NUUN_BreakShieldGauge".
  * 4/30/2026 Ver.1.2.0
@@ -156,7 +158,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -167,6 +169,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/8/13 Ver.1.2.2
+ * 表示項目にラインを設定するとエラーが出る問題を修正。
  * 2026/5/25 Ver.1.2.1
  * NUUN_BreakShieldGauge表示による更新。
  * 2026/4/30 Ver.1.2.0
@@ -819,7 +823,7 @@ Imported.NUUN_MenuParamListBase = true;
             w.drawText(nameText, x, y, width, data.Align);
         }
 
-        nuun_DrawContentsHorzLine(x, y, width, data) {
+        nuun_DrawContentsHorzLine(data, x, y, width) {
             const w = this._window;
             const lineY = y + w.lineHeight() / 2 - 1;
             w.contents.paintOpacity = 48;

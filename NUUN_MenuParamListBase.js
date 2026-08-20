@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * This is the base plugin for plugins that customize menu screens.
@@ -22,6 +22,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 8/15/2026 Ver.1.2.3
+ * Added support for "NUUN_SkillTree" Ver.1.9.0 and later.
  * 8/13/2026 Ver.1.2.2
  * Fixed an issue where an error occurred when setting a line as a display item.
  * 5/25/2026 Ver.1.2.1
@@ -158,7 +160,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.2.2
+ * @version 1.2.3
  * 
  * @help
  * メニュー系の画面をカスタマイズするプラグインのベースプラグインになります。
@@ -169,6 +171,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/8/15 Ver.1.2.3
+ * NUUN_SkillTree Ver.1.9.0以降に対応。
  * 2026/8/13 Ver.1.2.2
  * 表示項目にラインを設定するとエラーが出る問題を修正。
  * 2026/5/25 Ver.1.2.1
@@ -1454,7 +1458,7 @@ Imported.NUUN_MenuParamListBase = true;
                 width -= iconWidth;
             }
             w.changeTextColor(NuunManager.getColorCode(data.NameColor));
-            const nameText = data.paramName ? data.paramName : NuunManager.getSkillPointParamName();
+            const nameText = data.paramName ? data.paramName : _getSkillPointParamName();
             w.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
             this.nuun_SetContentsFontFace(data);
             const textWidth = data.Align === 'left' && data.SystemItemWidth === 0 ? w.textWidth(nameText) : this.nuun_SystemWidth(data.SystemItemWidth, width);
@@ -2481,5 +2485,9 @@ Imported.NUUN_MenuParamListBase = true;
             FaceImg: actor.faceName()
         }
     }
+
+    function _getSkillPointParamName() {
+        return NuunSkillTreeManager.getSkillPointParamName ? NuunSkillTreeManager.getSkillPointParamName() : NuunManager.getSkillPointParamName();
+    };
     
 })();

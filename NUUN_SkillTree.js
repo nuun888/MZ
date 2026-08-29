@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Skill Tree
  * @author NUUN
- * @version 1.9.1
+ * @version 1.9.2
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -97,6 +97,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 8/29/2026 Ver.1.9.2
+ * Fixes included in the "NUUN_SkillTreeBuilder" Ver.1.0.0 update.
  * 8/8/2026 Ver.1.9.1
  * Fixed an issue where an error would occur if "NUUN_SkillTreeFreeArrangement" was not installed.
  * 8/7/2026 Ver.1.9.0
@@ -440,7 +442,7 @@
  * 
  * 
  * @param SkillTreeSetting
- * @text Skill tree settings
+ * @text Skill tree settings(Builder)
  * @desc Set the skills in the skill tree.
  * @default 
  * @type struct<SkillTreeList>[]
@@ -655,7 +657,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTypeWindow
- * @text Skill tree type window settings
+ * @text Skill tree type window settings(Builder)
  * @desc Configure the Skill Tree Type window.
  * @default {"WindowX":"0","WindowY":"230","WindowWidth":"240"}
  * @type struct<CommandWindowSetting>
@@ -669,7 +671,7 @@
  * @parent SkillTypeSetting
  * 
  * @param SkillTypeCols
- * @text Number of skill tree type columns
+ * @text Number of skill tree type columns(Builder)
  * @desc Number of columns in skill tree type.
  * @type number
  * @default 1
@@ -677,7 +679,7 @@
  * @parent SkillTypeSetting
  * 
  * @param SkillTypeRows
- * @text Skill Tree Type Number of Lines
+ * @text Skill Tree Type Number of Lines(Builder)
  * @desc Number of lines in skill tree type.
  * @type number
  * @default 3
@@ -697,7 +699,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeWindow
- * @text Skill tree window settings
+ * @text Skill tree window settings(Builder)
  * @desc Configure the Skill Tree window.
  * @default {"WindowX":"240","WindowY":"0","WindowWidth":"576","WindowHeight":"0"}
  * @type struct<WindowSetting>
@@ -711,7 +713,7 @@
  * @parent SkillTreeWindowSetting
  * 
  * @param SkillTreeCols
- * @text Skill tree columns
+ * @text Skill tree columns(Builder)
  * @desc Number of columns in the skill tree.
  * @type number
  * @default 4
@@ -719,7 +721,7 @@
  * @parent SkillTreeWindowSetting
  * 
  * @param InnerWidth
- * @text Window inner width
+ * @text Window inner width(Builder)
  * @desc Specifies the width of the window. Scrolls to a width equal to or greater than the window width. 0 is the original inner width
  * @type number
  * @default 0
@@ -732,7 +734,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeCostWindow
- * @text Skill tree cost window settings
+ * @text Skill tree cost window settings(Builder)
  * @desc Configure the skill cost window settings.
  * @default {"WindowX":"0","WindowY":"288","WindowWidth":"240","WindowHeight":"0"}
  * @type struct<WindowSetting>
@@ -746,7 +748,7 @@
  * @parent SkillTreeCostSetting
  * 
  * @param CostWindowCols
- * @text Skill Tree Cost Window Column Count
+ * @text Skill Tree Cost Window Column Count(Builder)
  * @desc Number of columns in the Skill Tree Cost window
  * @type number
  * @default 1
@@ -888,7 +890,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeStatusWindow
- * @text Status window settings
+ * @text Status window settings(Builder)
  * @desc Configure the status window settings.
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"240","WindowHeight":"134"}
  * @type struct<WindowSetting>
@@ -907,13 +909,13 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeHelpWindow
- * @text Help window settings
+ * @text Help window settings(Builder)
  * @desc Configure the Help window.
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0"}
  * @type struct<WindowSetting>
  * @parent SkillTreeHelpSetting
  * 
- * @param SkillTreeHelpRows
+ * @param SkillTreeHelpRows(Builder)
  * @text Skill Tree Help Window Display Lines
  * @desc Number of lines displayed in the skill tree help window.
  * @type number
@@ -962,7 +964,7 @@
  * @parent SkillTreeConfirmationSetting
  * 
  * @param SkillTreeConfirmationWindow
- * @text Confirmation window settings
+ * @text Confirmation window settings(Builder)
  * @desc Configure the confirmation window settings.
  * @default {"WindowX":"204","WindowY":"120","WindowWidth":"408"}
  * @type struct<CommandWindowSetting>
@@ -1789,7 +1791,7 @@
  * @target MZ
  * @plugindesc スキルツリー
  * @author NUUN
- * @version 1.9.1
+ * @version 1.9.2
  * 
  * @help
  * ツリー型のスキル習得システムを実装します。
@@ -1876,6 +1878,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/8/29 Ver.1.9.2
+ * NUUN_SkillTreeBuilder Ver.1.0.0更新による修正。
  * 2026/8/8 Ver.1.9.1
  * NUUN_SkillTreeFreeArrangementを導入していない場合に、エラーが出る問題を修正。
  * 2026/8/7 Ver.1.9.0
@@ -2220,7 +2224,7 @@
  * 
  * 
  * @param SkillTreeSetting
- * @text スキルツリー設定
+ * @text スキルツリー設定(Builder)
  * @desc スキルツリーのスキルの設定を行います。
  * @default 
  * @type struct<SkillTreeList>[]
@@ -2435,7 +2439,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTypeWindow
- * @text スキルツリータイプウィンドウ設定
+ * @text スキルツリータイプウィンドウ設定(Builder)
  * @desc スキルツリータイプウィンドウの設定を行います。
  * @default {"WindowX":"0","WindowY":"134","WindowWidth":"240"}
  * @type struct<CommandWindowSetting>
@@ -2449,7 +2453,7 @@
  * @parent SkillTypeSetting
  * 
  * @param SkillTypeCols
- * @text スキルツリータイプ列数
+ * @text スキルツリータイプ列数(Builder)
  * @desc スキルツリータイプの列数
  * @type number
  * @default 1
@@ -2457,7 +2461,7 @@
  * @parent SkillTypeSetting
  * 
  * @param SkillTypeRows
- * @text スキルツリータイプ行数
+ * @text スキルツリータイプ行数(Builder)
  * @desc スキルツリータイプの行数
  * @type number
  * @default 3
@@ -2477,7 +2481,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeWindow
- * @text スキルツリーウィンドウ設定
+ * @text スキルツリーウィンドウ設定(Builder)
  * @desc スキルツリーウィンドウの設定を行います。
  * @default {"WindowX":"240","WindowY":"0","WindowWidth":"576","WindowHeight":"0"}
  * @type struct<WindowSetting>
@@ -2491,7 +2495,7 @@
  * @parent SkillTreeWindowSetting
  * 
  * @param SkillTreeCols
- * @text スキルツリー列数
+ * @text スキルツリー列数(Builder)
  * @desc スキルツリーの列数
  * @type number
  * @default 4
@@ -2512,7 +2516,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeCostWindow
- * @text スキルツリーコストウィンドウ設定
+ * @text スキルツリーコストウィンドウ設定(Builder)
  * @desc スキルツリーコストウィンドウの設定を行います。
  * @default {"WindowX":"0","WindowY":"288","WindowWidth":"240","WindowHeight":"0"}
  * @type struct<WindowSetting>
@@ -2526,7 +2530,7 @@
  * @parent SkillTreeCostSetting
  * 
  * @param CostWindowCols
- * @text スキルツリーコストウィンドウ列数
+ * @text スキルツリーコストウィンドウ列数(Builder)
  * @desc スキルツリーコストウィンドウの列数
  * @type number
  * @default 1
@@ -2669,7 +2673,7 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeStatusWindow
- * @text ステータスウィンドウ設定
+ * @text ステータスウィンドウ設定(Builder)
  * @desc ステータスウィンドウの設定を行います。
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"240","WindowHeight":"134"}
  * @type struct<WindowSetting>
@@ -2688,14 +2692,14 @@
  * @parent WindowSetting
  * 
  * @param SkillTreeHelpWindow
- * @text ヘルプウィンドウ設定
+ * @text ヘルプウィンドウ設定(Builder)
  * @desc ヘルプウィンドウの設定を行います。
  * @default {"WindowX":"0","WindowY":"0","WindowWidth":"0","WindowHeight":"0"}
  * @type struct<WindowSetting>
  * @parent SkillTreeHelpSetting
  * 
  * @param SkillTreeHelpRows
- * @text スキルツリーヘルプウィンドウ表示行数
+ * @text スキルツリーヘルプウィンドウ表示行数(Builder)
  * @desc スキルツリーヘルプウィンドウの表示行数。
  * @type number
  * @default 2
@@ -2743,7 +2747,7 @@
  * @parent SkillTreeConfirmationSetting
  * 
  * @param SkillTreeConfirmationWindow
- * @text 確認ウィンドウ設定
+ * @text 確認ウィンドウ設定(Builder)
  * @desc 確認ウィンドウの設定を行います。
  * @default {"WindowX":"204","WindowY":"120","WindowWidth":"408"}
  * @type struct<CommandWindowSetting>
@@ -3670,10 +3674,7 @@ Imported.NUUN_SkillTree = true;
                 } catch (error) {
                     return this.getTextCodeMeta(data);
                 }
-                list.forEach(a => {
-                    a = this.getTextCodeMeta(a);
-                });
-                return list;
+                return list.map(a => this.getTextCodeMeta(a));
             } else {
                 return undefined;
             }
@@ -3723,7 +3724,7 @@ Imported.NUUN_SkillTree = true;
 
     NuunSkillTreeManager.stringCode = function(code){
         try {
-            if (code.indexOf("'") === 0 || code.indexOf('"' === 0)) {
+            if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
                 return eval(code);//'または"を外す。
             }
             return !!code ? String(code) : null;
@@ -3800,6 +3801,19 @@ Imported.NUUN_SkillTree = true;
         return params.LineDiagonalWidth || 30;
     };
 
+    NuunSkillTreeManager.getSkillTreeResetSkillId = function() {
+        return params.SkillTreeResetSkillId;
+    };
+
+    NuunSkillTreeManager.getSkillTreeInnerWidth = function() {
+        if (!$dataSkillTree) return params.InnerWidth;
+        try {
+            return $dataSkillTree.windowData.SkillTreeWindow.InnerWidth;
+        } catch (error) {
+            return params.InnerWidth;
+        }
+    };
+
     NuunSkillTreeManager.getSkillTreeParams = function() {
         return params;
     };
@@ -3823,6 +3837,10 @@ Imported.NUUN_SkillTree = true;
 
     NuunSkillTreeManager.getSkillTreeReqSkillListId = function(list, skillId) {
         return this.getSkillTreeReqSkillList(list, skillId).map(t => t.SkillId);
+    };
+
+    NuunSkillTreeManager.isSkillTreeResetSkillId = function(skillId) {
+        return this.getSkillTreeResetSkillId() === skillId;
     };
 
     PluginManager.registerCommand(pluginName, 'ShowSkillTreeWindow', args => {
@@ -4070,7 +4088,10 @@ Imported.NUUN_SkillTree = true;
         }
 
         setSKillPointCost(data) {
-            if (this.isSkillTreeReset()) return 0;//スキルリセットはSPを消費させない。
+            if (this.isSkillTreeReset()) {
+                this._costFormula = 0;
+                return;//スキルリセットはSPを消費させない。
+            }
             const tagCost = _getSkillCostTag($dataSkills[this._id], "SKillPointCost");
             this._costFormula = tagCost !== null ? tagCost : (!!data.Cost ? data.Cost : params.DefaultSkillPointCost);
         }
@@ -4095,7 +4116,6 @@ Imported.NUUN_SkillTree = true;
         updateCost() {
             this._cost = this.getCode(this._costFormula);
             this._costGold = this.getCode(this._costGoldFormula);
-            //this._costVariables = this.getCode(this._costVariablesFormulat);
             this._consumeItem = this.getCode(this._consumeItemFormula);
             this._consumeWeapon = this.getCode(this._consumeWeaponFormula);
             this._consumeArmor = this.getCode(this._consumeArmorFormula);
@@ -4699,6 +4719,10 @@ Imported.NUUN_SkillTree = true;
 
     Scene_SkillTree.prototype.create = function() {
         Scene_MenuBase.prototype.create.call(this);
+        this.createSkillTreeWindows();
+    };
+
+    Scene_SkillTree.prototype.createSkillTreeWindows = function() {
         this.createSkillTreeWindow();
         this.createSkillTreeTypeWindow();
         this.createSkillTreeCostWindow();
@@ -4872,7 +4896,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Scene_SkillTree.prototype.getSkillTreeWindowData = function(method) {
-        return !!$dataSkillTree ? $dataSkillTree.windowData[method] : params[method];
+        return !!$dataSkillTree && !!$dataSkillTree.windowData ? $dataSkillTree.windowData[method] : params[method];
     };
 
     Scene_SkillTree.prototype.helpAreaBottomY = function() {
@@ -5257,7 +5281,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.skillTreeInnerWidth = function() {
-        return (params.InnerWidth > 0 ? Math.max(params.InnerWidth, this.innerWidth) : this.innerWidth);
+        return (NuunSkillTreeManager.getSkillTreeInnerWidth() > 0 ? Math.max(NuunSkillTreeManager.getSkillTreeInnerWidth(), this.innerWidth) : this.innerWidth);
     };
 
     Window_SkillTree.prototype.skillTreeCol = function() {
@@ -6083,7 +6107,7 @@ Imported.NUUN_SkillTree = true;
     };
 
     Window_SkillTree.prototype.ensureCursorVisible = function(smooth) {
-        if (params.InnerWidth > 0) {
+        if (NuunSkillTreeManager.getSkillTreeInnerWidth() > 0) {
             if (this._cursorAll) {
                 this.scrollTo(0, 0);
             } else {

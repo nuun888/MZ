@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.9.1
+# Ver.1.9.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 利用規約
 クレジット表記：任意  
@@ -319,6 +319,8 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2026/8/29 Ver.1.9.2  
+NUUN_SkillTreeBuilder Ver.1.0.0更新による修正。  
 2026/8/8 Ver.1.9.1  
 NUUN_SkillTreeFreeArrangementを導入していない場合に、エラーが出る問題を修正。  
 2026/8/7 Ver.1.9.0  

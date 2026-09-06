@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Skill Tree
  * @author NUUN
- * @version 1.9.2
+ * @version 1.9.3
  * 
  * @help
  * Implement a tree-type skill learning system.
@@ -97,6 +97,10 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/6/2026 Ver.1.9.3
+ * Added a feature to store the number of skills learned through the Skill Tree in a variable.
+ * Added a feature to store the number of Skill Tree resets in a variable.
+ * Revised the cursor movement specification process. (Update required when using Skill Tree Builder settings.)
  * 8/29/2026 Ver.1.9.2
  * Fixes included in the "NUUN_SkillTreeBuilder" Ver.1.0.0 update.
  * 8/8/2026 Ver.1.9.1
@@ -490,6 +494,20 @@
  * @desc Skill point acquisition message displayed at the end of battle. %1: Amount of SP acquired %2: Skill point name
  * @type string
  * @default %1\%2 found!
+ * @parent BasicSetting
+ * 
+ * @param LearnSkillCountVariable
+ * @text Learned skill count variable
+ * @desc Specifies the variable that stores the total number of skills learned through the Skill Tree.
+ * @type variable
+ * @default 0
+ * @parent BasicSetting
+ * 
+ * @param ResetSkillTreeCountVariable
+ * @text Skill tree reset count variable
+ * @desc Specifies the variable that stores the total number of Skill Tree resets.
+ * @type variable
+ * @default 0
  * @parent BasicSetting
  * 
  * @param SkillTreeTextSetting
@@ -1878,6 +1896,10 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/6 Ver.1.9.3
+ * スキルツリーでスキルを習得した回数を変数に格納する機能を追加。
+ * スキルツリーをリセットした回数を変数に格納する機能を追加。
+ * カーソル移動指定の処理の修正。(スキルツリービルダー設定の場合は要更新)
  * 2026/8/29 Ver.1.9.2
  * NUUN_SkillTreeBuilder Ver.1.0.0更新による修正。
  * 2026/8/8 Ver.1.9.1
@@ -2272,6 +2294,20 @@
  * @desc 戦闘終了時に表示されるスキルポイントの入手メッセージ。%1:獲得SP量 %2:スキルポイント名
  * @type string
  * @default %1 の%2を獲得！
+ * @parent BasicSetting
+ * 
+ * @param LearnSkillCountVariable
+ * @text 習得スキル回数変数
+ * @desc スキルツリーで習得したスキルの総回数を格納する変数を指定します。
+ * @type variable
+ * @default 0
+ * @parent BasicSetting
+ * 
+ * @param ResetSkillTreeCountVariable
+ * @text スキルツリーリセット回数変数
+ * @desc スキルツリーをリセットした総回数を格納する変数を指定します。
+ * @type variable
+ * @default 0
  * @parent BasicSetting
  * 
  * @param SkillTreeTextSetting
@@ -4080,6 +4116,10 @@ Imported.NUUN_SkillTree = true;
             this._maxCountSkillRequired = data.MaxCountSkillRequired;
             this._learnPrerequisiteSkillMode = data.LearnPrerequisiteSkillMode || "and";
             this._skillTreeReset = params.SkillTreeResetSkillId === this._id;
+            this._downCursor = Number.isFinite(data.DownCursor) ? data.DownCursor : -1;
+            this._upCursor = Number.isFinite(data.UpCursor) ? data.UpCursor : -1;
+            this._rightCursor = Number.isFinite(data.RightCursor) ? data.RightCursor : -1;
+            this._leftCursor = Number.isFinite(data.LeftCursor) ? data.LeftCursor : -1;
             this.setCountLearnSkillData();
             const exLearningData = NuunSkillTreeManager.getCountLearnSkillData(this._countLearnSkillData, data);
             this.setupCost(exLearningData);
@@ -6686,8 +6726,6 @@ Imported.NUUN_SkillTree = true;
         if (params.IsClassSp && !this._cnsp) {
             this._cnsp = [];
         }
-
-
         const sp = params.IsClassSp ? this._cnsp[this._classId] : this._nsp;
         if (isNaN(sp)) {
             this.setSkillPoint(params.IsClassSp && this._cnsp.length > 0 ? 0 : this.initBattlerSkillPoint(this.actorId()), this._classId);
@@ -6914,6 +6952,10 @@ Imported.NUUN_SkillTree = true;
             this.forgetSkill(forgetSkillId);
         }
         this.setLearnSkillTreeSkill(data);
+        if (params.LearnSkillCountVariable > 0) {
+            const value = $gameVariables.value(params.LearnSkillCountVariable);
+            $gameVariables.setValue(params.LearnSkillCountVariable, value + 1);
+        }
     };
 
     Game_Actor.prototype.getSkillTreeLearnSkill = function(data) {
@@ -6997,6 +7039,10 @@ Imported.NUUN_SkillTree = true;
                 const t = _getSkillTreeData(data, skillTree.SymbolName, this);
                 this.removeSkillTreeSkill(t, (!this.isNotSkillTreeCostReturn(t._id) && r), classId);
             }
+        }
+        if (params.ResetSkillTreeCountVariable > 0) {
+            const variableId = params.ResetSkillTreeCountVariable;
+            $gameVariables.setValue(variableId, $gameVariables.value(variableId) + 1);
         }
     };
 

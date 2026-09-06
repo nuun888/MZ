@@ -1,5 +1,5 @@
 # [スキルツリー](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
-# Ver.1.9.2
+# Ver.1.9.3
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js)
 #### 利用規約
 クレジット表記：任意  
@@ -319,6 +319,10 @@ NUUN_SkillTreeでの設定とは異なりスキルツリー設定で習得でき
 `Window_SkillTreeTooltips` スキルツリーツールチップウィンドウ  
 
 ## 更新履歴
+2026/9/6 Ver.1.9.3
+スキルツリーでスキルを習得した回数を変数に格納する機能を追加。  
+スキルツリーをリセットした回数を変数に格納する機能を追加。  
+カーソル移動指定の処理の修正。(スキルツリービルダー設定の場合は要更新)  
 2026/8/29 Ver.1.9.2  
 NUUN_SkillTreeBuilder Ver.1.0.0更新による修正。  
 2026/8/8 Ver.1.9.1  

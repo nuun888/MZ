@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.4.0
+# Ver.1.4.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -44,7 +44,10 @@
 [max]が0の場合は、現在の値から[rate]%を消費します。  
 [Identifier]:識別ID(SkillCostRateCustomizeプラグイン(トリアコンタン様)で使用) 省略可能
 スキルコスト倍率調整プラグインのプラグインパラメータ「スキルコスト倍率リスト」内の、コストタイプに[Identifier]と同じ文字列を記入してください。
-記入はテキストタブで文字列を記入できます。
+記入はテキストタブで文字列を記入できます。  
+### ステートを消費
+`<SkillStateCost:[stateId]>` 特定のステートが付与されている場合に使用でき、スキル使用時にそのステートを解除します。  
+[stateId]:ステートID  
 
 ### 評価式
 `<SkillEvalCost:[eval]>` 消費を判定するための評価式を記入します。   
@@ -85,6 +88,9 @@ Gold:Gold
 経験値:Exp  
 
 ## 更新履歴
+2026/9/21 Ver.1.4.1  
+ステートをコストとして設定できる機能を追加。  
+微細な修正。  
 2026/9/20 Ver.1.4.0  
 NUUN_Baseなしで実行できるように仕様を変更。  
 変数コストでSkillCostRateCustomizeプラグインでのコスト割合が正常に取得できていなかった問題を修正。  

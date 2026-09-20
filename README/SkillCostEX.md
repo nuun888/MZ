@@ -1,5 +1,5 @@
 # [スキルコスト拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)
-# Ver.1.3.3
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostEX.js)  
 [スキルコスト表示拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostShowEX.md)  
 
@@ -39,9 +39,13 @@
 `[itemId]`:武器、防具ID  
 `[num]`:0で消費なし、1で消失  
 ### ゲーム変数から消費
-`<SkillVarCost:[id],[cost]>` ゲーム変数に設定した数値から消費します。  
-`<SkillVarCostR:[id],[max],[rate]>` ゲーム変数に設定した数値から[max]の[rate]%を消費します。  
+`<SkillVarCost:[id],[cost],[Identifier]>` ゲーム変数に設定した数値から消費します。  
+`<SkillVarCostR:[id],[max],[rate],[Identifier]>` ゲーム変数に設定した数値から[max]の[rate]%を消費します。  
 [max]が0の場合は、現在の値から[rate]%を消費します。  
+[Identifier]:識別ID(SkillCostRateCustomizeプラグイン(トリアコンタン様)で使用) 省略可能
+スキルコスト倍率調整プラグインのプラグインパラメータ「スキルコスト倍率リスト」内の、コストタイプに[Identifier]と同じ文字列を記入してください。
+記入はテキストタブで文字列を記入できます。
+
 ### 評価式
 `<SkillEvalCost:[eval]>` 消費を判定するための評価式を記入します。   
 `<SkillEvalCons:[eval]>` 消費するための評価式を記入します。  
@@ -81,6 +85,9 @@ Gold:Gold
 経験値:Exp  
 
 ## 更新履歴
+2026/9/20 Ver.1.4.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
+変数コストでSkillCostRateCustomizeプラグインでのコスト割合が正常に取得できていなかった問題を修正。  
 2025/1/26 Ver.1.3.3  
 HPコスト消費時で消費による戦闘不能を有効にした場合で、現在のHPを超えるコストを持つスキルを使用できない問題を修正。  
 HPコスト消費で戦闘不能になった場合、敵のグラフィックが表示されたままになる問題を修正。  

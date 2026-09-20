@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 #### 必須、前提プラグイン
 [スキルコスト拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostEX.md)  
@@ -35,11 +35,12 @@
 `<SkillCostWidth:00000>` コストの表示幅として00000の長さが設定させます。  
 
 ### コストのデータ参照　コスト評価式及び表示コストの個別設定共通
-HP、MP、TP、Gold、Expはコスト値で取得されます。  
+HP、MP、TP、Gold、Exp、ステートはコスト値で取得されます。  
 消費MPが50の場合は、costの値に50が代入されます。  
 それ以外のコストは配列で取得されます。  
 `cost[id]`:取得タグの[id]番の値を取得します。各タグの:から左から順位0,1,2...となります。  
 アイテム消費の場合は`<SkillItemCost:0番,1番,2番>` `cost[2]`を指定した場合は消費個数を取得します。  
+※Ver.1.2.0以前のバージョンからアップデートを行った場合、ステートの表示を行う場合追加設定を行う必要があります。
 
 コストの評価式が定義してある消費スキルは接頭語、接尾語が適用されません。  
 
@@ -50,6 +51,8 @@ HP、MP、TP、Gold、Expはコスト値で取得されます。
 (https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md)
 
 ## 更新履歴
+2026/9/21 Ver.1.2.1  
+スキルコストステートのコスト表示に対応。  
 2026/9/20 Ver.1.2.0  
 NUUN_Baseなしで実行できるように仕様を変更。  
 一部のプラグインパラメータで0が設定できない問題を修正。  

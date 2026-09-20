@@ -10,14 +10,14 @@
  * @target MZ
  * @plugindesc Skill Cost Display Extension
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_SkillCostEX
  * 
  * @help
  * Extends the display of skill costs.
- * When setting costs other than HP, MP, TP, Gold, and Exp in the skill cost display order,
- * enter the tag name of the cost to be consumed in the cost display target, and configure it in the individual cost settings for costs other than HP, MP, TP, Gold, and Exp.
+ * When setting costs other than HP, MP, TP, Gold, Exp, and states in the skill cost display order, 
+ * enter the tag name of the cost to be consumed in the cost display target, and configure it in the individual cost settings for costs other than HP, MP, TP, Gold, Exp, and states.
  * Enter the formula used to calculate the cost in the cost evaluation formula.
  * To display the party limit gauge cost, enter 'limitCost' in the cost display target,
  * and enter this._actor.skillLimitCost(skill) in the cost evaluation formula.
@@ -87,7 +87,7 @@
  * @param CostOrderSetting
  * @text Display order of skill cost
  * @desc Set the display order of skill costs. Costs set at the top are displayed later.
- * @default ["{\"CostOrderSelect\":\"'Exp'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'Gold'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'TP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'MP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'HP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}"]
+ * @default ["{\"CostOrderSelect\":\"'Exp'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'Gold'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'TP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'MP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'HP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'State'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}"]
  * @type struct<CostOrderSettingList>[]
  * 
  * @param CostWidth
@@ -298,10 +298,11 @@
  * @option 'Exp'
  * @option 'limitCost'
  * @option 'EquipSkillLearnSkill'
+ * @option 'State'
  * @default
  * 
  * @param CostTagSetting
- * @text Individual cost settings other than HP, MP, TP, Gold, Exp
+ * @text Individual cost settings other than HP, MP, TP, Gold, Exp, and States
  * @default ------------------------------
  * 
  * @param CostColor
@@ -338,14 +339,14 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_SkillCostEX
  * 
  * @help
  * スキルコストの表示を拡張します。
- * スキルコストの表示順でHP、MP、TP、Gold、Exp以外のコストを設定する場合は
- * 消費するコストのタグ名をコスト表示対象に記入し、HP、MP、TP、Gold、Exp以外のコスト個別設定で設定してください。
+ * スキルコストの表示順でHP、MP、TP、Gold、Exp、ステート以外のコストを設定する場合は
+ * 消費するコストのタグ名をコスト表示対象に記入し、HP、MP、TP、Gold、Exp、ステート以外のコスト個別設定で設定してください。
  * コスト評価式はコストの評価式を記入します。
  * パーティリミットゲージのコストを表示する場合はコスト表示対象に'limitCost'を記入し、
  * コスト評価式にthis._actor.skillLimitCost(skill)と記入してください。
@@ -388,6 +389,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/21 Ver.1.2.1
+ * スキルコストステートのコスト表示に対応。
  * 2026/9/20 Ver.1.2.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * 一部のプラグインパラメータで0が設定できない問題を修正。
@@ -413,7 +416,7 @@
  * @param CostOrderSetting
  * @text スキルコストの表示順
  * @desc スキルコストの表示順の設定を行います。上の設定ほど後ろに表示されます。
- * @default ["{\"CostOrderSelect\":\"'Exp'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'Gold'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'TP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'MP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'HP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}"]
+ * @default ["{\"CostOrderSelect\":\"'Exp'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'Gold'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'TP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'MP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'HP'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}","{\"CostOrderSelect\":\"'State'\",\"CostTagSetting\":\"------------------------------\",\"CostColor\":\"0\",\"Prefix\":\"\",\"Suffix\":\"\",\"CostEval\":\"\"}"]
  * @type struct<CostOrderSettingList>[]
  * 
  * @param CostWidth
@@ -609,13 +612,12 @@
  * @default 
  * @parent ExpCostSetting
  * 
- * 
  */
 /*~struct~CostOrderSettingList:ja
  * 
  * @param CostOrderSelect
  * @text コスト表示対象
- * @desc コストの表示対象を設定します。HP、MP、TP、Gold、Exp以外を指定する場合は該当のコストタグ名を記入してください。
+ * @desc コストの表示対象を設定します。HP、MP、TP、Gold、Exp、ステート以外を指定する場合は該当のコストタグ名を記入してください。
  * @type combo
  * @option 'HP'
  * @option 'MP'
@@ -624,10 +626,11 @@
  * @option 'Exp'
  * @option 'limitCost'
  * @option 'EquipSkillLearnSkill'
+ * @option 'State'
  * @default
  * 
  * @param CostTagSetting
- * @text HP、MP、TP、Gold、Exp以外のコスト個別設定
+ * @text HP、MP、TP、Gold、Exp、ステート以外のコスト個別設定
  * @default ------------------------------
  * 
  * @param CostColor
@@ -784,6 +787,11 @@ Imported.NUUN_SkillCostShowEX = true;
                     x = this.drawExpCost(skill, x, y, width, type);
                     NuunSkillCostManager.count++;
                 }
+            } else if (type.CostOrderSelect == 'State') {
+                if (this._actor.skillStateCost(skill)) {
+                    x = this.drawStateCost(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
             } else if (Imported.NUUN_EquipSkillLearning && type.CostOrderSelect == 'EquipSkillLearnSkill') {
                 if (!this._actor.isEquipSkillLearning(skill.id) && this.equipSkillLearnSkill(skill) > 0) {
                     x = this.drawEquipSkillLearnSkill(skill, x, y, width, type);
@@ -924,6 +932,23 @@ Imported.NUUN_SkillCostShowEX = true;
             x -= this.textWidth(cost);
             x -= this.drawCostPrefix(NuunSkillCostManager.skillCostShowParams(23), x, y, width);
         }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
+
+    Window_SkillList.prototype.drawStateCost = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const stateId = this._actor.skillStateCost(skill);
+        const state = $dataStates[stateId];
+        if (!state) {
+            return x;
+        }
+        x -= ImageManager.iconWidth + 4;
+        const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        const delta = (ImageManager.standardIconWidth !== undefined ? ImageManager.standardIconWidth - ImageManager.iconWidth : 0);
+        this.drawIcon(state.iconIndex, (x + width) - delta / 2, iconY);
         this.contents.fontSize = $gameSystem.mainFontSize();
         return x;
     };

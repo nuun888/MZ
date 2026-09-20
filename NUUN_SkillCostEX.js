@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Skill Cost Extension
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * You can set various types of costs for skills.
@@ -35,7 +35,7 @@
  * 
  * EXP Cost Skills
  * <SkillExpCost:300> Consumes 300 EXP as the skill cost.
- * <SkillLavelExpCost> Consumes EXP from the EXP gained toward the current level.
+ * <SkillLevelExpCost> Consumes EXP from the EXP gained toward the current level.
  * <SkillExpCostR:50> Consumes 50% of the EXP required to reach the next level.
  * 
  * Item Cost Skills
@@ -70,6 +70,10 @@
  * [rate]: Percentage cost (%)
  * [Identifier]: Identifier ID (used by the SkillCostRateCustomize plugin(Triacontane)). Optional.
  * 
+ * State Cost Skills
+ * <SkillStateCost:[stateId]> Can only be used when the specified state is applied. The state is removed when the skill is used.
+ * [stateId]: State ID
+ * 
  * Evaluation Formulas
  * <SkillEvalCost:[eval]> Enter an evaluation formula used to determine whether the cost can be paid.
  * <SkillEvalCons:[eval]> Enter an evaluation formula used to consume the cost.
@@ -100,6 +104,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/21/2026 Ver.1.4.1
+ * Added a feature that allows states to be set as skill costs.
+ * Minor fixes.
  * 9/20/2026 Ver.1.4.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
  * Fixed an issue where the cost rate from the SkillCostRateCustomize plugin was not applied correctly to variable costs.
@@ -136,7 +143,7 @@
  * @target MZ
  * @plugindesc スキルコスト拡張
  * @author NUUN
- * @version 1.4.0
+ * @version 1.4.1
  * 
  * @help
  * スキルコストにさまざまなコストを設定できます。
@@ -163,7 +170,7 @@
  * 
  * 経験値消費スキル
  * <SkillExpCost:300>　コストとして経験値を３００失います。
- * <SkillLavelExpCost> 現在のレベルの獲得経験値から消費させます。
+ * <SkillLevelExpCost> 現在のレベルの獲得経験値から消費させます。
  * <SkillExpCostR:50> 次のレベルの経験値までの獲得経験値の５０％を消費します。
  * 
  * アイテム消費スキル
@@ -198,6 +205,10 @@
  * [rate]:割合消費コスト(%)
  * [Identifier]:識別ID(SkillCostRateCustomizeプラグイン(トリアコンタン様)で使用) 省略可能
  * 
+ * ステート消費スキル
+ * <SkillStateCost:[stateId]> 特定のステートが付与されている場合に使用でき、スキル使用時にそのステートを解除します。
+ * [stateId]:ステートID
+ * 
  * 評価式
  * <SkillEvalCost:[eval]> 消費を判定するための評価式を記入します。
  * <SkillEvalCons:[eval]> 消費するための評価式を記入します。
@@ -228,6 +239,9 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/21 Ver.1.4.1
+ * ステートをコストとして設定できる機能を追加。
+ * 微細な修正。
  * 2026/9/20 Ver.1.4.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * 変数コストでSkillCostRateCustomizeプラグインでのコスト割合が正常に取得できていなかった問題を修正。
@@ -330,10 +344,7 @@ Imported.NUUN_SkillCostEX = true;
                 } catch (error) {
                     return this.getTextCodeMeta(data);
                 }
-                list.forEach(a => {
-                    a = this.getTextCodeMeta(a);
-                });
-                return list;
+                return list.map(a => this.getTextCodeMeta(a));
             } else {
                 return undefined;
             }
@@ -386,6 +397,9 @@ Imported.NUUN_SkillCostEX = true;
     NuunSkillCostManager.getMetaCodeList = function(object, method) {
         const meta = object.meta[method];
         if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
         if (meta.indexOf('[') >= 0) {
             const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
             throw ["ParameterError", log];
@@ -575,6 +589,14 @@ Imported.NUUN_SkillCostEX = true;
         }
     };
 
+    Game_BattlerBase.prototype.skillStateCost = function(skill) {
+        let stateId = 0;
+        if (skill.meta.SkillStateCost) {
+            stateId = Number(NuunSkillCostManager.getMetaCode(skill, "SkillStateCost"));
+        }
+        return stateId;
+    };
+
     Game_BattlerBase.prototype.skillCostRateCustomizeRateTriacontane = function(result, type, skill) {
         if (!!this.applyCostRateCustomize) {
             return this.applyCostRateCustomize(result, type, skill);
@@ -593,7 +615,8 @@ Imported.NUUN_SkillCostEX = true;
             this.canSkillEquipCost(skill) &&
             this.canSkillVarCost(skill) && 
             this.canSkillVarCostR(skill) &&
-            this.canSkillEvalCost(skill)
+            this.canSkillEvalCost(skill) && 
+            this.canSkillStateCost(skill)
         )
     };
 
@@ -612,7 +635,7 @@ Imported.NUUN_SkillCostEX = true;
 
     Game_BattlerBase.prototype.canSkillExpCost = function(skill) {
         if (this.isActor()) {
-            if (skill.meta.SkillLavelExpCost) {
+            if (skill.meta.SkillLevelExpCost || skill.meta.SkillLavelExpCost) {
                 return this.currentExp() - this.skillExpCost(skill) >= this.currentLevelExp();
             } else {
                 return this.currentExp() >= this.skillExpCost(skill);
@@ -663,6 +686,11 @@ Imported.NUUN_SkillCostEX = true;
         return skill.meta.SkillEvalCost ? NuunSkillCostManager.getEvalParam(this, skill.meta.SkillEvalCost) : true;
     };
 
+    Game_BattlerBase.prototype.canSkillStateCost = function(skill) {
+        const stateId = this.skillStateCost(skill);
+        return stateId > 0 ? this.isStateAffected(stateId) : true;
+    };
+
     const _Game_BattlerBase_paySkillCost = Game_BattlerBase.prototype.paySkillCost;
     Game_BattlerBase.prototype.paySkillCost = function(skill) {
         this.setBCostParam();
@@ -675,6 +703,7 @@ Imported.NUUN_SkillCostEX = true;
         this.paySkillVarCostR(skill);
         this.paySkillEquipCost(skill);
         this.paySkillEvalCost(skill);
+        this.paySkillStateCost(skill);
     };
 
     Game_BattlerBase.prototype.paySkillMpTpCost = function(skill) {
@@ -759,6 +788,13 @@ Imported.NUUN_SkillCostEX = true;
     Game_BattlerBase.prototype.paySkillEvalCost = function(skill) {
         if (skill.meta.SkillEvalCons) {
             NuunSkillCostManager.getEvalParam(this, skill.meta.SkillEvalCons);
+        }
+    };
+
+    Game_BattlerBase.prototype.paySkillStateCost = function(skill) {
+        const stateId = this.skillStateCost(skill);
+        if (stateId > 0) {
+            this.removeState(stateId);
         }
     };
 

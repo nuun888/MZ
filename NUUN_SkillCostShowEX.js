@@ -8,56 +8,64 @@
  */ 
 /*:
  * @target MZ
- * @plugindesc Skill cost display EX
+ * @plugindesc Skill Cost Display Extension
  * @author NUUN
- * @version 1.1.3
- * @base NUUN_Base
+ * @version 1.2.0
  * @base NUUN_SkillCostEX
- * @orderAfter NUUN_Base
  * @orderAfter NUUN_SkillCostEX
  * 
  * @help
  * Extends the display of skill costs.
- * When setting costs other than HP, MP, TP, Gold, and Exp in the display order of skill costs, enter the tag name of the cost to be consumed in the cost display target, and the costs other than HP, MP, TP, Gold, and Exp Please set in individual settings.
- * or Cost evaluation formula, enter the cost evaluation formula.
- * To display the cost of the party limit gauge, enter 'limitCost' in the cost display target and enter "this._actor.skillLimitCost(skill)" in the cost evaluation formula.
- * skill：Skill data to activate
- * actor:Actor game data
- * cost:Cost(Equipment consumption and evaluation formulas are returned as true/false values.)
+ * When setting costs other than HP, MP, TP, Gold, and Exp in the skill cost display order,
+ * enter the tag name of the cost to be consumed in the cost display target, and configure it in the individual cost settings for costs other than HP, MP, TP, Gold, and Exp.
+ * Enter the formula used to calculate the cost in the cost evaluation formula.
+ * To display the party limit gauge cost, enter 'limitCost' in the cost display target,
+ * and enter this._actor.skillLimitCost(skill) in the cost evaluation formula.
+ * actor: Actor data
+ * skill: Skill data to be activated
+ * cost: Cost. Equipment consumption and evaluation formulas return true/false values.
  * 
- * For the color setting, normally enter the system color.
- * You can enter the color code from the text tab.
+ * For color settings, normally specify a system color, but you can also enter a color code from the Text tab.
  * 
- * Individual display cost settings.
- * skill notes
- * <SkillCostEval:[eval]> You can define the format to display.
- * [eval]:Evaluation formula
- * actor:Actor game data
- * skill:Activated skill data
- * cost:Cost(Equipment consumption and evaluation formulas are returned as true/false values.)
+ * Individual Display Cost Settings
+ * Skill Note Tags
+ * <SkillCostEval:[eval]> Defines the format used to display the cost.
+ * [eval]: Evaluation formula
+ * actor: Actor game data
+ * skill: Skill data to be activated
+ * cost: Cost. Equipment consumption and evaluation formulas return true/false values.
  * 
- * <SkillCostWidth:[string]> Specify the display width of the cost as a string. The width of the specified string affects the width of the skill name.
+ * <SkillCostWidth:[string]> Specifies the cost display width using a string. The width of the specified string affects the width available for the skill name.
  * [string]:string
- * <SkillCostWidth:00000> Let the length of 00000 be set as the display width of the cost.
+ * <SkillCostWidth:00000> Uses the width of "00000" as the cost display width.
  * 
- * Cost data reference
- * HP, MP, TP, Gold, Exp are obtained by cost value.
- * If the consumption MP is 50, 50 will be substituted for the cost value.
- * Other costs are retrieved in an array.
- * cost[id]: Get the value of the [id] number of the acquisition tag.
- * From the : of each tag, the order is 0, 1, 2... from the left.
- * In the case of item consumption <SkillItemCost: No.0, No.1, No.2> If you specify cost[2], you will get the number of consumption.
+ * Cost Data Reference
+ * The following applies to both cost evaluation formulas and individual display cost settings.
+ * HP, MP, TP, Gold, and Exp costs are retrieved as cost values.
+ * For example, if the MP cost is 50, 50 is assigned to cost.
+ * Other costs are retrieved as arrays.
+ * cost[id]: Retrieves the value at position [id] from the tag. Values after the ":" are numbered from left to right starting at 0: 0, 1, 2...
+ * For example, with an item cost tag such as <SkillItemCost:value0,value1,value2>, specifying cost[2] retrieves the consumption amount.
  * 
- * Prefixes and suffixes are not applied to consumption skills that have a cost evaluation formula defined.
+ * Prefixes and suffixes are not applied to cost skills that have a cost evaluation formula defined.
  * 
- * "NUUN_EquipSkillLearning" is required to set 'EquipSkillLearnSkill' for "Cost display target".
+ * The Skill Learning Equipment plugin is required to set 'EquipSkillLearnSkill' as the cost display target.
  * https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md
  * 
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/22/2023 Ver.1.2.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
+ * Fixed an issue where 0 could not be set for some plugin parameters.
+ * Fixed an issue where the cost width of the previous skill was applied.
  * 1/22/2023 Ver.1.1.3
  * Added a function that allows you to specify the cost range for each skill.
  * 12/17/2022 Ver.1.1.2
@@ -281,7 +289,7 @@
  * 
  * @param CostOrderSelect
  * @text Cost display target
- * @desc Set the display target of the cost. When specifying other than HP, MP, TP, Gold, Exp, please enter the corresponding cost tag name.
+ * @desc Set the cost to display. For other costs, enter the cost tag name.
  * @type combo
  * @option 'HP'
  * @option 'MP'
@@ -330,10 +338,8 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.1.3
- * @base NUUN_Base
+ * @version 1.2.0
  * @base NUUN_SkillCostEX
- * @orderAfter NUUN_Base
  * @orderAfter NUUN_SkillCostEX
  * 
  * @help
@@ -374,9 +380,18 @@
  * https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/1/22 Ver.1.2.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * 一部のプラグインパラメータで0が設定できない問題を修正。
+ * コストの幅が前のスキルのコスト幅が適用されてしまう問題を修正。
  * 2023/1/22 Ver.1.1.3
  * スキル毎にコスト幅を指定できる機能を追加。
  * 2022/12/17 Ver.1.1.2
@@ -649,313 +664,341 @@ var Imported = Imported || {};
 Imported.NUUN_SkillCostShowEX = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_SkillCostShowEX');
-const CostWidth = String(parameters['CostWidth'] || '000');
-const Connection = String(parameters['Connection'] || '/');
-const PrefixFontSize = Number(parameters['PrefixFontSize'] || 20);
-const SuffixFontSize = Number(parameters['SuffixFontSize'] || 20);
-const ConnectionFontSize = Number(parameters['ConnectionFontSize'] || 26);
-const CostFontSize = Number(parameters['CostFontSize'] || 26);
-const PrefixY = Number(parameters['PrefixY'] || 4);
-const SuffixY = Number(parameters['SuffixY'] || 4);
-const ConnectionY = Number(parameters['ConnectionY'] || 0);
-const CostY = Number(parameters['CostY'] || 0);
-const HPCostColor = (DataManager.nuun_structureData(parameters['HPCostColor'])) || 21;
-const MPCostColor = (DataManager.nuun_structureData(parameters['MPCostColor'])) || 23;
-const TPCostColor = (DataManager.nuun_structureData(parameters['TPCostColor'])) || 29;
-const GoldCostColor = (DataManager.nuun_structureData(parameters['GoldCostColor'])) || 17;
-const ExpCostColor = (DataManager.nuun_structureData(parameters['ExpCostColor'])) || 0;
-const HPPrefix = String(parameters['HPPrefix'] || 'HP');
-const HPSuffix = String(parameters['HPSuffix'] || '');
-const MPPrefix = String(parameters['MPPrefix'] || 'MP');
-const MPSuffix = String(parameters['MPSuffix'] || '');
-const TPPrefix = String(parameters['TPPrefix'] || 'TP');
-const TPSuffix = String(parameters['TPSuffix'] || '');
-const GoldPrefix = String(parameters['GoldPrefix'] || '');
-const GoldSuffix = String(parameters['GoldSuffix'] || 'G');
-const ExpPrefix = String(parameters['ExpPrefix'] || 'EXP');
-const ExpSuffix = String(parameters['ExpSuffix'] || '');
-const CostOrderSetting = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['CostOrderSetting'])) : null) || [];
-let count = 0;
+    const params = Nuun_PluginParams_SkillCost.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
 
-const _Window_SkillList_initialize = Window_SkillList.prototype.initialize;
-Window_SkillList.prototype.initialize = function(rect) {
-    this.skillCostWidth = null;
-    _Window_SkillList_initialize.call(this, rect);
-};
+    NuunSkillCostManager.count = 0;
 
-const _Window_SkillList_drawItem = Window_SkillList.prototype.drawItem;
-Window_SkillList.prototype.drawItem = function(index) {
-    const skill = this.itemAt(index);
-    if (skill) {
-        this.skillCostWidth = skill.meta.SkillCostWidth;
-    }
-    _Window_SkillList_drawItem.call(this, index);
-};
+    NuunSkillCostManager.skillCostShowParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.CostWidth || "000";
+            case 1:
+                return params.Connection || '/';
+            case 2:
+                return params.PrefixFontSize || 20;
+            case 3:
+                return params.SuffixFontSize || 20;
+            case 4:
+                return params.ConnectionFontSize || 26;
+            case 5:
+                return params.CostFontSize || 26;
+            case 6:
+                return params.PrefixY || 0;
+            case 7:
+                return params.SuffixY || 0;
+            case 8:
+                return params.ConnectionY || 0;
+            case 9:
+                return params.CostY || 0;
+            case 10:
+                return params.HPCostColor || 0;
+            case 11:
+                return params.MPCostColor || 0;
+            case 12:
+                return params.TPCostColor || 0;
+            case 13:
+                return params.GoldCostColor || 0;
+            case 14:
+                return params.ExpCostColor || 0;
+            case 15:
+                return params.HPPrefix || '';
+            case 16:
+                return params.HPSuffix || '';
+            case 17:
+                return params.MPPrefix || '';
+            case 18:
+                return params.MPSuffix || '';
+            case 19:
+                return params.TPPrefix || '';
+            case 20:
+                return params.TPSuffix || '';
+            case 21:
+                return params.GoldPrefix || '';
+            case 22:
+                return params.GoldSuffix || '';
+            case 23:
+                return params.ExpPrefix || '';
+            case 24:
+                return params.ExpSuffix || '';
+            case 25:
+                return params.CostOrderSetting || [];
+        }
+    };
 
-Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再定義
-    count = 0;
-    CostOrderSetting.forEach(type => {
-        if (type.CostOrderSelect == 'HP') {
-            if (this._actor.skillHpCost(skill)) {
-                x = this.drawHpCost(skill, x, y, width, type);
-                count++;
+    NuunSkillCostManager.getEvalCost = function(battler, cost, skill, param) {
+        const v = $gameVariables._data;
+        const actor = battler.isActor() ? battler : null;
+        const enemy = battler.isEnemy() ? battler : null;
+        try {
+            if (!!actor && actor[param] !== undefined) {
+                return actor[param];
+            } else if (!!enemy && enemy[param] !== undefined) {
+                return enemy[param];
+            } else {
+                return eval(param);
             }
-        } else if (type.CostOrderSelect == 'MP') {
-            if (this._actor.skillMpCost(skill)) {
-                x = this.drawMpCost(skill, x, y, width, type);
-                count++;
-            }
-        } else if (type.CostOrderSelect == 'TP') {
-            if (this._actor.skillTpCost(skill)) {
-                x = this.drawTpCost(skill, x, y, width, type);
-                count++;
-            }
-        } else if (type.CostOrderSelect == 'Gold') {
-            if (this._actor.skillGoldCost(skill)) {
-                x = this.drawGoldCost(skill, x, y, width, type);
-                count++;
-            }
-        } else if (type.CostOrderSelect == 'Exp') {
-            if (this._actor.skillExpCost(skill)) {
-                x = this.drawExpCost(skill, x, y, width, type);
-                count++;
-            }
-        } else if (Imported.NUUN_EquipSkillLearning && type.CostOrderSelect == 'EquipSkillLearnSkill') {
-            if (!this._actor.isEquipSkillLearning(skill.id) && this.equipSkillLearnSkill(skill) > 0) {
-                x = this.drawEquipSkillLearnSkill(skill, x, y, width, type);
-                count++;
-            }
-        } else if (type.CostOrderSelect) {
-            if (skill.meta[type.CostOrderSelect]) {
-                const actor = this._actor;
-                const cost = this.getEvalCost(actor, String(type.CostOrderSelect), skill);
-                const evalData = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-                const costText = eval(evalData);
-                if (costText) {
-                    x = this.drawOrderCost(skill, costText, type, x, y, width);
-                    count++; 
+        } catch (error) {
+            return 0;
+        }
+    };
+
+    const _Window_SkillList_initialize = Window_SkillList.prototype.initialize;
+    Window_SkillList.prototype.initialize = function(rect) {
+        this.skillCostWidth = null;
+        _Window_SkillList_initialize.apply(this, arguments);
+    };
+
+    const _Window_SkillList_drawItem = Window_SkillList.prototype.drawItem;
+    Window_SkillList.prototype.drawItem = function(index) {
+        const skill = this.itemAt(index);
+        this.skillCostWidth = skill && skill.meta.SkillCostWidth ? NuunSkillCostManager.getMetaCode(skill, "SkillCostWidth") : NuunSkillCostManager.skillCostShowParams(0);
+        _Window_SkillList_drawItem.apply(this, arguments);
+    };
+
+    Window_SkillList.prototype.drawSkillCost = function(skill, x, y, width) {//再定義
+        NuunSkillCostManager.count = 0;
+        NuunSkillCostManager.skillCostShowParams(25).forEach(type => {
+            if (type.CostOrderSelect == 'HP') {
+                if (this._actor.skillHpCost(skill)) {
+                    x = this.drawHpCost(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
+            } else if (type.CostOrderSelect == 'MP') {
+                if (this._actor.skillMpCost(skill)) {
+                    x = this.drawMpCost(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
+            } else if (type.CostOrderSelect == 'TP') {
+                if (this._actor.skillTpCost(skill)) {
+                    x = this.drawTpCost(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
+            } else if (type.CostOrderSelect == 'Gold') {
+                if (this._actor.skillGoldCost(skill)) {
+                    x = this.drawGoldCost(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
+            } else if (type.CostOrderSelect == 'Exp') {
+                if (this._actor.skillExpCost(skill)) {
+                    x = this.drawExpCost(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
+            } else if (Imported.NUUN_EquipSkillLearning && type.CostOrderSelect == 'EquipSkillLearnSkill') {
+                if (!this._actor.isEquipSkillLearning(skill.id) && this.equipSkillLearnSkill(skill) > 0) {
+                    x = this.drawEquipSkillLearnSkill(skill, x, y, width, type);
+                    NuunSkillCostManager.count++;
+                }
+            } else if (type.CostOrderSelect) {
+                if (skill.meta[type.CostOrderSelect]) {
+                    const cost = this.getEvalCost(this._actor, String(type.CostOrderSelect), skill);
+                    const evalData = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+                    const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalData);
+                    if (costText) {//0は表示しない
+                        x = this.drawOrderCost(skill, costText, type, x, y, width);
+                        NuunSkillCostManager.count++; 
+                    }
                 }
             }
+        });
+    };
+
+    Window_SkillList.prototype.getEvalCost = function(actor, tag, skill) {
+        switch (tag) {
+            case 'SkillItemCost':
+            return actor.skillItemCost(skill);
+            case 'SkillEquipCost':
+                return actor.skillEquipCost(skill);
+            case 'SkillVarCost':
+                return actor.skillVarCost(skill);
+            case 'SkillVarCostR':
+                return actor.skillVarCostR(skill);
+            case 'SkillEvalCost':
+                return actor.canSkillEvalCost(skill);
         }
-    });
-};
+    };
 
-Window_SkillList.prototype.getEvalCost = function(actor, tag, skill) {
-    switch (tag) {
-        case 'SkillItemCost':
-           return actor.skillItemCost(skill);
-        case 'SkillEquipCost':
-            return actor.skillEquipCost(skill);
-        case 'SkillVarCost':
-            return actor.skillVarCost(skill);
-        case 'SkillVarCostR':
-            return actor.skillVarCostR(skill);
-        case 'SkillEvalCost':
-            return actor.canSkillEvalCost(skill);
-    }
-};
+    Window_SkillList.prototype.drawHpCost = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const cost = this._actor.skillHpCost(skill);
+        this.setCostColor(NuunSkillCostManager.skillCostShowParams(10));
+        const evalCost = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+        if (evalCost) {
+            const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalCost);
+            this.drawText(costText, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(costText);
+        } else {
+            x -= this.drawCostSuffix(NuunSkillCostManager.skillCostShowParams(16), x, y, width);
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+            this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(cost);
+            x -= this.drawCostPrefix(NuunSkillCostManager.skillCostShowParams(15), x, y, width);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
 
-Window_SkillList.prototype.drawHpCost = function(skill, x, y, width, type) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    const cost = this._actor.skillHpCost(skill);
-    this.setCostColor(HPCostColor);
-    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-    if (evalCost) {
-        const actor = this._actor;
-        const costText = eval(evalCost);
-        this.drawText(costText, x, y + CostY, width, "right");
-        x -= this.textWidth(costText);
-    } else {
-        x -= this.drawCostSuffix(HPSuffix, x, y, width);
-        this.contents.fontSize = CostFontSize;
-        this.drawText(cost, x, y + CostY, width, "right");
+    Window_SkillList.prototype.drawMpCost = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const cost = this._actor.skillMpCost(skill);
+        this.setCostColor(NuunSkillCostManager.skillCostShowParams(11));
+        const evalCost = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+        if (evalCost) {
+            const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalCost);
+            this.drawText(costText, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(costText);
+        } else {
+            x -= this.drawCostSuffix(NuunSkillCostManager.skillCostShowParams(18), x, y, width);
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+            this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(cost);
+            x -= this.drawCostPrefix(NuunSkillCostManager.skillCostShowParams(17), x, y, width);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
+
+    Window_SkillList.prototype.drawTpCost = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const cost = this._actor.skillTpCost(skill);
+        this.setCostColor(NuunSkillCostManager.skillCostShowParams(12));
+        const evalCost = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+        if (evalCost) {
+            const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalCost);
+            this.drawText(costText, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(costText);
+        } else {
+            x -= this.drawCostSuffix(NuunSkillCostManager.skillCostShowParams(20), x, y, width);
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+            this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(cost);
+            x -= this.drawCostPrefix(NuunSkillCostManager.skillCostShowParams(19), x, y, width);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
+
+    Window_SkillList.prototype.drawGoldCost = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const cost = this._actor.skillGoldCost(skill);
+        this.setCostColor(NuunSkillCostManager.skillCostShowParams(13));
+        const evalCost = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+        if (evalCost) {
+            const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalCost);
+            this.drawText(costText, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(costText);
+        } else {
+            x -= this.drawCostSuffix(NuunSkillCostManager.skillCostShowParams(22), x, y, width);
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+            this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(cost);
+            x -= this.drawCostPrefix(NuunSkillCostManager.skillCostShowParams(21), x, y, width);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
+
+    Window_SkillList.prototype.drawExpCost = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const cost = this._actor.skillExpCost(skill);
+        this.setCostColor(NuunSkillCostManager.skillCostShowParams(14));
+        const evalCost = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+        if (evalCost) {
+            const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalCost);
+            this.drawText(costText, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(costText);
+        } else {
+            x -= this.drawCostSuffix(NuunSkillCostManager.skillCostShowParams(24), x, y, width);
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+            this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(cost);
+            x -= this.drawCostPrefix(NuunSkillCostManager.skillCostShowParams(23), x, y, width);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
+
+    Window_SkillList.prototype.drawEquipSkillLearnSkill = function(skill, x, y, width, type) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        const cost = this.equipSkillLearnSkillText(skill);
+        this.setCostColor(type.CostColor);
+        const evalCost = skill.meta.SkillCostEval ? NuunSkillCostManager.getMetaCode(skill, "SkillCostEval") : type.CostEval;
+        if (evalCost) {
+            const costText = NuunSkillCostManager.getEvalCost(this._actor, cost, skill, evalCost);
+            this.drawText(costText, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(costText);
+        } else {
+            x -= this.drawCostSuffix(type.Suffix, x, y, width);
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+            this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
+            x -= this.textWidth(cost);
+            x -= this.drawCostPrefix(type.Prefix, x, y, width);
+        }
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
+
+    Window_SkillList.prototype.drawOrderCost = function(skill, cost, data, x, y, width) {
+        if (NuunSkillCostManager.count > 0) {
+            x -= this.drawCostConnection(x, y, width);
+        }
+        this.setCostColor(data.CostColor);
+        x -= this.drawCostSuffix(data.Suffix, x, y, width);
+        this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(5);
+        this.drawText(cost, x, y + NuunSkillCostManager.skillCostShowParams(9), width, "right");
         x -= this.textWidth(cost);
-        x -= this.drawCostPrefix(HPPrefix, x, y, width);
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
+        x -= this.drawCostPrefix(data.Prefix, x, y, width);
+        this.contents.fontSize = $gameSystem.mainFontSize();
+        return x;
+    };
 
-Window_SkillList.prototype.drawMpCost = function(skill, x, y, width, type) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    const cost = this._actor.skillMpCost(skill);
-    this.setCostColor(MPCostColor);
-    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-    if (evalCost) {
-        const actor = this._actor;
-        const costText = eval(evalCost);
-        this.drawText(costText, x, y + CostY, width, "right");
-        x -= this.textWidth(costText);
-    } else {
-        x -= this.drawCostSuffix(MPSuffix, x, y, width);
-        this.contents.fontSize = CostFontSize;
-        this.drawText(cost, x, y + CostY, width, "right");
-        x -= this.textWidth(cost);
-        x -= this.drawCostPrefix(MPPrefix, x, y, width);
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
+    Window_SkillList.prototype.drawCostSuffix = function(suffix, x, y, width) {
+        if (suffix) {
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(3);
+            this.drawText(suffix, x, y + NuunSkillCostManager.skillCostShowParams(7), width, "right");
+            return this.textWidth(suffix);
+        } else {
+            return 0;
+        }
+    };
 
-Window_SkillList.prototype.drawTpCost = function(skill, x, y, width, type) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    const cost = this._actor.skillTpCost(skill);
-    this.setCostColor(TPCostColor);
-    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-    if (evalCost) {
-        const actor = this._actor;
-        const costText = eval(evalCost);
-        this.drawText(costText, x, y + CostY, width, "right");
-        x -= this.textWidth(costText);
-    } else {
-        x -= this.drawCostSuffix(TPSuffix, x, y, width);
-        this.contents.fontSize = CostFontSize;
-        this.drawText(cost, x, y + CostY, width, "right");
-        x -= this.textWidth(cost);
-        x -= this.drawCostPrefix(TPPrefix, x, y, width);
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
+    Window_SkillList.prototype.drawCostPrefix = function(prefix, x, y, width) {
+        if (prefix) {
+            this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(2);
+            this.drawText(prefix, x, y + NuunSkillCostManager.skillCostShowParams(6), width, "right");
+            return this.textWidth(prefix);
+        } else {
+            return 0;
+        }
+    };
 
-Window_SkillList.prototype.drawGoldCost = function(skill, x, y, width, type) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    const cost = this._actor.skillGoldCost(skill);
-    this.setCostColor(GoldCostColor);
-    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-    if (evalCost) {
-        const actor = this._actor;
-        const costText = eval(evalCost);
-        this.drawText(costText, x, y + CostY, width, "right");
-        x -= this.textWidth(costText);
-    } else {
-        x -= this.drawCostSuffix(GoldSuffix, x, y, width);
-        this.contents.fontSize = CostFontSize;
-        this.drawText(cost, x, y + CostY, width, "right");
-        x -= this.textWidth(cost);
-        x -= this.drawCostPrefix(GoldPrefix, x, y, width);
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
+    Window_SkillList.prototype.drawCostConnection = function(x, y, width) {
+        this.resetTextColor();
+        this.contents.fontSize = NuunSkillCostManager.skillCostShowParams(4);
+        this.drawText(NuunSkillCostManager.skillCostShowParams(1), x, y + NuunSkillCostManager.skillCostShowParams(8), width, "right");
+        return this.textWidth(NuunSkillCostManager.skillCostShowParams(1));
+    };
 
-Window_SkillList.prototype.drawExpCost = function(skill, x, y, width, type) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    const cost = this._actor.skillExpCost(skill);
-    this.setCostColor(ExpCostColor);
-    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-    if (evalCost) {
-        const actor = this._actor;
-        const costText = eval(evalCost);
-        this.drawText(costText, x, y + CostY, width, "right");
-        x -= this.textWidth(costText);
-    } else {
-        x -= this.drawCostSuffix(ExpSuffix, x, y, width);
-        this.contents.fontSize = CostFontSize;
-        this.drawText(cost, x, y + CostY, width, "right");
-        x -= this.textWidth(cost);
-        x -= this.drawCostPrefix(ExpPrefix, x, y, width);
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
+    Window_SkillList.prototype.setCostColor = function(costColor) {
+        this.changeTextColor(NuunSkillCostManager.getColorCode(costColor));
+    };
 
-Window_SkillList.prototype.drawEquipSkillLearnSkill = function(skill, x, y, width, type) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    const cost = this.equipSkillLearnSkillText(skill);
-    this.setCostColor(type.CostColor);
-    const evalCost = skill.meta.SkillCostEval ? skill.meta.SkillCostEval : type.CostEval;
-    if (evalCost) {
-        const actor = this._actor;
-        const costText = eval(evalCost);
-        this.drawText(costText, x, y + CostY, width, "right");
-        x -= this.textWidth(costText);
-    } else {
-        x -= this.drawCostSuffix(type.Suffix, x, y, width);
-        this.contents.fontSize = CostFontSize;
-        this.drawText(cost, x, y + CostY, width, "right");
-        x -= this.textWidth(cost);
-        x -= this.drawCostPrefix(type.Prefix, x, y, width);
-    }
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
+    const _Window_SkillList_costWidth = Window_SkillList.prototype.costWidth;
+    Window_SkillList.prototype.costWidth = function() {
+        return !!this.skillCostWidth ? this.textWidth(this.skillCostWidth) : _Window_SkillList_costWidth.apply(this, arguments);
+    };
 
-Window_SkillList.prototype.drawOrderCost = function(skill, cost, data, x, y, width) {
-    if (count > 0) {
-        x -= this.drawCostConnection(x, y, width);
-    }
-    this.setCostColor(data.CostColor);
-    x -= this.drawCostSuffix(data.Suffix, x, y, width);
-    this.contents.fontSize = CostFontSize;
-    this.drawText(cost, x, y + CostY, width, "right");
-    x -= this.textWidth(cost);
-    x -= this.drawCostPrefix(data.Prefix, x, y, width);
-    this.contents.fontSize = $gameSystem.mainFontSize();
-    return x;
-};
-
-Window_SkillList.prototype.drawCostSuffix = function(suffix, x, y, width) {
-    if (suffix) {
-        this.contents.fontSize = SuffixFontSize;
-        this.drawText(suffix, x, y + SuffixY, width, "right");
-        return this.textWidth(suffix);
-    } else {
-        return 0;
-    }
-};
-
-Window_SkillList.prototype.drawCostPrefix = function(prefix, x, y, width) {
-    if (prefix) {
-        this.contents.fontSize = PrefixFontSize;
-        this.drawText(prefix, x, y + PrefixY, width, "right");
-        return this.textWidth(prefix);
-    } else {
-        return 0;
-    }
-};
-
-Window_SkillList.prototype.drawCostConnection = function(x, y, width) {
-    this.resetTextColor();
-    this.contents.fontSize = ConnectionFontSize;
-    this.drawText(Connection, x, y + ConnectionY, width, "right");
-    return this.textWidth(Connection);
-};
-
-Window_SkillList.prototype.setCostColor = function(costColor) {
-    this.changeTextColor(getColorCode(costColor));
-};
-
-const _Window_SkillList_costWidth = Window_SkillList.prototype.costWidth;
-Window_SkillList.prototype.costWidth = function() {
-    if (this.skillCostWidth) {
-        return this.textWidth(this.skillCostWidth);
-    } else if (!!CostWidth) {
-        return this.textWidth(CostWidth);
-    } else {
-        return _Window_SkillList_costWidth.call(this);
-    }
-};
-
-
-function getColorCode(color) {
-    if (typeof(color) === "string") {
-      return color;
-    }
-    return ColorManager.textColor(color);
-}
 
 })();

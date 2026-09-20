@@ -62,7 +62,7 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
- * 9/22/2023 Ver.1.2.0
+ * 9/20/2026 Ver.1.2.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
  * Fixed an issue where 0 could not be set for some plugin parameters.
  * Fixed an issue where the cost width of the previous skill was applied.
@@ -388,7 +388,7 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2026/1/22 Ver.1.2.0
+ * 2026/9/20 Ver.1.2.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * 一部のプラグインパラメータで0が設定できない問題を修正。
  * コストの幅が前のスキルのコスト幅が適用されてしまう問題を修正。

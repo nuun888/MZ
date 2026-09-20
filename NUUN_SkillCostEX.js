@@ -100,7 +100,7 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
- * 1/26/2025 Ver.1.4.0
+ * 9/20/2026 Ver.1.4.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
  * Fixed an issue where the cost rate from the SkillCostRateCustomize plugin was not applied correctly to variable costs.
  * 1/26/2025 Ver.1.3.3
@@ -228,7 +228,7 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2025/1/26 Ver.1.4.0
+ * 2026/9/20 Ver.1.4.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * 変数コストでSkillCostRateCustomizeプラグインでのコスト割合が正常に取得できていなかった問題を修正。
  * 2025/1/26 Ver.1.3.3

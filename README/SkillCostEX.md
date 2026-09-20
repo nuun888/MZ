@@ -83,8 +83,8 @@
 このプラグインよりも下に設定。  
 HP:Hp  
 Gold:Gold  
-変数:Var  
-割合変数:VarR  
+変数:Varまたはタグの[Identifier]  
+割合変数:VarRまたはタグの[Identifier]  
 経験値:Exp  
 
 ## 更新履歴

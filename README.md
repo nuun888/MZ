@@ -94,9 +94,9 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 前提、必須プラグインが必要なプラグインでエラーが出た場合は、まず前提、必須プラグインを最新版にしてください。  
 
-| 有償プラグイン　　　　　　　　　　|Booth         　　　　　　　  |         　　　　　　　  | Ver |
-| ------------------------------ | -------------------------- | -------------------------- | -------- |
-| リザルト | [リザルト(booth)](https://booth.pm/ja/items/8046406) | [マニュアル](https://github.com/nuun888/MZ/blob/master/README/ResultEx.md) | 1.3.0 |
+| 有償プラグイン　　　　　　　　　　|Booth         　　　　　　　  |         　　　　　　　  |         　　　　　　　  |
+| ------------------------------ | -------------------------- | -------------------------- | -------------------------- |
+| リザルト | [リザルト(booth)](https://booth.pm/ja/items/8046406) | [マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result.pdf) | [Manual (English)](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Result_en.pdf) |
 | シンボルエンカウント | [シンボルエンカウント(booth)](https://booth.pm/ja/items/7504032) | [マニュアル](https://github.com/nuun888/MZ/blob/master/README/SymbolEncounter_r.md) | 1.6.0 |
 | ブレイクダメージ | [ブレイクダメージ(booth)](https://booth.pm/ja/items/7500971) | [マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/BreakDamage.pdf) | [Manual (English)](https://raw.githubusercontent.com/nuun888/MZ/master/BreakDamage_en.pdf) |
 | 実績システム| [実績システム(booth)](https://booth.pm/ja/items/8506759) | [マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/AchievementSystem.pdf) | [Manual (English)](https://raw.githubusercontent.com/nuun888/MZ/master/AchievementSystem_en.pdf) |

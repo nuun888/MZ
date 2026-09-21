@@ -2,18 +2,14 @@
  * NUUN_EnemyLevel.js
  * 
  * Copyright (C) 2024 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
  */ 
 /*:
  * @target MZ
  * @plugindesc Enemy Level
- * @base NUUN_Base
- * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.4
+ * @version 1.2.0
  * 
  * @help
  * Sets the enemy's level.
@@ -46,9 +42,17 @@
  * Enemy memo field > List data enemy level variable level > Overall enemy level variable level > Map level
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/21/2026 Ver.1.2.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
+ * Fixed an issue where the fixed values for Magic Attack and Magic Defense were reversed.
  * 2/28/2026 Ver.1.1.4
  * Fixed an issue where levels would not be set correctly if level dispersion was not set.
  * Fixed the issue where the skill's level application range was not being applied correctly.
@@ -70,7 +74,7 @@
  * @desc Sets the enemy level.
  * @text Enemy level setting
  * @type struct<EnemyLevelDataList>[]
- * @default []
+ * @default ["{\"Name\":\"\",\"HpSetting\":\"------------------------------\",\"FixedHpIncrease\":\"50\",\"HpIncreaseRate\":\"100\",\"MpSetting\":\"------------------------------\",\"FixedMpIncrease\":\"10\",\"MpIncreaseRate\":\"100\",\"AtkSetting\":\"------------------------------\",\"FixedAtkIncrease\":\"2\",\"AtkIncreaseRate\":\"100\",\"DefSetting\":\"------------------------------\",\"FixedDefIncrease\":\"2\",\"DefIncreaseRate\":\"100\",\"MatSetting\":\"------------------------------\",\"FixedMatIncrease\":\"2\",\"MatIncreaseRate\":\"100\",\"MdfSetting\":\"------------------------------\",\"FixedMdfIncrease\":\"2\",\"MdfIncreaseRate\":\"100\",\"AgiSetting\":\"------------------------------\",\"FixedAgiIncrease\":\"2\",\"AgiIncreaseRate\":\"100\",\"LukSetting\":\"------------------------------\",\"FixedLukIncrease\":\"2\",\"LukIncreaseRate\":\"100\",\"ExpSetting\":\"------------------------------\",\"FixedExpIncrease\":\"10\",\"ExpIncreaseRate\":\"100\",\"GoldSetting\":\"------------------------------\",\"FixedGoldIncrease\":\"10\",\"GoldIncreaseRate\":\"100\",\"VariableSetting\":\"------------------------------\",\"EnemyLevelVariable\":\"0\"}"]
  * 
  * @param MaxLevel
  * @desc Max enemy level.
@@ -318,10 +322,8 @@
 /*:ja
  * @target MZ
  * @plugindesc 敵レベル
- * @base NUUN_Base
- * @orderAfter NUUN_Base
  * @author NUUN
- * @version 1.1.4
+ * @version 1.2.0
  * 
  * @help
  * 敵にレベルを設定します。
@@ -354,9 +356,17 @@
  * 敵のメモ欄 > リストデータの敵レベル変数のレベル > 全体の敵レベル変数のレベル > マップで設定したレベル
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/21 Ver 1.2.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * 魔法力と魔法防御の固定値が逆に設定されていた問題を修正。
  * 2026/2/28 Ver 1.1.4
  * レベルの分散度が設定されていないと、正しくレベルが設定されない問題を修正。
  * スキルのレベル使用範囲が正常に適用されていなかった問題を修正。
@@ -378,7 +388,7 @@
  * @desc 敵レベルの設定を行います。
  * @text 敵レベル設定
  * @type struct<EnemyLevelDataList>[]
- * @default []
+ * @default ["{\"Name\":\"\",\"HpSetting\":\"------------------------------\",\"FixedHpIncrease\":\"50\",\"HpIncreaseRate\":\"100\",\"MpSetting\":\"------------------------------\",\"FixedMpIncrease\":\"10\",\"MpIncreaseRate\":\"100\",\"AtkSetting\":\"------------------------------\",\"FixedAtkIncrease\":\"2\",\"AtkIncreaseRate\":\"100\",\"DefSetting\":\"------------------------------\",\"FixedDefIncrease\":\"2\",\"DefIncreaseRate\":\"100\",\"MatSetting\":\"------------------------------\",\"FixedMatIncrease\":\"2\",\"MatIncreaseRate\":\"100\",\"MdfSetting\":\"------------------------------\",\"FixedMdfIncrease\":\"2\",\"MdfIncreaseRate\":\"100\",\"AgiSetting\":\"------------------------------\",\"FixedAgiIncrease\":\"2\",\"AgiIncreaseRate\":\"100\",\"LukSetting\":\"------------------------------\",\"FixedLukIncrease\":\"2\",\"LukIncreaseRate\":\"100\",\"ExpSetting\":\"------------------------------\",\"FixedExpIncrease\":\"10\",\"ExpIncreaseRate\":\"100\",\"GoldSetting\":\"------------------------------\",\"FixedGoldIncrease\":\"10\",\"GoldIncreaseRate\":\"100\",\"VariableSetting\":\"------------------------------\",\"EnemyLevelVariable\":\"0\"}"]
  * 
  * @param MaxLevel
  * @desc 敵の最大レベル。
@@ -627,16 +637,185 @@ var Imported = Imported || {};
 Imported.NUUN_EnemyLevel = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_EnemyLevel {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_EnemyLevel = Nuun_PluginParams_EnemyLevel;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+
+    const params = Nuun_PluginParams_EnemyLevel.getPluginParams(document.currentScript);
     const pluginName = params.pluginName;
 
-    function _getParams(id) {
+    function NuunEnemyLevelManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunEnemyLevelManager = NuunEnemyLevelManager;
+
+    NuunEnemyLevelManager.getStructureData = function(params){
+        return params ? this.structureData(params) : [];
+    };
+
+    NuunEnemyLevelManager.structureData = function(params){
+        return JSON.parse(JSON.stringify(params, function(key, value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return NuunEnemyLevelManager.getEvalCode(value);
+            }
+        }));
+    };
+
+    NuunEnemyLevelManager.getEvalCode = function(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    };
+
+    NuunEnemyLevelManager.getMetaCode = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunEnemyLevelManager.getMetaCodeList = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta.split(',');
+    };
+
+    NuunEnemyLevelManager.stringCode = function(code){
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return code;
+        }
+    };
+
+    NuunEnemyLevelManager.getParams = function(id){
         if (isNaN(id)) {
-            return params.EnemyLevelData.findIndex(data => data.Name === id) + 1;
+            return this.enemyLevelParams(0).findIndex(data => data.Name === id) + 1;
         } else {
             return Number(id);
         }
-    }
+    };
+
+    NuunEnemyLevelManager.enemyLevelParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.EnemyLevelData || [];
+            case 1:
+                return params.MaxLevel || 99;
+            case 2:
+                return params.LevelName;
+            case 3:
+                return params.EnemyLevelVariable;
+            case 4:
+                return params.EnemyBookNoMapLevel;
+            case 5:
+                return params.EnemyBookNoVariance;
+        }
+    };
 
     const _Game_Enemy_initMembers = Game_Enemy.prototype.initMembers;
     Game_Enemy.prototype.initMembers = function() {
@@ -655,14 +834,14 @@ Imported.NUUN_EnemyLevel = true;
     Game_Enemy.prototype.setupLevelData = function(enemyId) {
         const enemy = $dataEnemies[enemyId];
         if (!enemy) return;
-        const dataId = _getParams(NuunManager.getMetaCode(enemy, "EnemyLevel"));
-        if (!dataId && !params.EnemyLevelData[dataId - 1]) return;
+        const dataId = NuunEnemyLevelManager.getParams(NuunEnemyLevelManager.getMetaCode(enemy, "EnemyLevel"));
+        if (!dataId || !NuunEnemyLevelManager.enemyLevelParams(0)[dataId - 1]) return;
         this._levelData = dataId;
     };
 
     Game_Enemy.prototype.setupLevel = function(enemyId) {
         if (this._levelData === 0) return;
-        const data = params.EnemyLevelData[this._levelData - 1];
+        const data = NuunEnemyLevelManager.enemyLevelParams(0)[this._levelData - 1];
         if (!data) return;
         const enemy = $dataEnemies[enemyId];
         let level = 1;
@@ -670,8 +849,8 @@ Imported.NUUN_EnemyLevel = true;
             level = this.getIndividualEnemyLevel(enemy);
         } else if (data.EnemyLevelVariable > 0) {
             level = $gameVariables.value(data.EnemyLevelVariable) || 1;
-        } else if (params.EnemyLevelVariable > 0) {
-            level = $gameVariables.value(params.EnemyLevelVariable) || 1;
+        } else if (NuunEnemyLevelManager.enemyLevelParams(3) > 0) {
+            level = $gameVariables.value(NuunEnemyLevelManager.enemyLevelParams(3)) || 1;
         } else {
             level = this.mapEnemyLevel();
         }
@@ -679,7 +858,7 @@ Imported.NUUN_EnemyLevel = true;
     };
 
     Game_Enemy.prototype.maxLevel = function() {
-        return params.MaxLevel;
+        return NuunEnemyLevelManager.enemyLevelParams(1);
     };
 
     const _Game_Enemy_paramBase = Game_Enemy.prototype.paramBase;
@@ -690,7 +869,7 @@ Imported.NUUN_EnemyLevel = true;
 
     Game_Enemy.prototype.getParamEnemyLevel = function(base, paramId) {
         if (this._levelData === 0) return 0;
-        const data = params.EnemyLevelData[this._levelData - 1];
+        const data = NuunEnemyLevelManager.enemyLevelParams(0)[this._levelData - 1];
         switch (paramId) {
             case 0:
                 return (Math.floor(base * (data.HpIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedHpIncrease * (this._level - 1);
@@ -701,9 +880,9 @@ Imported.NUUN_EnemyLevel = true;
             case 3:
                 return (Math.floor(base * (data.DefIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedDefIncrease * (this._level - 1);
             case 4:
-                return (Math.floor(base * (data.MatIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMdfIncrease * (this._level - 1);
+                return (Math.floor(base * (data.MatIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMatIncrease * (this._level - 1);
             case 5:
-                return (Math.floor(base * (data.MdfIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMatIncrease * (this._level - 1);
+                return (Math.floor(base * (data.MdfIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedMdfIncrease * (this._level - 1);
             case 6:
                 return (Math.floor(base * (data.AgiIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedAgiIncrease * (this._level - 1);
             case 7:
@@ -732,7 +911,7 @@ Imported.NUUN_EnemyLevel = true;
 
     Game_Enemy.prototype.meetsLevelCondition = function(action) {
         const tag = "EnemyLevelLearnSkill" + action.skillId;
-        const data = NuunManager.getMetaCodeList(this.enemy(), tag);
+        const data = NuunEnemyLevelManager.getMetaCodeList(this.enemy(), tag);
         if (!data) return true;
         return Number(data[0]) <= this._level && (data[1] ? Number(data[1]) >= this._level : true);
     };
@@ -744,34 +923,34 @@ Imported.NUUN_EnemyLevel = true;
 
     Game_Enemy.prototype.getExpEnemyLevel = function(base) {
         if (this._levelData === 0) return 0;
-        const data = params.EnemyLevelData[this._levelData - 1];
+        const data = NuunEnemyLevelManager.enemyLevelParams(0)[this._levelData - 1];
         return (Math.floor(base * (data.ExpIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedExpIncrease * (this._level - 1);
     };
 
     Game_Enemy.prototype.getGoldEnemyLevel = function(base) {
         if (this._levelData === 0) return 0;
-        const data = params.EnemyLevelData[this._levelData - 1];
+        const data = NuunEnemyLevelManager.enemyLevelParams(0)[this._levelData - 1];
         return (Math.floor(base * (data.GoldIncreaseRate / 100)) - base) * (this._level - 1) + data.FixedGoldIncrease * (this._level - 1);
     };
 
     Game_Enemy.prototype.getIndividualEnemyLevel = function(enemy) {
-        const data = NuunManager.getMetaCodeList(enemy, "Level");//レベル, 分散度
+        const data = NuunEnemyLevelManager.getMetaCodeList(enemy, "Level");//レベル, 分散度
         if (!data) return 1;
         return this.enemyLevelVariance(Number(data[0]), Number(data[1] || 0));
     };
 
     Game_Enemy.prototype.mapEnemyLevel = function() {
-        if (params.EnemyBookNoMapLevel && this.isEnemybookLevelStatus()) return 1;
+        if (NuunEnemyLevelManager.enemyLevelParams(4) && this.isEnemybookLevelStatus()) return 1;
         const map = $dataMap;
         if (!map) return 1;
         const tag = 'MapEnemyLevel' + this.enemyId();
-        const data = NuunManager.getMetaCodeList(map, tag);//レベル, 分散度
+        const data = NuunEnemyLevelManager.getMetaCodeList(map, tag);//レベル, 分散度
         if (!data) return 1;
         return this.enemyLevelVariance(Number(data[0]), Number(data[1] || 0));
     };
 
     Game_Enemy.prototype.enemyLevelVariance = function(level, variance = 0) {
-        if (params.EnemyBookNoVariance && this.isEnemybookLevelStatus()) return level;
+        if (NuunEnemyLevelManager.enemyLevelParams(5) && this.isEnemybookLevelStatus()) return level;
         const amp = Math.floor(Math.max((Math.abs(level) * variance) / 100, 0));
         const v = Math.randomInt(amp + 1) + Math.randomInt(amp + 1) - amp;
         return level >= 0 ? level + v : level - v;
@@ -792,8 +971,7 @@ Imported.NUUN_EnemyLevel = true;
     };
 
     Game_Enemy.prototype.getNameLevel = function() {
-        return this.enemy().meta.EnemyLevel && !!params.LevelName ? " "+ params.LevelName + String(this._level) : "";
+        return this.enemy().meta.EnemyLevel && !!NuunEnemyLevelManager.enemyLevelParams(2) ? " "+ NuunEnemyLevelManager.enemyLevelParams(2) + String(this._level) : "";
     };
-
  
 })();

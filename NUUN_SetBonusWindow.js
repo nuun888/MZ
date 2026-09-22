@@ -104,7 +104,7 @@
  * ※https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2026/9/26 Ver.2.0.0
+ * 2026/9/23 Ver.2.0.0
  * NUUN_EquipSetBonus Ver.2.0.0更新によるアップデート。(Ver1では使用できません)
  * 
  * @param WindowSetting

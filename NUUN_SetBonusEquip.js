@@ -36,7 +36,8 @@
  * If multiple set bonuses of the same set bonus type meet their activation conditions, the set bonus listed higher in the "Set bonus settings" plugin parameter takes priority.
  * 
  * 【Identifier】
- * You can assign an optional identifier to each set bonus.
+ * Set an optional identifier for each set bonus using half-width alphanumeric characters.
+ * The identifier must be specified.
  * The identifier can be used instead of the list ID in fields that specify a list ID.
  * 
  * 【Set bonus display settings】
@@ -275,7 +276,8 @@
  * 同じセットボーナスタイプの適用条件を複数満たしている場合、プラグインパラメータ「セットボーナス設定」の上に設定されているセットボーナスが優先して適用されます。
  * 
  * 【識別名】
- * セットボーナスには任意の識別名を設定できます。
+ * セットボーナスには半角英数字で任意の識別名を設定します。
+ * 識別名は必ず設定を行ってください。
  * 識別名を設定すると、リストIDを指定する項目でリストIDの代わりに識別名を指定できます。
  * 
  * 【セットボーナス表示設定】

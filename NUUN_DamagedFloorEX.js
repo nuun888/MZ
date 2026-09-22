@@ -2,18 +2,14 @@
  * NUUN_DamagedFloorEX.js
  * 
  * Copyright (C) 2021 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  * 
  */
 /*:
  * @target MZ
- * @plugindesc  Famage floor EX
+ * @plugindesc  Damage floor EX
  * @author NUUN
- * @version 1.3.3
- * @base NUUN_Base
- * @orderAfter NUUN_Base
+ * @version 1.4.0
  * 
  * @help
  * Expands the handling of damage on the damage floor.
@@ -35,9 +31,16 @@
  * <DfrExPoison:70> The effectiveness rate of floor damage with the tag name Poison will be increased by 0.7 times.
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Adult content: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/22/2026 Ver.1.4.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
  * 9/21/2024 Ver.1.3.3
  * Fixed an issue that caused errors when traversing maps that use tilesets that do not have the Damage Floor setting applied.
  * 8/3/2024 Ver.1.3.2
@@ -167,7 +170,7 @@
  * @max 7
  * 
  * @param DamageType
- * @text Damege type
+ * @text Damage type
  * @desc Specifies the target that will receive floor damage.
  * @type select
  * @option HP
@@ -334,9 +337,7 @@
  * @target MZ
  * @plugindesc  ダメージ床拡張
  * @author NUUN
- * @version 1.3.3
- * @base NUUN_Base
- * @orderAfter NUUN_Base
+ * @version 1.4.0
  * 
  * @help
  * ダメージ床のダメージ時の処理を拡張します。
@@ -359,9 +360,16 @@
  * 
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 成人向け：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/22 Ver.1.4.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
  * 2024/9/21 Ver.1.3.3
  * ダメージ床適用設定が適用されていないタイルセットを使用しているマップを移動するとエラーが出る問題を修正。
  * 2024/8/3 Ver.1.3.2
@@ -658,201 +666,351 @@ var Imported = Imported || {};
 Imported.NUUN_DamagedFloorEX = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_DamagedFloorEX');
-const DamagedFloorList = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DamagedFloorList'])) : null) || [];
-const DefaultFlashColor = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['DefaultFlashColor'])) : null);
-const DefaultDamage = String(parameters['DefaultDamage'] || '10');
-const DefaultDamagedFloorSE = String(parameters['DefaultDamagedFloorSE'] || '');
-const DefaultVolume = Number(parameters['DefaultVolume'] || 90);
-const DefaultPitch = Number(parameters['DefaultPitch'] || 100);
-const DefaultPan = Number(parameters['DefaultPan'] || 50);
-let _onMapFloorDamage = false;
-let _damagedFloorExData = {};
-let FlashColor = {};
-let _floorDamageAnimationTargets = [];
 
-const _Game_Map_initialize  = Game_Map.prototype.initialize ;
-Game_Map.prototype.initialize = function() {
-    _Game_Map_initialize.call(this);
-    this._damagedFloorId = -1;
-    this._damagedFloorSe = null;
-    this._damagedFloorExData = null;
-};
-
-const _Game_Map_setup = Game_Map.prototype.setup;
-Game_Map.prototype.setup = function(mapId) {
-    _Game_Map_setup.call(this, mapId);
-    this.initDamagedFloorId();
-};
-
-Game_Map.prototype.initDamagedFloorId = function() {
-    this._damagedFloorId = DamagedFloorList.findIndex(data => data.TileSetId === this._tilesetId);
-};
-
-Game_Map.prototype.setFloorDamageData = function() {
-    const damagedFloorId = this._damagedFloorId;
-    const x = $gamePlayer._x;
-    const y = $gamePlayer._y;
-    const regionId = $gameMap.regionId(x, y);
-    const Terrain = $gameMap.terrainTag(x, y);
-    const damagedFloorData = DamagedFloorList[damagedFloorId] ? DamagedFloorList[damagedFloorId].DamagedFloorRegion : [];
-    _damagedFloorExData = damagedFloorData.find(data => this.isDamagedFloorData(data, regionId, Terrain));
-};
-
-Game_Map.prototype.isDamagedFloorData = function(data, regionId, Terrain) {
-    if (regionId > 0) {
-        return (data.RegionId === regionId && (data.TerrainId >= 0 ? data.TerrainId === Terrain : true));
-    } else {
-        return (data.TerrainId >= 0 ? data.TerrainId === Terrain : true);
-    }
-};
-
-
-const _Game_Actor_executeFloorDamage = Game_Actor.prototype.executeFloorDamage;
-Game_Actor.prototype.executeFloorDamage = function() {
-    _onMapFloorDamage = true;
-    if (!!_damagedFloorExData && _damagedFloorExData.DamageType !== 'Hp') {
-        const floorDamage = Math.floor(this.basicFloorDamage() * this.fdr);
-        const realDamage = Math.min(floorDamage, this.maxFloorDamage());
-        const methodName = 'gain' + _damagedFloorExData.DamageType;
-        this[methodName](-realDamage);
-        if (realDamage > 0) {
-            this.performMapDamage();
-        }
-    } else {
-        _Game_Actor_executeFloorDamage.call(this);
-    }
-    if (!!_damagedFloorExData && _damagedFloorExData.AddState > 0) {
-        this.floorDamageAddState();
-    }
-    _onMapFloorDamage = false;
-};
-
-Game_Actor.prototype.floorDamageAddState = function() {
-    if (Math.random() * 100 < _damagedFloorExData.AddStateProbability) {
-        this.addState(_damagedFloorExData.AddState);
-    }
-};
-
-Game_Actor.prototype.floorDamageRate = function() {
-    const tag = _damagedFloorExData ? 'DfrEx'+ String(_damagedFloorExData.DamagedFloorName) : null;
-    return this.traitObjects().reduce((r, trait) => {
-        if (tag && trait.meta[tag] !== undefined && trait.meta[tag] >= 0) {
-            return r * Number(trait.meta[tag]) / 100;
-        } else {
-            return r;
-        }
-    }, 1.0);
-};
-
-const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
-Game_Actor.prototype.basicFloorDamage = function() {
-    const coreDamage = _Game_Actor_basicFloorDamage.call(this);
-    const a = this;
-    if (!!_damagedFloorExData) {
-        const mainData = _damagedFloorExData;
-        if (this.floorDamageActor(mainData.DamageActor)) {
-            return mainData.Damage !== 'NoDamage' ? ((mainData.Damage ? eval(mainData.Damage) : (DefaultDamage ? eval(DefaultDamage) : coreDamage)) * this.floorDamageRate()) : 0;
-        } else {
-            return 0;
-        }
-    } else {
-        return (DefaultDamage ? eval(DefaultDamage) : coreDamage) * this.floorDamageRate();
-    }
-};
-
-const _Game_Actor_performMapDamage = Game_Actor.prototype.performMapDamage;
-Game_Actor.prototype.performMapDamage = function() {
-    const floorDamage = _onMapFloorDamage;
-    _Game_Actor_performMapDamage.call(this);
-    this.exFloorDamage(floorDamage);
-};
-
-Game_Actor.prototype.exFloorDamage = function(mode) {
-    if (mode) {
-        this.floorDamagePlaySe(_damagedFloorExData);
-        this.floorDamageAnimation(_damagedFloorExData);
-    }
-};
-
-Game_Actor.prototype.floorDamagePlaySe = function(data) {
-    if (data && data.DamagedFloorSE) {
-        AudioManager.playSe({"name":data.DamagedFloorSE,"volume":data.volume,"pitch":data.pitch,"pan":data.pan});
-    } else if (DefaultDamagedFloorSE) {
-        AudioManager.playSe({"name":DefaultDamagedFloorSE,"volume":DefaultVolume,"pitch":DefaultPitch,"pan":DefaultPan});
-    }
-};
-
-Game_Actor.prototype.floorDamageAnimation = function(data) {
-    if (!!data) {
-        const mode = !data.DamageInclude ? 'includefollowers' : data.DamageInclude;
-        if (mode === 'player') {
-            $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
-        } else {
-            if ($gameParty.leader() === this) {
-                if (mode === 'includefollowers') {
-                    $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
-                } else {
-                    _floorDamageAnimationTargets.push($gamePlayer);
+    class Nuun_PluginParams_DamagedFloorEX {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
                 }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_DamagedFloorEX = Nuun_PluginParams_DamagedFloorEX;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
             } else {
-                const target = this.getFloorDamageFollowerTarget();
-                if (!!target) {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_DamagedFloorEX.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunDamagedFloorEXManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunDamagedFloorEXManager = NuunDamagedFloorEXManager;
+
+    NuunDamagedFloorEXManager._onMapFloorDamage = false;
+    NuunDamagedFloorEXManager._damagedFloorExData = {};
+    NuunDamagedFloorEXManager._flashColor = {};
+    NuunDamagedFloorEXManager._floorDamageAnimationTargets = [];
+
+    NuunDamagedFloorEXManager.structureData = function(params){
+        return JSON.parse(JSON.stringify(params, function(key, value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return NuunDamagedFloorEXManager.getEvalCode(value);
+            }
+        }));
+    };
+
+    NuunDamagedFloorEXManager.getEvalCode = function(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    };
+
+    NuunDamagedFloorEXManager.stringCode = function(code){
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return code;
+        }
+    };
+    
+    NuunDamagedFloorEXManager.getMetaCode = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunDamagedFloorEXManager.damagedFloorEXParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.DamagedFloorList || [];
+            case 1:
+                return params.DefaultFlashColor || null;
+            case 2:
+                return params.DefaultDamage || "10";
+            case 3:
+                return params.DefaultDamagedFloorSE || "";
+            case 4:
+                return params.DefaultVolume || 0;
+            case 5:
+                return params.DefaultPitch || 0;
+            case 6:
+                return params.DefaultPan || 0;
+        }
+    };
+
+
+    const _Game_Map_initialize  = Game_Map.prototype.initialize ;
+    Game_Map.prototype.initialize = function() {
+        _Game_Map_initialize.call(this);
+        this._damagedFloorId = -1;
+        this._damagedFloorSe = null;
+        this._damagedFloorExData = null;
+    };
+
+    const _Game_Map_setup = Game_Map.prototype.setup;
+    Game_Map.prototype.setup = function(mapId) {
+        _Game_Map_setup.call(this, mapId);
+        this.initDamagedFloorId();
+    };
+
+    Game_Map.prototype.initDamagedFloorId = function() {
+        this._damagedFloorId = NuunDamagedFloorEXManager.damagedFloorEXParams(0).findIndex(data => data.TileSetId === this._tilesetId);
+    };
+
+    Game_Map.prototype.setFloorDamageData = function() {
+        const damagedFloorId = this._damagedFloorId;
+        const x = $gamePlayer._x;
+        const y = $gamePlayer._y;
+        const regionId = $gameMap.regionId(x, y);
+        const Terrain = $gameMap.terrainTag(x, y);
+        const damagedFloorData = NuunDamagedFloorEXManager.damagedFloorEXParams(0)[damagedFloorId] ? NuunDamagedFloorEXManager.damagedFloorEXParams(0)[damagedFloorId].DamagedFloorRegion : [];
+        NuunDamagedFloorEXManager._damagedFloorExData = damagedFloorData.find(data => this.isDamagedFloorData(data, regionId, Terrain));
+    };
+
+    Game_Map.prototype.isDamagedFloorData = function(data, regionId, Terrain) {
+        if (regionId > 0) {
+            return (data.RegionId === regionId && (data.TerrainId >= 0 ? data.TerrainId === Terrain : true));
+        } else {
+            return (data.TerrainId >= 0 ? data.TerrainId === Terrain : true);
+        }
+    };
+
+    const _Game_Actor_executeFloorDamage = Game_Actor.prototype.executeFloorDamage;
+    Game_Actor.prototype.executeFloorDamage = function() {
+        NuunDamagedFloorEXManager._onMapFloorDamage = true;
+        if (!!NuunDamagedFloorEXManager._damagedFloorExData && NuunDamagedFloorEXManager._damagedFloorExData.DamageType !== undefined && NuunDamagedFloorEXManager._damagedFloorExData.DamageType !== 'Hp') {
+            const floorDamage = Math.floor(this.basicFloorDamage() * this.fdr);
+            const realDamage = Math.min(floorDamage, this.maxFloorDamage());
+            const methodName = 'gain' + NuunDamagedFloorEXManager._damagedFloorExData.DamageType;
+            this[methodName](-realDamage);
+            if (realDamage > 0) {
+                this.performMapDamage();
+            }
+        } else {
+            _Game_Actor_executeFloorDamage.call(this);
+        }
+        if (!!NuunDamagedFloorEXManager._damagedFloorExData && NuunDamagedFloorEXManager._damagedFloorExData.AddState > 0) {
+            this.floorDamageAddState();
+        }
+        NuunDamagedFloorEXManager._onMapFloorDamage = false;
+    };
+
+    Game_Actor.prototype.floorDamageAddState = function() {
+        if (Math.random() * 100 < NuunDamagedFloorEXManager._damagedFloorExData.AddStateProbability) {
+            this.addState(NuunDamagedFloorEXManager._damagedFloorExData.AddState);
+        }
+    };
+
+    Game_Actor.prototype.floorDamageRate = function() {
+        const tag = NuunDamagedFloorEXManager._damagedFloorExData ? 'DfrEx'+ String(NuunDamagedFloorEXManager._damagedFloorExData.DamagedFloorName) : null;
+        return this.traitObjects().reduce((r, trait) => {
+            if (tag && trait.meta[tag] !== undefined && NuunDamagedFloorEXManager.getMetaCode(trait, tag) >= 0) {
+                return r * Number(NuunDamagedFloorEXManager.getMetaCode(trait, tag)) / 100;
+            } else {
+                return r;
+            }
+        }, 1.0);
+    };
+
+    const _Game_Actor_basicFloorDamage = Game_Actor.prototype.basicFloorDamage;
+    Game_Actor.prototype.basicFloorDamage = function() {
+        const coreDamage = _Game_Actor_basicFloorDamage.call(this);
+        const a = this;
+        if (!!NuunDamagedFloorEXManager._damagedFloorExData) {
+            const mainData = NuunDamagedFloorEXManager._damagedFloorExData;
+            if (this.floorDamageActor(mainData.DamageActor)) {
+                return mainData.Damage !== 'NoDamage' ? ((mainData.Damage ? eval(mainData.Damage) : (NuunDamagedFloorEXManager.damagedFloorEXParams(2) ? eval(NuunDamagedFloorEXManager.damagedFloorEXParams(2)) : coreDamage)) * this.floorDamageRate()) : 0;
+            } else {
+                return 0;
+            }
+        } else {
+            return (NuunDamagedFloorEXManager.damagedFloorEXParams(2) ? eval(NuunDamagedFloorEXManager.damagedFloorEXParams(2)) : coreDamage) * this.floorDamageRate();
+        }
+    };
+
+    const _Game_Actor_performMapDamage = Game_Actor.prototype.performMapDamage;
+    Game_Actor.prototype.performMapDamage = function() {
+        const floorDamage = NuunDamagedFloorEXManager._onMapFloorDamage;
+        _Game_Actor_performMapDamage.call(this);
+        this.exFloorDamage(floorDamage);
+    };
+
+    Game_Actor.prototype.exFloorDamage = function(mode) {
+        if (mode) {
+            this.floorDamagePlaySe(NuunDamagedFloorEXManager._damagedFloorExData);
+            this.floorDamageAnimation(NuunDamagedFloorEXManager._damagedFloorExData);
+        }
+    };
+
+    Game_Actor.prototype.floorDamagePlaySe = function(data) {
+        if (data && data.DamagedFloorSE) {
+            AudioManager.playSe({"name":data.DamagedFloorSE,"volume":data.volume,"pitch":data.pitch,"pan":data.pan});
+        } else if (NuunDamagedFloorEXManager.damagedFloorEXParams(3)) {
+            AudioManager.playSe({"name":NuunDamagedFloorEXManager.damagedFloorEXParams(3),"volume":NuunDamagedFloorEXManager.damagedFloorEXParams(4),"pitch":NuunDamagedFloorEXManager.damagedFloorEXParams(5),"pan":NuunDamagedFloorEXManager.damagedFloorEXParams(6)});
+        }
+    };
+
+    Game_Actor.prototype.floorDamageAnimation = function(data) {
+        if (!!data && !!data.DamageAnimation) {
+            const mode = !data.DamageInclude ? 'includefollowers' : data.DamageInclude;
+            if (mode === 'player') {
+                $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
+            } else {
+                if ($gameParty.leader() === this) {
                     if (mode === 'includefollowers') {
-                        $gameTemp.requestAnimation([target], data.DamageAnimation);
+                        $gameTemp.requestAnimation([$gamePlayer], data.DamageAnimation);
                     } else {
-                        _floorDamageAnimationTargets.push(target);
+                        NuunDamagedFloorEXManager._floorDamageAnimationTargets.push($gamePlayer);
+                    }
+                } else {
+                    const target = this.getFloorDamageFollowerTarget();
+                    if (!!target) {
+                        if (mode === 'includefollowers') {
+                            $gameTemp.requestAnimation([target], data.DamageAnimation);
+                        } else {
+                            NuunDamagedFloorEXManager._floorDamageAnimationTargets.push(target);
+                        }
                     }
                 }
             }
         }
-    }
-};
+    };
 
-Game_Actor.prototype.getFloorDamageFollowerTarget = function() {
-    const followers = $gamePlayer.followers()._data;
-    return followers.find(follower => follower.isVisible() && follower.actor() === this);
-};
+    Game_Actor.prototype.getFloorDamageFollowerTarget = function() {
+        const followers = $gamePlayer.followers()._data;
+        return followers.find(follower => follower.isVisible() && follower.actor() === this);
+    };
 
-Game_Actor.prototype.floorDamageActor = function(data) {
-    return data.length > 0 ? data.some(a => a.Actor === this.actorId()) : true;
-};
+    Game_Actor.prototype.floorDamageActor = function(data) {
+        return data && data.length > 0 ? data.some(a => a.Actor === this.actorId()) : true;
+    };
 
-const _Game_Screen_startFlashForDamage = Game_Screen.prototype.startFlashForDamage;
-Game_Screen.prototype.startFlashForDamage = function() {
-    if (_onMapFloorDamage) {
-        this.startFlashFloorDamage();
-    } else {
-        _Game_Screen_startFlashForDamage.call(this);
-    }
-};
+    const _Game_Screen_startFlashForDamage = Game_Screen.prototype.startFlashForDamage;
+    Game_Screen.prototype.startFlashForDamage = function() {
+        if (NuunDamagedFloorEXManager._onMapFloorDamage) {
+            this.startFlashFloorDamage();
+        } else {
+            _Game_Screen_startFlashForDamage.call(this);
+        }
+    };
 
-Game_Screen.prototype.startFlashFloorDamage = function() {
-    if (!!_damagedFloorExData && _damagedFloorExData.FlashColor) {
-        setFlashData(_damagedFloorExData.FlashColor);
-    } else {
-        setFlashData(DefaultFlashColor);
-    }
-    if (FlashColor.flame > 0) {
-        this.startFlash([FlashColor.red, FlashColor.green, FlashColor.blue, FlashColor.gray], FlashColor.flame);
-    }
-    FlashColor = {};
-};
+    Game_Screen.prototype.startFlashFloorDamage = function() {
+        if (!!NuunDamagedFloorEXManager._damagedFloorExData && NuunDamagedFloorEXManager._damagedFloorExData.FlashColor) {
+            setFlashData(NuunDamagedFloorEXManager._damagedFloorExData.FlashColor);
+        } else {
+            setFlashData(NuunDamagedFloorEXManager.damagedFloorEXParams(1));
+        }
+        if (NuunDamagedFloorEXManager._flashColor.flame > 0) {
+            const flashColor = NuunDamagedFloorEXManager._flashColor;
+            this.startFlash([flashColor.red, flashColor.green, flashColor.blue, flashColor.gray], flashColor.flame);
+        }
+        NuunDamagedFloorEXManager._flashColor = {};
+    };
 
 
-const _Game_Party_onPlayerWalk = Game_Party.prototype.onPlayerWalk;
-Game_Party.prototype.onPlayerWalk = function() {
-    $gameMap.setFloorDamageData();
-    _Game_Party_onPlayerWalk.call(this);
-    if (_floorDamageAnimationTargets.length > 0) {
-        $gameTemp.requestAnimation(_floorDamageAnimationTargets, _damagedFloorExData.DamageAnimation);
-        _floorDamageAnimationTargets = [];
-    }
-};
+    const _Game_Party_onPlayerWalk = Game_Party.prototype.onPlayerWalk;
+    Game_Party.prototype.onPlayerWalk = function() {
+        $gameMap.setFloorDamageData();
+        _Game_Party_onPlayerWalk.call(this);
+        if (NuunDamagedFloorEXManager._floorDamageAnimationTargets.length > 0) {
+            $gameTemp.requestAnimation(NuunDamagedFloorEXManager._floorDamageAnimationTargets, NuunDamagedFloorEXManager._damagedFloorExData.DamageAnimation);
+            NuunDamagedFloorEXManager._floorDamageAnimationTargets = [];
+        }
+    };
 
-function setFlashData(data) {
-    FlashColor = data;
-};
+    function setFlashData(data) {
+        NuunDamagedFloorEXManager._flashColor = data;
+    };
 
 
 })();

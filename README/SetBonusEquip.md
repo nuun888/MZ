@@ -83,9 +83,9 @@ NRP_TraitsPlusへの特徴適用
 初版  
 
 ## 旧バージョン
-# [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
+# [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/oldVer/NUUN_SetBonusEquip.js)
 # Ver.1.3.5
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/oldVer/NUUN_SetBonusEquip.js)  
 #### 無償ライセンス
 クレジット表記：任意  
 商業利用：可能  

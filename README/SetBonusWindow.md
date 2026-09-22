@@ -1,6 +1,6 @@
-# [セットボーナスツールチップウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSetBonusTooltipsWindow.js)
-# Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSetBonusTooltipsWindow.js)
+# [セットボーナスツールチップウィンドウ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js)
+# Ver.2.0.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js)
 #### 必須、前提プラグイン
 [装備セットボーナス](https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md)  
 
@@ -9,8 +9,8 @@
 ![画像](img/SetBonusEquip1.png)  
 
 ## 更新履歴
-2026/9/23 Ver.1.0.0  
-初版  
+2026/9/23 Ver.2.0.0  
+NUUN_EquipSetBonus Ver.2.0.0更新によるアップデート。(Ver1では使用できません)  
 
 
 

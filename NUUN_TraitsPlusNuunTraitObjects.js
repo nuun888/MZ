@@ -11,7 +11,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NRP_TraitsPlus
- * @version 1.0.1
+ * @version 1.0.3
  * 
  * @help
  * This is a plugin for applying ability parameters based on NRP_TraitsPlus and unique characteristics.
@@ -29,6 +29,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/26/2026 Ver.1.0.2
+ * Added support for NUUN_EquipSetBonus.
  * 11/30/2025 Ver.1.0.1
  * Fixed an issue that caused an error to occur in Ver.1.5.9 and later.
  * Fixed so that passive skills can be applied to enemies as well.
@@ -44,7 +46,7 @@
  * @base NUUN_Base
  * @orderAfter NUUN_Base
  * @orderAfter NRP_TraitsPlus
- * @version 1.0.1
+ * @version 1.0.2
  * 
  * @help
  * NRP_TraitsPlusと独自の特徴による能力値のパラメータを適用させるためのプラグインです。
@@ -62,6 +64,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/23 Ver.1.0.2
+ * NUUN_EquipSetBonusに対応。
  * 2025/11/30 Ver.1.0.1
  * Ver.1.5.9以降エラーが出る問題を修正。
  * 敵にもパッシブスキルが適用できるように修正。
@@ -82,7 +86,7 @@ Imported.NUUN_TraitsPlusNuunTraitObjects = true;
         if (Imported.NUUN_PassiveSkill) {//条件パッシブスキル
             Array.prototype.push.apply(objects, this.traitBattlerPassiveObject());
         }
-        if (Imported.NUUN_SetBonusEquip) {//セットボーナス
+        if (Imported.NUUN_SetBonusEquip || Imported.NUUN_EquipSetBonus) {//セットボーナス
             Array.prototype.push.apply(objects, this.setBonusObject());
         }
         return objects;

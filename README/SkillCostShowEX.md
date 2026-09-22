@@ -7,6 +7,9 @@
 スキルコストの表示を拡張します。  
 注:Ver.1.1.0よりスキルコストの表示順のコスト表示対象及びコスト評価式の仕様変更を行っていますので、再度設定をお願いいたします。  
 
+[マニュアル](https://raw.githubusercontent.com/nuun888/MZ/master/SkillCostEx.pdf)  
+[Manual](https://raw.githubusercontent.com/nuun888/MZ/master/SkillCostEx_en.pdf)  
+
 ![画像](img/SkillCost1.png)  
 
 ## 設定方法

@@ -13,7 +13,7 @@
  * @orderAfter NUUN_EquipSetBonus
  * 
  * @help
- *  * Displays a tooltip for set bonuses related to the equipment currently selected in the equipment slot on the Equip screen.
+ * Displays a tooltip for set bonuses related to the equipment currently selected in the equipment slot on the Equip screen.
  * This plugin is an extension plugin for Equip Set Bonus Plugin Ver. 2.
  * 
  * Terms of Use

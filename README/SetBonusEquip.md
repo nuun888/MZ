@@ -1,6 +1,6 @@
-# [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSetBonus.js)
-# Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSetBonus.js)  
+# [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
+# Ver.2.0.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)  
 #### 拡張プラグイン
 [セットボーナスツールチップウィンドウ](https://github.com/nuun888/MZ/blob/master/README/SetBonusWindow.md)  
 #### 対応プラグイン
@@ -17,8 +17,7 @@
 ## 概要
 特定の装備を同時に装備したときに、セットボーナスを発動させます。  
 
-旧版とはプラグインパラメータの仕様及びプラグイン名が異なります。旧版から以降の場合は再設定が必要になります。  
-新版はセットボーナスの装備設定をプラグインパラメータ側では行わなくなりました。装備のメモ欄からのみ設定する仕様に変更になっております。  
+旧版とはプラグインパラメータの仕様が異なります。Ver.1から更新の場合は再設定が必要になります。  
 
 ## 主な特徴
 特定の装備を組み合わせて装備することで、セットボーナスを発動できます。  

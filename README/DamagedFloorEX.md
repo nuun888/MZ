@@ -2,7 +2,6 @@
 # Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
 ダメージ床のダメージ時の処理を拡張します。
 

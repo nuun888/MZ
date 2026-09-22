@@ -66,16 +66,21 @@
 ボーナスパラメータテキストは複数設定できます。  
 ![画像](img/SetBonusEquip2.png)  
 
+### セットボーナス適用中アイコン
+備セットボーナスの効果が適用されている装備には、アイコンが表示されます。  
+表示されるアイコンには、適用中のセットボーナス効果に設定されている武器または防具のアイコンが使用されます。  
+
 ### 実績設定
  装備セットボーナス適用時に指定の実績IDの実績判定を実行します。  
 この機能を実行するには別途実績システムプラグイン（[NUUN_AchievementSystem](https://booth.pm/ja/items/8506759)）が必要です。  
 
+### 競合
+NRP_TraitsPlusへの特徴適用  
+[NRP_TraitsPlus能力値特徴適用](https://github.com/nuun888/MZ/blob/master/README/TraitsPlusNuunTraitObjects.md)  
+
 ## 更新履歴
 2026/9/23 Ver.1.0.0  
 初版  
-
-
-
 
 ## 旧バージョン
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)

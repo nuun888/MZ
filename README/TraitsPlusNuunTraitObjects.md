@@ -1,5 +1,5 @@
 # [NRP_TraitsPlus能力値特徴適用](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TraitsPlusNuunTraitObjects.js)
-# Ver.1.0.2
+# Ver.1.0.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TraitsPlusNuunTraitObjects.js)  
 
 NRP_TraitsPlusと独自の特徴による能力値のパラメータを適用させるためのプラグインです。  
@@ -9,8 +9,6 @@ NRP_TraitsPlusと独自の特徴による能力値のパラメータを適用さ
 装備セットボーナス(NUUN_SetBonusEquip)  
 
 ### 更新履歴
-2026/9/23 Ver.1.0.2  
-NUUN_EquipSetBonusに対応。  
 2025/11/30 Ver.1.0.1  
 Ver.1.5.9以降エラーが出る問題を修正。  
 敵にもパッシブスキルが適用できるように修正。  

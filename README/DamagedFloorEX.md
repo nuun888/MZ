@@ -1,5 +1,5 @@
 # [床ダメージ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)
-# Ver.1.3.3
+# Ver.1.4.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -43,6 +43,8 @@ HP、MP、TPのいずれかを指定します。
 フォロワー含むを指定している場合は表示されている床ダメージを受けたフォロワーにアニメーションが再生されます。  
 
 ## 更新履歴
+2026/9/22 Ver.1.4.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
 2024/9/21 Ver.1.3.3  
 ダメージ床適用設定が適用されていないタイルセットを使用しているマップを移動するとエラーが出る問題を修正。  
 2024/8/3 Ver.1.3.2  

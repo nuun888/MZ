@@ -9,8 +9,8 @@
  * @plugindesc Set bonus tooltip window
  * @author NUUN
  * @version 1.0.0
- * @base NUUN_EquipSetBonus
- * @orderAfter NUUN_EquipSetBonus
+ * @base NUUN_SetBonusEquip
+ * @orderAfter NUUN_SetBonusEquip
  * 
  * @help
  * Displays a tooltip for set bonuses related to the equipment currently selected in the equipment slot on the Equip screen.
@@ -88,8 +88,8 @@
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
  * @version 2.0.0
- * @base NUUN_EquipSetBonus
- * @orderAfter NUUN_EquipSetBonus
+ * @base NUUN_SetBonusEquip
+ * @orderAfter NUUN_SetBonusEquip
  * 
  * @help
  * 装備画面で、装備スロットで選択中の装備に関連するセットボーナスをツールチップで表示します。
@@ -377,21 +377,22 @@ Imported.NUUN_SetBonusWindow = true;
             const data = setBonus.getData();
             if (!!data) {
                 const setBonusSum = setBonus.getEquipsNum();
-                this.drawSetBonusName(data.SetBonusName, rect.x, y, rect.width);
+                const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);console.log(equip)
+                this.drawSetBonusName(equip, data.SetBonusName, rect.x, y, rect.width);
                 y += lineHeight;
                 contentsRows++;
                 this.horzLine(rect.x, y, rect.width);
                 y += lineHeight;
                 contentsRows++;
-                for (const equip of data.SetBonusNumberEquipment || []) {
-                    if (NuunEquipSetBonusManager.getSetBonusEquipMaxNum(data) > 1 && equip.SetNumberEquip <= setBonusSum) {
-                        const rows = this.drawSetBonusNumberEquipment(equip, rect.x, y, rect.width);
+                for (const e of data.SetBonusNumberEquipment || []) {
+                    if (NuunEquipSetBonusManager.getSetBonusEquipMaxNum(data) > 1 && e.SetNumberEquip <= setBonusSum) {
+                        const rows = this.drawSetBonusNumberEquipment(e, rect.x, y, rect.width);
                         y += lineHeight * rows;
                         contentsRows += rows;
                     }
                 }
                 if (NuunEquipSetBonusManager.getSetBonusEquipMaxNum(data) > 1 && NuunEquipSetBonusManager.getSetBonusEquipMaxNum(data) <= setBonusSum) {
-                    const rows = this.drawSetBonusParam(data, rect.x, y, rect.width);
+                    const rows = this.drawSetBonusParam(equip, data, rect.x, y, rect.width);
                     y += lineHeight * rows;
                     contentsRows += rows;
                 }
@@ -403,14 +404,13 @@ Imported.NUUN_SetBonusWindow = true;
         this.contents.fontSize = $gameSystem.mainFontSize();
     };
 
-    Window_SetBounsEquip.prototype.drawSetBonusName = function(name, x, y, width) {
+    Window_SetBounsEquip.prototype.drawSetBonusName = function(equip, name, x, y, width) {
         this.changeTextColor(NuunEquipSetBonusManager.getColorCode(NuunEquipSetBonusManager.equipSetBonusTooltipsParams(4)));
         this.drawText(name, x, y, width);
         this.resetTextColor();
     };
 
-    Window_SetBounsEquip.prototype.drawSetBonusParam = function(data, x, y, width) {
-        const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);
+    Window_SetBounsEquip.prototype.drawSetBonusParam = function(equip, data, x, y, width) {
         let line = 0;
         if (equip) {
             let textWidth = 0;

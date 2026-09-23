@@ -8,9 +8,7 @@
  * @target MZ
  * @plugindesc Slippery floor
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * I will implement a slippery floor.
@@ -36,6 +34,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/23/2026 Ver.1.1.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
  * 5/9/2026 Ver.1.0.1
  * Added a feature that allows specifying the character chip pattern for events.
  * Fixed an issue where direction‑fixed events would move in their original facing direction when sliding on slippery tiles.
@@ -62,9 +62,7 @@
  * @target MZ
  * @plugindesc 滑る床
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 滑る床を実装します。
@@ -89,6 +87,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/23 Ver.1.1.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
  * 2026/5/9 Ver.1.0.1
  * イベントにキャラクターチップのパターンを指定できる機能を追加。
  * 向き固定のイベントが滑る床を移動する際に、元の向きの方向に移動してしまう問題を修正。
@@ -117,25 +117,164 @@ var Imported = Imported || {};
 Imported.NUUN_SlipperyFloor = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_SlipperyFloor {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_SlipperyFloor = Nuun_PluginParams_SlipperyFloor;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                list = list.map(a => this.getTextCodeMeta(a));
+                return list;
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_SlipperyFloor.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunSlipperyFloorManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunSlipperyFloorManager = NuunSlipperyFloorManager;
+
+    NuunSlipperyFloorManager.getEvalCode = function(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    };
+
+    NuunSlipperyFloorManager.stringCode = function(code){
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return code;
+        }
+    };
+
+    NuunSlipperyFloorManager.getMetaCode = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunSlipperyFloorManager.slipperyFloorParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.RegionId;
+            case 1:
+                return params.TerrainTagId;
+        }
+    };
+
 
     Game_Map.prototype.isSlipperyFloor = function(x, y) {
         const region = this.regionId(x, y);
         const terrainTag = this.terrainTag(x, y);
-        return (params.RegionId > 0 && params.RegionId === region) || (params.TerrainTagId >= 0 && params.TerrainTagId === terrainTag);
+        return (NuunSlipperyFloorManager.slipperyFloorParams(0) > 0 && NuunSlipperyFloorManager.slipperyFloorParams(0) === region) ||
+         (NuunSlipperyFloorManager.slipperyFloorParams(1) >= 0 && NuunSlipperyFloorManager.slipperyFloorParams(1) === terrainTag);
     };
 
     const _Game_CharacterBase_moveStraight = Game_CharacterBase.prototype.moveStraight;
     Game_CharacterBase.prototype.moveStraight = function(d) {
         _Game_CharacterBase_moveStraight.apply(this, arguments);
-        this._slipDirection = d;
+        if (this.isMovementSucceeded()) {
+            this._slipDirection = d;
+        }
     };
 
     const _Game_CharacterBase_updateMove = Game_CharacterBase.prototype.updateMove;
     Game_CharacterBase.prototype.updateMove = function() {
         _Game_CharacterBase_updateMove.apply(this, arguments);
         if (!this.isSlipCharacter()) return;
-        if (!this.isMoving() && $gameMap.isSlipperyFloor(this._realX, this._realY)) {
+        if (!this.isMoving() && $gameMap.isSlipperyFloor(this.x, this.y)) {
             if (this.isMoveRouteForcing()) {
                 this.processRouteEnd();//スリップしたら予約中の移動ルートの設定を無効にする。
             }
@@ -163,7 +302,7 @@ Imported.NUUN_SlipperyFloor = true;
     };
 
     Game_CharacterBase.prototype.endSlippingMove = function() {
-        this._slipping = $gameMap.isSlipperyFloor(this._realX, this._realY);
+        this._slipping = $gameMap.isSlipperyFloor(this.x, this.y);
     };
 
     Game_CharacterBase.prototype.isSlipping = function() {
@@ -181,7 +320,7 @@ Imported.NUUN_SlipperyFloor = true;
 
     Game_Event.prototype.getSlipEventPattern = function() {
         if (!this.event().meta.SlipEventPattern) return Game_CharacterBase.prototype.getSlipEventPattern.apply(this, arguments);
-        return Number(NuunManager.getMetaCode(this.event(), "SlipEventPattern") || 0);
+        return Number(NuunSlipperyFloorManager.getMetaCode(this.event(), "SlipEventPattern") || 0);
     };
 
 

@@ -377,7 +377,7 @@ Imported.NUUN_SetBonusWindow = true;
             const data = setBonus.getData();
             if (!!data) {
                 const setBonusSum = setBonus.getEquipsNum();
-                const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);console.log(equip)
+                const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);
                 this.drawSetBonusName(equip, data.SetBonusName, rect.x, y, rect.width);
                 y += lineHeight;
                 contentsRows++;

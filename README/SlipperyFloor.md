@@ -1,8 +1,8 @@
 # [滑る床](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipperyFloor.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipperyFloor.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+
 #### 利用規約
 クレジット表記：任意  
 商業利用：可能  
@@ -11,6 +11,7 @@
 再配布：可能  
 当レポジトリ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 
+## 概要
 プレイヤー、フォロワー、イベントが滑る床を実装します。  
 指定のリージョンまたは、指定の地形タグで移動を行うと、通行不能箇所または通常タイルまで滑る出します。  
 [NUUN_SymbolEncounter](https://booth.pm/ja/items/7504032)を導入している場合は、NUUN_SymbolEncounterVer.1.3.2以降に更新してください。  
@@ -27,6 +28,8 @@
 [pattern]:パターン 0～2  
 
 ## 更新履歴
+2026/9/23 Ver.1.1.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
 2026/5/9 Ver.1.0.1  
 イベントにキャラクターチップのパターンを指定できる機能を追加。  
 向き固定のイベントが滑る床を移動する際に、元の向きの方向に移動してしまう問題を修正。  

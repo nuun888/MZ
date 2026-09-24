@@ -8,43 +8,20 @@
  * @target MZ
  * @plugindesc Additional animation display
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.3.0
  * 
  * @help
  * Play multiple or additional item/skill animations.
  * 
  * Skill and item notes
  * <AddAnimation:[id]> The set animation will be played continuously.
- * [id]:Plug-in parameter "Animation setting" ID
+ * [id]:Plugin parameter "Additional animation settings" list ID or identifier.
  * 
  * Play after animation ends
  * Plays after all currently playing animations have finished.
  * Subsequent animations will have a wait time based on the animation that is set to play after the animation ends.
  * 
- * 
- * Old setting (not recommended)
- * Skill and item notes
- * <AddAnimation:[id],[id]...>
- * Play multiple animations simultaneously.
- * [id]: Animation ID
- * [Number]: Identification ID (integer) Omit the number in the first tag. Enter 2 for the second and subsequent items.
- * 
- * <AddAnimationWaitFrame[Number]:[WaitFrame]> 
- * Delay playback of the above animation by the specified number of frames.
- * [WaitFrame]; number of frames to delay If you enter -1, wait until the animation finishes playing.
- * [Number]: Identification ID (integer) Omit the number in the first tag. Enter 2 for the second and subsequent items.
- * 
- * Example
- * <AddAnimation:13>
- * <AddAnimation2:14>
- * <AddAnimationWaitFrame:30>
- * <AddAnimationWaitFrame2:45>
- * Animation ID 13 will be played 30 frames after the first animation is played, and animation ID 14 will be played after 45 frames.
- * 
- * <WaitAddAnimation:[id],[id]...>
- * Plays the next animation after one animation finishes.
+ * The old settings have been discontinued. Please use a version earlier than Ver.1.2.0.
  * 
  * Terms of Use
  * Credit: Optional
@@ -55,6 +32,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/24/2026 Ver.1.3.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
  * 2/4/2025 Ver.1.2.0
  * The setting method has been changed to set using plugin parameters.
  * 6/4/2023 Ver.1.1.0
@@ -65,17 +44,17 @@
  * @param AnimationSetting
  * @text Animation setting
  * @desc Set up multiple animations to be played.
- * @default ["{\"Animation\":\"0\",\"AddAnimation\":\"\"}"]
+ * @default ["{\"IdentifierName\":\"\",\"AddAnimation\":\"[]\"}"]
  * @type struct<AnimationList>[]
- * 
- * @param OldAddAnimationValid
- * @desc The old setting method is enabled. The same items and skills cannot be used in conjunction with the new method.
- * @text Old setting method applied
- * @type boolean
- * @default false
  * 
  */
 /*~struct~AnimationList:
+ * 
+ * @param IdentifierName
+ * @text Identifier
+ * @desc Specify an optional identifier. Make sure it does not duplicate any other animation setting identifier.
+ * @type string
+ * @default 
  * 
  * @param AddAnimation
  * @text Additional animation settings
@@ -94,9 +73,10 @@
  * @default 0
  * 
  * @param AddAnimationWait
- * @text Weight
- * @desc Specifies the frame number at which the animation will start playing. If you enter -1, it will wait until the animation finishes playing.
+ * @text Wait
+ * @desc Specifies the delay before the animation plays. Enter -1 to wait until it finishes.
  * @default 0
+ * @min -1
  * @type number
  * 
  * @param EndAnimationPlay
@@ -110,41 +90,20 @@
  * @target MZ
  * @plugindesc 追加アニメーション表示
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.2.0
+ * @version 1.3.0
  * 
  * @help
  * アイテム、スキルのアニメーションを複数または追加で再生させます。
  * 
  * スキル、アイテムのメモ欄
  * <AddAnimation:[id]> 設定したアニメーションを連続再生します。
- * [id]:プラグインパラメータの追加アニメーション設定のID
+ * [id]:プラグインパラメータの追加アニメーション設定のリストIDまたは識別名
  * 
  * アニメーション終了後再生
  * 再生している全てのアニメーションが終了後に再生します。
  * それ以降のアニメーションはアニメーション終了後再生を設定しているアニメーション基準にウェイトが発生します。
  * 
- * 旧設定(非推奨)
- * スキル、アイテムのメモ欄
- * 
- * <AddAnimation[Number]:[id],[id]...>
- * 複数のアニメーションを同時に再生します。
- * [id]:アニメーションID
- * [Number]:識別ID(整数) 最初のタグは数字を省略します。２番目以降は2と記入します。
- * <AddAnimationWaitFrame[Number]:[WaitFrame]>　上記のアニメーションの再生を指定のフレーム数遅延再生します。
- * [WaitFrame];遅延フレーム数 -1と記入した場合は、アニメーションが再生し終わるまで待ちます。
- * [Number]:識別ID(整数) 最初のタグは数字を省略します。２番目以降は2と記入します。
- * 例
- * <AddAnimation:13>
- * <AddAnimation2:14>
- * <AddAnimationWaitFrame:30>
- * <AddAnimationWaitFrame2:45>
- * 最初のアニメーションが再生されて３０フレーム後にアニメーションID13が再生され、４５フレーム後にアニメーションID14番が再生されます。
- * 
- * <WaitAddAnimation:[id],[id]...>
- * 一つのアニメーションが終わった後に次のアニメーションを再生します。
- * [id]:アニメーションID
+ * 旧設定は廃止となりました。Ver.1.2.0以前のバージョンをご使用ください。
  * 
  * 利用規約
  * クレジット表記：任意
@@ -155,6 +114,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/24 Ver 1.3.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
  * 2025/2/4 Ver 1.2.0
  * 設定方法をプラグインパラメータで設定する方式に変更。
  * 2023/6/4 Ver 1.1.0
@@ -165,17 +126,17 @@
  * @param AnimationSetting
  * @text アニメーション設定
  * @desc 複数再生するアニメーションの設定を行います。
- * @default ["{\"Animation\":\"0\",\"AddAnimation\":\"\"}"]
+ * @default ["{\"IdentifierName\":\"\",\"AddAnimation\":\"[]\"}"]
  * @type struct<AnimationList>[]
- * 
- * @param OldAddAnimationValid
- * @desc 旧設定の方式を有効にします。同じアイテム、スキルで新方式との併用は出来ません。
- * @text 旧設定方式適用
- * @type boolean
- * @default false
  * 
  */
 /*~struct~AnimationList:ja
+ * 
+ * @param IdentifierName
+ * @text 識別名
+ * @desc 任意の識別名を設定します。必ず他のアニメーション設定と重複しない識別名を設定してください。
+ * @type string
+ * @default 
  * 
  * @param AddAnimation
  * @text 追加アニメーション設定
@@ -213,24 +174,154 @@ var Imported = Imported || {};
 Imported.NUUN_AddAnimation = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_AddAnimation {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_AddAnimation = Nuun_PluginParams_AddAnimation;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                list = list.map(a => this.getTextCodeMeta(a));
+                return list;
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_AddAnimation.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunAddAnimationManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunAddAnimationManager = NuunAddAnimationManager;
+
+    NuunAddAnimationManager.getEvalCode = function(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    };
+
+    NuunAddAnimationManager.getMetaCode = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunAddAnimationManager.getAddAnimation = function(id) {
+        if (isNaN(id)) {
+            return this.addAnimationParams(0).find(data => data.IdentifierName === id);
+        } else {
+            return this.addAnimationParams(0)[Number(id) - 1];
+        }
+    };
+
+    NuunAddAnimationManager.addAnimationParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.AnimationSetting || [];
+        }
+    };
 
     const _Window_BattleLog_startAction = Window_BattleLog.prototype.startAction;
     Window_BattleLog.prototype.startAction = function(subject, action, targets) {
         this.setAddAnimationList(action.item(), subject, targets);
-        _Window_BattleLog_startAction.call(this, subject, action, targets);
+        _Window_BattleLog_startAction.apply(this, arguments);
     };
 
     const _Window_BattleLog_displayAction = Window_BattleLog.prototype.displayAction;
     Window_BattleLog.prototype.displayAction = function(subject, item) {
         this.pushAddAnimationList();
-        _Window_BattleLog_displayAction.call(this, subject, item);
+        _Window_BattleLog_displayAction.apply(this, arguments);
     };
 
     const _Window_BattleLog_clear = Window_BattleLog.prototype.clear;
     Window_BattleLog.prototype.clear = function() {
         $gameTemp.addAnimation = false;
-        _Window_BattleLog_clear.call(this);
+        _Window_BattleLog_clear.apply(this, arguments);
     };
 
     Window_BattleLog.prototype.pushAddAnimationList = function() {
@@ -272,49 +363,12 @@ Imported.NUUN_AddAnimation = true;
 
     Window_BattleLog.prototype.setAddAnimationList = function(item, subject, targets) {
         this._addAnimationList = [];
-        const animation = item.meta.AnimationAdd ? params.AnimationSetting[Number(item.meta.AnimationAdd) - 1] : 0;
+        const animation = item.meta.AddAnimation ? NuunAddAnimationManager.getAddAnimation(NuunAddAnimationManager.getMetaCode(item, "AddAnimation") || 0) : 0;
         if (!!animation && !!animation.AddAnimation) {
             animation.AddAnimation.forEach(data => {
                 this._addAnimationList.push({id: data.Animation, subject: subject, target: targets.clone(), mode: data.EndAnimationPlay, wait: data.AddAnimationWait});
             });
         }
-        //旧仕様
-        if (params.OldAddAnimationValid && this._addAnimationList.length === 0) {
-            let i = 0;
-            while (true) {
-                const tag = i === 0 ? "AddAnimation" : "AddAnimation" + (i + 1);
-                const tag2 = i === 0 ? "AddAnimationWaitFrame" : "AddAnimationWaitFrame" + (i + 1);
-                if (i === 0 && item.meta[tag]) {
-                    getAddAnimationList(item, tag).forEach(animationId => {
-                        this._addAnimationList.push({id: animationId, subject: subject, target: targets.clone(), mode: false, wait: getAddAnimationWaitFrame(item, tag2)});
-                    });
-                } else if (item.meta[tag]) {
-                    getAddAnimationList(item, tag).forEach(animationId => {
-                        this._addAnimationList.push({id: animationId, subject: subject, target: targets.clone(), mode: false, wait: getAddAnimationWaitFrame(item, tag2)});
-                    });
-                } else {
-                    break;
-                }
-                i++;
-            }
-            getWaitAddAnimationList(item).forEach(animationId => {
-                this._addAnimationList.push({id: animationId, subject: subject, target: targets.clone(), mode: true, wait: 0});
-            });
-        }
     };
-
-    function getWaitAddAnimationList(item) {
-        return item.meta.WaitAddAnimation ? item.meta.WaitAddAnimation.split(",").map(Number) : [];
-    };
-
-    function getAddAnimationList(item, tag) {
-        return item.meta[tag] ? item.meta[tag].split(",").map(Number) : [];
-    };
-
-    function getAddAnimationWaitFrame(item, tag) {
-        return item.meta[tag] ? item.meta[tag] : 0;
-    };
-
-
 
 })();

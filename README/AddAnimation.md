@@ -1,5 +1,5 @@
 # [追加アニメーション表示](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js)
-# Ver.1.2.0
+# Ver.1.3.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js)  
 #### 無償ライセンス
 クレジット表記：任意  
@@ -22,6 +22,12 @@
 再生している全てのアニメーションが終了後に再生します。  
 それ以降のアニメーションはアニメーション終了後再生を設定しているアニメーション基準にウェイトが発生します。  
 
+## 旧設定について
+旧設定は廃止となりました。Ver.1.2.0以前のバージョンをご使用ください。  
+
+## 旧バージョン Ver.1.2.0
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/oldVer/NUUN_AddAnimation.js)  
+
 #### 旧設定(非推奨)
 スキル、アイテムのメモ欄  
 `<AddAnimation:[id],[id]...>` 複数のアニメーションを同時に再生します。  
@@ -42,6 +48,8 @@
 最初のアニメーションが再生されて３０フレーム後にアニメーションID13が再生され、４５フレーム後にアニメーションID14番が再生されます。  
 
 ### 更新履歴
+2026/9/24 Ver 1.3.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
 2025/2/4 Ver 1.2.0   
 設定方法をプラグインパラメータで設定する方式に変更。  
 2023/6/4 Ver 1.1.0  

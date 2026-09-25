@@ -12,7 +12,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.7
+ * @version 1.4.8
  * 
  * @help
  * Expands the display of equipment status.
@@ -40,6 +40,8 @@
  * This plugin is distributed under the MIT license.
  * 
  * Log
+ * 6/26/2024 Ver.1.4.8
+ * Fixed an issue where the set bonus application page in NUUN_SetBonusEquip did not support the new specifications.
  * 4/21/2024 Ver.1.4.7
  * Changed to switch actors if only one page of Equipment status setting is set.
  * 4/6/2024 Ver.1.4.6
@@ -836,7 +838,7 @@
  * @author NUUN
  * @base NUUN_Base
  * @orderAfter NUUN_Base
- * @version 1.4.7
+ * @version 1.4.8
  * 
  * @help
  * 装備ステータス１の表示を拡張します。
@@ -865,6 +867,8 @@
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/9/26 Ver.1.4.8
+ * NUUN_SetBonusEquipでセットボーナス適用ページが新仕様に対応しない問題を修正。
  * 2024/4/21 Ver.1.4.7
  * 装備ステータス設定が1ページしか設定されていない場合、アクターを切り替えるように変更。
  * 2024/4/6 Ver.1.4.6
@@ -1800,6 +1804,8 @@ Imported.NUUN_EquipStatusEX = true;
     
     Window_EquipStatusEX.prototype = Object.create(Window_EquipStatus.prototype);
     Window_EquipStatusEX.prototype.constructor = Window_EquipStatusEX;
+
+    window.Window_EquipStatusEX = Window_EquipStatusEX;
     
     Window_EquipStatusEX.prototype.initialize = function(rect) {
         this.loadImages();
@@ -2357,6 +2363,10 @@ Imported.NUUN_EquipStatusEX = true;
         if (!Imported.NUUN_SetBonusEquip) {
             return;
         }
+        if (typeof this.drawSetBonus_r === "function") {
+            this.drawSetBonus_r(data, actor, x, y, width);
+            return;
+        }
         const lineHeight = SetBonusLineHeight;
         this.contents.fontSize = $gameSystem.mainFontSize() + (data.FontSize || 0);
         this.changeTextColor(NuunManager.getColorCode(data.NameColor));
@@ -2586,10 +2596,6 @@ Imported.NUUN_EquipStatusEX = true;
         }
     };
 
-    Window_EquipStatusEX.prototype.drawSetBonusName = function(name, x, y, width) {
-        this.drawText(name, x, y, width);
-    };
-
     Window_EquipStatusEX.prototype.getSpecialAbilityText = function(actor) {
         const textList = [];
         actor.equips().forEach(equip => {
@@ -2718,6 +2724,10 @@ Imported.NUUN_EquipStatusEX = true;
             }
             y += lineHeight * text.row;
         }
+    };
+
+    Window_EquipStatusEX.prototype.getSetBonusLineHeight = function() {
+        return SetBonusLineHeight;
     };
 
     function getBatStatus(batStatus, value, newValue) {

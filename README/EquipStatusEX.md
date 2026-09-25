@@ -1,5 +1,5 @@
 # [装備ステータス表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)
-# Ver.1.4.7
+# Ver.1.4.8
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js)  
 #### 必須、前提プラグイン
 [共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
@@ -53,6 +53,8 @@ QWキー:ページ切り替え
 
 
 ## 更新履歴
+2026/9/26 Ver.1.4.8  
+NUUN_SetBonusEquipでセットボーナス適用ページが新仕様に対応しない問題を修正。  
 2024/4/21 Ver.1.4.7  
 装備ステータス設定が1ページしか設定されていない場合、アクターを切り替えるように変更。  
 2024/4/6 Ver.1.4.6  

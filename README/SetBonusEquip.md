@@ -1,5 +1,5 @@
 # [装備セットボーナス](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)
-# Ver.2.0.0
+# Ver.2.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js)  
 #### 拡張プラグイン
 [セットボーナスツールチップウィンドウ](https://github.com/nuun888/MZ/blob/master/README/SetBonusWindow.md)  
@@ -80,6 +80,8 @@ NRP_TraitsPlusへの特徴適用
 [NRP_TraitsPlus能力値特徴適用](https://github.com/nuun888/MZ/blob/master/README/TraitsPlusNuunTraitObjects.md)  
 
 ## 更新履歴
+2026/9/26 Ver.2.1.0  
+セットボーナス名にアイコンを表示する機能を追加。(セットボーナス設定の装備のアイコンが適用)  
 2026/9/23 Ver.2.0.0  
 リニューアル更新  
 

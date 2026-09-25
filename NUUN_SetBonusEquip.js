@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Equip set bonus
  * @author NUUN
- * @version 2.0.0
+ * @version 2.1.0
  * 
  * @help
  * Activates set bonuses when specific equipment is equipped together.
@@ -54,12 +54,14 @@
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/26/2026 Ver.2.1.0
+ * Added a feature to display an icon next to the set bonus name. (The icon of the equipment specified in the set bonus settings is used.)
+ * Changed how set bonuses are processed in NUUN_EquipStatusEX.
  * 9/23/2026 Ver.2.0.0
  * Renewed and updated.
  * 
@@ -105,12 +107,18 @@
  * @type variable
  * @default 0
  * 
+ * @param ShowSetBonusNameIcon
+ * @text Show set bonus name icon
+ * @desc Displays the set bonus icon to the left of the set bonus name.
+ * @type boolean
+ * @default true
+ * 
  */
 /*~struct~SetBonusList:
  * 
  * @param IdentifierName
  * @text Identifier
- * @desc Sets an optional identifier. The identifier can be used instead of the list ID in fields that specify an ID.
+ * @desc Sets the identifier. The identifier can be used instead of the list ID in fields that specify an ID.
  * @type string
  * @default 
  * 
@@ -248,7 +256,7 @@
  * @target MZ
  * @plugindesc 装備セットボーナス
  * @author NUUN
- * @version 2.0.0
+ * @version 2.1.0
  * 
  * @help
  * 特定の装備を同時に装備したときに、セットボーナスを発動させます。
@@ -296,12 +304,14 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * ※https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/26 Ver.2.1.0
+ * セットボーナス名にアイコンを表示する機能を追加。(セットボーナス設定の装備のアイコンが適用)
+ * NUUN_EquipStatusEXのセットボーナスの処理方法を変更。
  * 2026/9/23 Ver.2.0.0
  * リニューアル更新
  * 
@@ -348,12 +358,18 @@
  * @type variable
  * @default 0
  * 
+ * @param ShowSetBonusNameIcon
+ * @text セットボーナス名アイコン表示
+ * @desc セットボーナス名の左側にセットボーナスのアイコンを表示します。
+ * @type boolean
+ * @default true
+ * 
  */
 /*~struct~SetBonusList:ja
  * 
  * @param IdentifierName
  * @text 識別名
- * @desc 任意の識別名を設定します。IDを指定する項目で、リストIDの代わりに識別名を指定できます。
+ * @desc 識別名を設定します。IDを指定する項目で、リストIDの代わりに識別名を指定できます。
  * @type string
  * @default 
  * 
@@ -490,7 +506,6 @@
 
 var Imported = Imported || {};
 Imported.NUUN_SetBonusEquip = true;
-//こちらが最新
 
 (() => {
     class Nuun_PluginParams_EquipSetBonus {
@@ -597,6 +612,17 @@ Imported.NUUN_SetBonusEquip = true;
         }
     };
 
+    NuunEquipSetBonusManager.stringCode = function(code){
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return code;
+        }
+    };
+
     NuunEquipSetBonusManager.getMetaCode = function(object, method) {
         const meta = object.meta[method];
         if (!meta) return null;
@@ -618,22 +644,6 @@ Imported.NUUN_SetBonusEquip = true;
             throw ["ParameterError", log];
         }
         return meta.split(',');
-    };
-
-    NuunEquipSetBonusManager.getMetaNumberCode = function(index, object, method) {
-        let tag = method;
-        if (index === 0) {
-
-        } else {
-            tag = String(tag + index);
-        }
-        const meta = object.meta[method];
-        if (!meta) return null;
-        if (meta.indexOf('[') >= 0) {
-            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
-            throw ["ParameterError", log];
-        }
-        return meta;
     };
 
     NuunEquipSetBonusManager.getSetBonusData = function(id) {
@@ -663,6 +673,8 @@ Imported.NUUN_SetBonusEquip = true;
                 return params.SetBonusIconSize || 16;
             case 2:
                 return params.SetBonusTotalVariables || 0;
+            case 3:
+                return params.ShowSetBonusNameIcon;
         }
     };
 
@@ -787,6 +799,7 @@ Imported.NUUN_SetBonusEquip = true;
         return objects;
     };
 
+
     Game_Actor.prototype.setBonusObject = function() {
         const list = this._setBonus || [];
         return list.map(e => e > 0 ? $dataWeapons[e] : $dataArmors[Math.abs(e)]).filter(object => !!object);
@@ -811,11 +824,11 @@ Imported.NUUN_SetBonusEquip = true;
         }
     };
 
-    Game_Battler.prototype.setSetBonusList = function() {
+    Game_Actor.prototype.setSetBonusList = function() {
         this._setBonus = this.getAppliedSetBonusList();
     };
 
-    Game_Battler.prototype.getAppliedSetBonusList = function(isData) {
+    Game_Actor.prototype.getAppliedSetBonusList = function(isData) {
         const list = this.getSetBonusList();
         const setBonusIds = [];
         const appliedSetBonus = [];
@@ -880,11 +893,11 @@ Imported.NUUN_SetBonusEquip = true;
     };
 
     Game_Actor.prototype.isSetBonusWeaponImg = function(id) {
-        return this.getSetBonus().some(e => e === id);
+        return this.getSetBonus().some(e => e > 0 && e === id);
     };
 
     Game_Actor.prototype.isSetBonusArmorImg = function(id) {
-        return this.getSetBonus().some(e => Math.abs(e) === id);
+        return this.getSetBonus().some(e => e < 0 && Math.abs(e) === id);
     };
 
     Game_Actor.prototype.isSetBonusActor = function(data) {
@@ -982,7 +995,15 @@ Imported.NUUN_SetBonusEquip = true;
         }
         const textList = this.getSetBonusList_r(actor, data, width);
         const tempList = this._tempActor ? this.getSetBonusList_r(this._tempActor, data, width) : [];
-        this.drawTextList(textList, tempList, x, y, width, lineHeight);
+        this.drawTextList_r(textList, tempList, x, y, width, lineHeight);
+    };
+
+    Window_EquipStatus.prototype.getSetBonusName = function(data, equip) {
+        return data.SetBonusName || equip.name;
+    };
+    
+    Window_EquipStatus.prototype.getSetBonusText = function(data, equip) {
+        return data.SetBonusText || equip.name;
     };
 
     Window_EquipStatus.prototype.getSetBonusList_r = function(actor, data, width) {
@@ -992,10 +1013,12 @@ Imported.NUUN_SetBonusEquip = true;
         for (const setBonus of list) {
             const d = !!setBonus ? setBonus.getData() : null;
             if (!d) continue;
+            const applyEquip = this.getSetBonusEquip(d.SetBonusWeaponData, d.SetBonusArmorData);
+            if (!applyEquip) continue;
             tag = d.SetBonusName +"_"+ setBonus.getId();
             if (setBonus.getEquipsNum() >= 2) {
-                textList.push({text:d.SetBonusName, color:NuunEquipSetBonusManager.getColorCode(data.NameColor), row:1, mode:"headline", tag: tag});
-                textList.push({text:"this.horzLine", row:1, tag: tag +"_Line"});
+                textList.push({code:"name", text:this.getSetBonusName(d, applyEquip), icon:applyEquip.iconIndex , color:NuunEquipSetBonusManager.getColorCode(data.NameColor), row:1, mode:"headline", tag: tag});
+                textList.push({code:"horzLine", row:1, tag: tag +"_Line"});
             }
             for (const e of d.SetBonusNumberEquipment || []) {
                 if (NuunEquipSetBonusManager.getSetBonusEquipMaxNum(d) > 1 && e.SetNumberEquip <= setBonus.getEquipsNum()) {
@@ -1003,7 +1026,7 @@ Imported.NUUN_SetBonusEquip = true;
                     this.drawSetBonusEquipment(textList, equip, tag, data, e, width);
                 }
             }
-            if (NuunEquipSetBonusManager.getSetBonusEquipMaxNum(d) > 1 && NuunEquipSetBonusManager.getSetBonusEquipMaxNum(d) === setBonus.getEquipsNum()) {
+            if (NuunEquipSetBonusManager.getSetBonusEquipMaxNum(d) > 1 && NuunEquipSetBonusManager.getSetBonusEquipMaxNum(d) <= setBonus.getEquipsNum()) {
                 const equip = NuunEquipSetBonusManager.getSetBonusEquip(d.SetBonusWeaponData, d.SetBonusArmorData);
                 this.drawSetBonusEquipment(textList, equip, tag, data, d, width);
             }
@@ -1016,24 +1039,100 @@ Imported.NUUN_SetBonusEquip = true;
             let text = '';
             let textWidth = 0;
             if (numberEquip.SetBonusText) {
-                textList.push({text:numberEquip.SetBonusText, color:NuunEquipSetBonusManager.getColorCode(data.NameColor), row:0, mode:"headline", tag: tag + numberEquip.SetBonusText});
-                textWidth = this.textWidth(numberEquip.SetBonusText) + this.itemPadding();
+                const name = this.getSetBonusText(numberEquip, equip);
+                textList.push({code:"name", text: name, color:NuunEquipSetBonusManager.getColorCode(data.NameColor), row:0, mode:"headline", tag: tag + numberEquip.SetBonusText});
+                textWidth = this.textWidth(name) + this.itemPadding();
             }
             const setBonusParamText = numberEquip.SetBonusParamText || [];
             for (const textData of setBonusParamText) {
                 const statusWidth = this.textWidth(textData) + textWidth;
                 if (statusWidth > width && !!text) {
-                    textList.push({text: text, row: 1, width: textWidth, tag: tag + text});
+                    textList.push({code:"param", text: text, row: 1, width: textWidth, tag: tag + text});
                     text = '';
                     textWidth = 0;
                 }
                 if (!!textData) {
-                    text += text ? ','+ textData : textData;
+                    text += textData;
                 }
             }
             if (!!text) {
-                textList.push({text: text, row: 1, width: textWidth, tag: tag + text});
+                textList.push({code:"param", text: text, row: 1, width: textWidth, tag: tag + text});
             }
+        }
+    };
+
+    Window_EquipStatus.prototype.drawTextList_r = function(textList, tempList, x, y, width, lineHeight) {
+        let textWidth = 0;
+        let textX =  0;
+        for (const text of textList) {
+            if (this._tempActor) {
+                if (tempList.some(a => a.text === text.text)) {
+                    text.color ? this.changeTextColor(text.color) : this.resetTextColor();
+                } else {
+                    text.color ? this.changeTextColor(text.color) : this.changeTextColor(ColorManager.paramchangeTextColor(-1));
+                }
+            } else {
+                text.color ? this.changeTextColor(text.color) : this.resetTextColor();
+            }
+            textWidth = text.width ? text.width : width;
+            textX = text.width && text.mode !== "headline" ? text.width : 0;
+            switch (text.code) {
+                case "name":
+                    this.drawSetBonusName(text.text, text.icon, x + textX, y, width - textWidth);
+                    break;
+                case "param":
+                    this.drawText(text.text, x + textX, y, width - textWidth);
+                    break;
+                case "horzLine":
+                    this.listHorzLine(x, y, width);
+                    break;
+            }
+            y += lineHeight * text.row;
+        }
+        const newTempList = tempList.filter(text => !textList.some(a => a.tag === text.tag));
+        for (const text of newTempList) {
+            text.color? this.changeTextColor(text.color) : this.changeTextColor(ColorManager.paramchangeTextColor(1));
+            textWidth = text.width ? text.width : width;
+            textX =  text.width && text.mode !== "headline" ? text.width : 0;
+            switch (text.code) {
+                case "name":
+                    this.drawSetBonusName(text.text, text.icon, x + textX, y, width - textWidth);
+                    break;
+                case "param":
+                    this.drawText(text.text, x + textX, y, width - textWidth);
+                    break;
+                case "horzLine":
+                    this.listHorzLine(x, y, width);
+                    break;
+            }
+            y += lineHeight * text.row;
+        }
+    };
+
+    Window_EquipStatus.prototype.drawSetBonusName = function(name, iconIndex, x, y, width) {
+        let textMargin = 0;
+        if (NuunEquipSetBonusManager.equipSetBonusParams(3) && iconIndex > 0) {
+            textMargin = (!!ImageManager.standardIconWidth ? ImageManager.standardIconWidth : ImageManager.iconWidth) + 4;
+            this.drawSetBonusIcon(iconIndex, x, y);
+        }
+        this.drawText(name, x + textMargin, y, width - textMargin);
+        this.resetTextColor();
+    };
+
+    Window_EquipStatus.prototype.drawSetBonusIcon = function(iconIndex, x, y) {
+        if (iconIndex === 0) return;
+        const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        const delta = ImageManager.standardIconWidth ? ImageManager.standardIconWidth - ImageManager.iconWidth : 0;
+        this.drawIcon(iconIndex, x + delta / 2, iconY);
+    };
+
+    Window_EquipStatus.prototype.getSetBonusEquip = function(weaponId, armorId) {
+        if (weaponId > 0) {
+            return $dataWeapons[weaponId];
+        } else if (armorId > 0) {
+            return $dataArmors[armorId];
+        } else {
+            return null;
         }
     };
 

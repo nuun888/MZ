@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Set bonus tooltip window
  * @author NUUN
- * @version 1.0.0
+ * @version 2.0.1
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_SetBonusEquip
  * 
@@ -19,13 +19,14 @@
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
- * 9/23/2026 Ver.1.0.0
+ * 9/26/2026 Ver.2.0.1
+ * Fixed to support the feature that displays an icon next to the set bonus name.
+ * 9/23/2026 Ver.2.0.0
  * Updated to support NUUN_EquipSetBonus Ver.2.0.0. (Not compatible with Ver.1.)
  * 
  * @param WindowSetting
@@ -87,7 +88,7 @@
  * @target MZ
  * @plugindesc セットボーナスツールチップウィンドウ
  * @author NUUN
- * @version 2.0.0
+ * @version 2.0.1
  * @base NUUN_SetBonusEquip
  * @orderAfter NUUN_SetBonusEquip
  * 
@@ -98,12 +99,13 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * ※https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/26 Ver.2.0.1
+ * セットボーナス名にアイコンを表示する機能追加による修正。
  * 2026/9/23 Ver.2.0.0
  * NUUN_EquipSetBonus Ver.2.0.0更新によるアップデート。(Ver1では使用できません)
  * 
@@ -378,7 +380,7 @@ Imported.NUUN_SetBonusWindow = true;
             if (!!data) {
                 const setBonusSum = setBonus.getEquipsNum();
                 const equip = this.getSetBonusEquip(data.SetBonusWeaponData, data.SetBonusArmorData);
-                this.drawSetBonusName(equip, data.SetBonusName, rect.x, y, rect.width);
+                this.drawSetBonusName(this.getSetBonusName(data, equip), equip.iconIndex, rect.x, y, rect.width);
                 y += lineHeight;
                 contentsRows++;
                 this.horzLine(rect.x, y, rect.width);
@@ -404,10 +406,21 @@ Imported.NUUN_SetBonusWindow = true;
         this.contents.fontSize = $gameSystem.mainFontSize();
     };
 
-    Window_SetBounsEquip.prototype.drawSetBonusName = function(equip, name, x, y, width) {
+    Window_SetBounsEquip.prototype.drawSetBonusName = function(name, iconIndex, x, y, width) {
+        let textMargin = 0;
+        if (NuunEquipSetBonusManager.equipSetBonusParams(3) && iconIndex > 0) {
+            textMargin = (!!ImageManager.standardIconWidth ? ImageManager.standardIconWidth : ImageManager.iconWidth) + 4;
+            this.drawSetBonusIcon(iconIndex, x, y);
+        }
         this.changeTextColor(NuunEquipSetBonusManager.getColorCode(NuunEquipSetBonusManager.equipSetBonusTooltipsParams(4)));
-        this.drawText(name, x, y, width);
+        this.drawText(name, x + textMargin, y, width - textMargin);
         this.resetTextColor();
+    };
+
+    Window_SetBounsEquip.prototype.drawSetBonusIcon = function(iconIndex, x, y) {
+        const iconY = y + (this.lineHeight() - ImageManager.iconHeight) / 2;
+        const delta = ImageManager.standardIconWidth ? ImageManager.standardIconWidth - ImageManager.iconWidth : 0;
+        this.drawIcon(iconIndex, x + delta / 2, iconY);
     };
 
     Window_SetBounsEquip.prototype.drawSetBonusParam = function(equip, data, x, y, width) {
@@ -415,9 +428,10 @@ Imported.NUUN_SetBonusWindow = true;
         if (equip) {
             let textWidth = 0;
             const lineHeight = this.getFontSize();
+            const name = this.getSetBonusText(data, equip);
             if (data.SetBonusText) {
                 this.changeTextColor(this.systemColor());
-                this.drawText(data.SetBonusText, x, y, width);
+                this.drawSetBonusName(this.getSetBonusText(data, equip), x, y, width);
                 textWidth = this.textWidth(data.SetBonusText) + this.itemPadding();
             }
             this.resetTextColor();
@@ -490,6 +504,14 @@ Imported.NUUN_SetBonusWindow = true;
 
     Window_SetBounsEquip.prototype.tooltipsHeight = function() {
         return this.lineHeight() + NuunEquipSetBonusManager.equipSetBonusTooltipsParams(3);
+    };
+
+    Window_SetBounsEquip.prototype.getSetBonusName = function(data, equip) {
+        return data.SetBonusName || equip.name;
+    };
+    
+    Window_SetBounsEquip.prototype.getSetBonusText = function(data, equip) {
+        return data.SetBonusText || equip.name;
     };
 
 

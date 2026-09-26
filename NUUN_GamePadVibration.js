@@ -8,9 +8,7 @@
  * @target MZ
  * @plugindesc Gamepad Vibration
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * This is a plugin for vibrating the gamepad on X Input.
@@ -20,17 +18,18 @@
  * [id]:Specify the ID in the "VibrationSetting" list number of the plug-in parameter.
  * 
  * Specified from script
- * NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
+ * NuunGamePadVibrationManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
  * 
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/26/2026 Ver.1.2.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
  * 4/2/2023 Ver.1.1.0
  * Added function to vibrate gamepad from text code.
  * 3/16/2023 Ver.1.0.2
@@ -97,29 +96,28 @@
  * @target MZ
  * @plugindesc ゲームパッド振動
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
- * X Inputでのゲームパッドを振動させるためのプラグインです。
+ * XInputでのゲームパッドを振動させるためのプラグインです。
  * 
  * 制御文字
  * \VG[id]:ゲームパッドを振動させます。
  * [id]:プラグインパラメータの振動設定リスト番号内のIDを指定します。
  * 
  * スクリプトから指定
- * NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
+ * NuunGamePadVibrationManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)
  * 
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/26 Ver.1.2.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
  * 2023/4/2 Ver.1.1.0
  * 制御文字からゲームパッドを振動させる機能を追加。
  * 2023/3/16 Ver.1.0.2
@@ -187,33 +185,152 @@ var Imported = Imported || {};
 Imported.NUUN_GamePadVibration = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_GamePadVibration');
-    const OptionGamePadVibrationName = String(parameters['OptionGamePadVibrationName'] || "ゲームパッド振動");
-    const VibrationSetting = NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['VibrationSetting'])) : [];
+    class Nuun_PluginParams_GamePadVibration {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
 
-    const pluginName = "NUUN_GamePadVibration";
-    let _onGamepad = false;
+    window.Nuun_PluginParams_GamePadVibration = Nuun_PluginParams_GamePadVibration;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_GamePadVibration.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
 
     PluginManager.registerCommand(pluginName, 'OnVibration', args => {
         if (args.VibrationSetting) {
-            const data = DataManager.nuun_structureData(args.VibrationSetting);
-            NuunManager.setupGamePadVibration(data);
+            const data = NuunGamePadVibrationManager.structureData(args.VibrationSetting);
+            NuunGamePadVibrationManager.setupGamePadVibration(data);
         }
     });
 
-    const _Scene_Base_initialize = Scene_Base.prototype.initialize;
-    Scene_Base.prototype.initialize = function() {
-        _Scene_Base_initialize.call(this);
-        NuunManager.actuatorDuration = 0;
+    function NuunGamePadVibrationManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunGamePadVibrationManager = NuunGamePadVibrationManager;
+
+    NuunGamePadVibrationManager.onGamepad = false;
+    NuunGamePadVibrationManager.actuatorDuration = 0;
+    NuunGamePadVibrationManager.actuatorDelay = 0;
+    NuunGamePadVibrationManager.actuatorData = null;
+
+    NuunGamePadVibrationManager.structureData = function(params){
+        return JSON.parse(JSON.stringify(params, function(key, value) {
+            try {
+                return JSON.parse(value);
+            } catch (e) {
+                return NuunGamePadVibrationManager.getEvalCode(value);
+            }
+        }));
     };
 
-    const _Scene_Base_update = Scene_Base.prototype.update;
-    Scene_Base.prototype.update = function() {
-        _Scene_Base_update.call(this);
-        NuunManager.updateVibration();
+    NuunGamePadVibrationManager.stringCode = function(code){
+        try {
+            if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                return eval(code);//'または"を外す。
+            }
+            return !!code ? String(code) : null;
+        } catch (e) {
+            return code;
+        }
     };
-//
-    NuunManager.sprictGamePadVibration = function(data1, data2, data3, data4) {
+
+    NuunGamePadVibrationManager.getEvalCode = function(code) {
+        if (isNaN(code)) {
+            if (!code) {
+                return null;
+            }
+            return this.stringCode(code);
+        } else {
+            return String(code);
+        }
+    };
+
+    NuunGamePadVibrationManager.gamePadVibrationParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.OptionGamePadVibrationName || "ゲームパッド振動";
+            case 1:
+                return params.VibrationSetting || [];
+        }
+    };
+
+    NuunGamePadVibrationManager.sprictGamePadVibration = function(data1, data2, data3, data4) {
         const vibration = {};
         vibration.StartDelay = Number(data1);
         vibration.Duration = Number(data2);
@@ -223,7 +340,8 @@ Imported.NUUN_GamePadVibration = true;
     };
     
 
-    NuunManager.setupGamePadVibration = function(data) {
+    NuunGamePadVibrationManager.setupGamePadVibration = function(data) {
+        if (!data) return;
         if (navigator.getGamepads && ConfigManager.gamePadVibration) {
             const gamepad = navigator.getGamepads()[0];
             if (gamepad && gamepad.vibrationActuator) {
@@ -232,15 +350,15 @@ Imported.NUUN_GamePadVibration = true;
         }
     };
     
-    NuunManager.setVibration = function(data) {
+    NuunGamePadVibrationManager.setVibration = function(data) {
         if (data.Duration > this.actuatorDuration) {
             this.actuatorDelay = data.StartDelay;
-            this._actuatorData = data;
+            this.actuatorData = data;
             this.actuatorDuration = data.Duration;
         }
     };
 
-    NuunManager.updateVibration = function() {
+    NuunGamePadVibrationManager.updateVibration = function() {
         if (this.actuatorDelay > 0) {
             this.actuatorDelay--;
         }
@@ -252,13 +370,13 @@ Imported.NUUN_GamePadVibration = true;
                     if (actuator) {
                         //const agent = window.navigator.userAgent.toLowerCase();
                         //if (agent.indexOf('firefox') >= 0) {//firefox
-                            //actuator.pulse(this._actuatorData.WeakMagnitude, 20);
+                            //actuator.pulse(this.actuatorData.WeakMagnitude, 20);
                         //} else {
                             actuator.playEffect(actuator.type, {
                                 startDelay: 0,
                                 duration: 20,
-                                weakMagnitude: this._actuatorData.WeakMagnitude,
-                                strongMagnitude: this._actuatorData.StrongMagnitude,
+                                weakMagnitude: this.actuatorData.WeakMagnitude,
+                                strongMagnitude: this.actuatorData.StrongMagnitude,
                             });
                         //}
                     }
@@ -268,7 +386,28 @@ Imported.NUUN_GamePadVibration = true;
         }
     };
 
-//
+    //旧互換性
+    if (typeof NuunManager !== "undefined") {
+        NuunManager.sprictGamePadVibration = function(data1, data2, data3, data4) {
+            NuunGamePadVibrationManager.sprictGamePadVibration(data1, data2, data3, data4);
+        };
+    }
+
+
+    const _Scene_Base_initialize = Scene_Base.prototype.initialize;
+    Scene_Base.prototype.initialize = function() {
+        _Scene_Base_initialize.call(this);
+        NuunGamePadVibrationManager.actuatorDuration = 0;
+        NuunGamePadVibrationManager.actuatorDelay = 0;
+        NuunGamePadVibrationManager.actuatorData = null;
+    };
+
+    const _Scene_Base_update = Scene_Base.prototype.update;
+    Scene_Base.prototype.update = function() {
+        _Scene_Base_update.call(this);
+        NuunGamePadVibrationManager.updateVibration();
+    };
+
     const _Window_Base_processEscapeCharacter = Window_Base.prototype.processEscapeCharacter;
     Window_Base.prototype.processEscapeCharacter = function(code, textState) {
         switch (code) {
@@ -282,9 +421,9 @@ Imported.NUUN_GamePadVibration = true;
     };
 
     Window_Base.prototype.processGamepadVibration = function(state) {
-        const data = VibrationSetting[state -1];
+        const data = NuunGamePadVibrationManager.gamePadVibrationParams(1)[state -1];
         if (data) {
-            NuunManager.setupGamePadVibration(data);
+            NuunGamePadVibrationManager.setupGamePadVibration(data);
         }
     };
 
@@ -292,21 +431,22 @@ Imported.NUUN_GamePadVibration = true;
     const _Scene_Options_initialize = Scene_Options.prototype.initialize;
     Scene_Options.prototype.initialize = function() {
         _Scene_Options_initialize.call(this);
-        _onGamepad = !!navigator.getGamepads()[0];
+        NuunGamePadVibrationManager.onGamepad = !!navigator.getGamepads()[0];
     };
 
     const _Scene_Options_maxCommands = Scene_Options.prototype.maxCommands;
     Scene_Options.prototype.maxCommands = function() {
-        return _Scene_Options_maxCommands.call(this) + (_onGamepad ? 1 : 0);
+        return _Scene_Options_maxCommands.call(this) + (NuunGamePadVibrationManager.onGamepad ? 1 : 0);
     };
 
     const _Window_Options_addGeneralOptions = Window_Options.prototype.addGeneralOptions;
     Window_Options.prototype.addGeneralOptions = function() {
         _Window_Options_addGeneralOptions.call(this);
-        if (_onGamepad) {
-            this.addCommand(OptionGamePadVibrationName, "gamePadVibration");
+        if (NuunGamePadVibrationManager.onGamepad) {
+            this.addCommand(NuunGamePadVibrationManager.gamePadVibrationParams(0), "gamePadVibration");
         }
     };
+
 
     ConfigManager.gamePadVibration = true;
 
@@ -321,6 +461,6 @@ Imported.NUUN_GamePadVibration = true;
     ConfigManager.applyData = function(config) {
         _ConfigManager_applyData.call(this, config);
         this.gamePadVibration = this.readFlag(config, "gamePadVibration", true);
-    };
+    }; 
     
 })();

@@ -6,7 +6,7 @@
  */
 /*:
  * @target MZ
- * @plugindesc Gamepad Vibration
+ * @plugindesc Battle Gamepad Vibration
  * @author NUUN
  * @base NUUN_GamePadVibration
  * @orderAfter NUUN_GamePadVibration

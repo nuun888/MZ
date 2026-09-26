@@ -35,7 +35,6 @@ X Inputでのゲームパッドを振動させるためのプラグインです�
 
 #### スクリプトから指定
 `NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)`  
-バトルスタイル拡張プラグインでの開始ディレイもフレーム数指定になります。  
 
 ## 更新履歴 
 2023/4/2 Ver.1.1.0  

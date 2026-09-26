@@ -37,6 +37,8 @@ X Inputでのゲームパッドを振動させるためのプラグインです�
 `NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)`  
 
 ## 更新履歴 
+2026/9/26 Ver.1.2.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
 2023/4/2 Ver.1.1.0  
 制御文字からゲームパッドを振動させる機能を追加。  
 2023/3/16 Ver.1.0.2  

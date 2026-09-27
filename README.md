@@ -166,7 +166,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [敵のドロップアイテム追加](https://github.com/nuun888/MZ/blob/master/README/AddDropItems.md)  | [NUUN_AddDropItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddDropItems.js) |  | 1.0.1 |
 | [条件付きドロップアイテム](https://github.com/nuun888/MZ/blob/master/README/ConditionalDrops.md) | [NUUN_ConditionalDrops](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_ConditionalDrops.js) | 条 | 1.0.8 |
 | [ユニークモンスター](https://github.com/nuun888/MZ/blob/master/README/UniqueEnemy.md) | [NUUN_UniqueEnemy](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UniqueEnemy.js) | 共 | 1.0.2 |
-| [敵のレベル](https://github.com/nuun888/MZ/blob/master/README/EnemyLevel.md) | [NUUN_EnemyLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js) | 共 | 1.0.0 |
+| [敵のレベル](https://github.com/nuun888/MZ/blob/master/README/EnemyLevel.md) | [NUUN_EnemyLevel](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyLevel.js) | | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 |  |  |  |  |
@@ -260,13 +260,13 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | マップ　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数2　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | 共 | 1.1.1 |
+| [床ダメージの処理を拡張](https://github.com/nuun888/MZ/blob/master/README/DamagedFloorEX.md) | [NUUN_DamagedFloorEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DamagedFloorEX.js) | | 1.1.1 |
 | [地域マップ名](https://github.com/nuun888/MZ/blob/master/README/RegionMapName.md) | [NUUN_RegionMapName](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapName.js) | 共 | 1.0.1 |
 | [地域マップBGM](https://github.com/nuun888/MZ/blob/master/README/RegionMapBGM.md) | [NUUN_RegionMapBGM](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RegionMapBGM.js) | 共 | 1.0.0 |
 | [複数マップ結合](https://github.com/nuun888/MZ/blob/master/README/SeamlessMap.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SeamlessMap.js) | 共 | 1.1.6 |
 | [ファストトラベル](https://github.com/nuun888/MZ/blob/master/README/FastTravel.md) | [NUUN_SeamlessMap](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_FastTravel.js) | 共 | 1.0.0 |
 | [方向キーランダム移動](https://github.com/nuun888/MZ/blob/master/README/RandomMove.md) | [NUUN_RandomMove](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomMove.js) | 共 | 1.0.0 |
-| [滑る床](https://github.com/nuun888/MZ/blob/master/README/SlipperyFloor.md) | [NUUN_SlipperyFloor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipperyFloor.js) | 共 | 1.0.0 |
+| [滑る床](https://github.com/nuun888/MZ/blob/master/README/SlipperyFloor.md) | [NUUN_SlipperyFloor](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlipperyFloor.js) | | 1.0.0 |
 |  |  |  |  |
 |  |  |  |  |
 
@@ -284,7 +284,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | メニュー　　　　　　　　　　　　　　　 | プラグイン　プラグイン数10　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [スキルツリー](https://github.com/nuun888/MZ/blob/master/README/SkillTree.md) | [NUUN_SkillTree](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js) | 共 | 1.0.0 |
+| [スキルツリー](https://github.com/nuun888/MZ/blob/master/README/SkillTree.md) | [NUUN_SkillTree](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillTree.js) | | 1.0.0 |
 | [所持金拡張](https://github.com/nuun888/MZ/blob/master/README/GoldEX.md) | [NUUN_GoldEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GoldEX.js) | 共 | 1.2.1 |
 | [モンスター図鑑](https://github.com/nuun888/MZ/blob/master/README/EnemyBook.md) | [NUUN_EnemyBook](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBook.js) | 共 レ グ A | 2.18.5 |
 | ┣　[モンスター図鑑マップ遭遇チェック](https://github.com/nuun888/MZ/blob/master/README/EnemyBookEncounterCheck.md) | [NUUN_EnemyBookEncounterCheck](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EnemyBookEncounterCheck.js) | 共 | 1.0.0 |
@@ -313,9 +313,9 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 
 | 装備　　　　　　　　　　　　　　　　　 | プラグイン　プラグイン数1　　　　　　　　　　 | 　　　　　　　　　　　　　　 | Ver |
 | ---------- | ------------- | ------------- | -------- |
-| [装備時ステート](https://github.com/nuun888/MZ/blob/master/README/EquipsState.md) | [NUUN_EquipsState](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipsState.js) | 共 | 1.0.2 |
-| [装備セットボーナス](https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md) | [NUUN_SetBonusEquip](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js) | 共 | 1.3.5 |
-| ┗ [セットボーナスツールチップウィンドウ](https://github.com/nuun888/MZ/blob/master/README/SetBonusWindow.md) | [NUUN_SetBonusWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js) | 共 | 1.0.3 |
+| [装備時ステート](https://github.com/nuun888/MZ/blob/master/README/EquipsState.md) | [NUUN_EquipsState](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipsState.js) | | 1.0.2 |
+| [装備セットボーナス](https://github.com/nuun888/MZ/blob/master/README/SetBonusEquip.md) | [NUUN_SetBonusEquip](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusEquip.js) | | 1.3.5 |
+| ┗ [セットボーナスツールチップウィンドウ](https://github.com/nuun888/MZ/blob/master/README/SetBonusWindow.md) | [NUUN_SetBonusWindow](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SetBonusWindow.js) | | 1.0.3 |
 | [装備能力値変化量上限突破](https://github.com/nuun888/MZ/blob/master/README/EquipParamUnlimited.md) | [NUUN_EquipParamUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipParamUnlimited.js) |  | 1.0.1 |
 | [装備ステータス表示拡張](https://github.com/nuun888/MZ/blob/master/README/EquipStatusEX.md) | [NUUN_EquipStatusEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipStatusEX.js) | 共 | 1.3.3 |
 | 装備画面レイアウト変更 |  |  |  |
@@ -364,7 +364,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | [全体、ランダム、敵味方全体攻撃でも対象選択](https://github.com/nuun888/MZ/blob/master/README/Scope_confirmation.md) | [NUUN_Scope_confirmation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_Scope_confirmation.js) | 共 | 1.6.0 |
 | [MV互換アニメーションフレームレート変更](https://github.com/nuun888/MZ/blob/master/README/AnimationFPSRate.md) | [NUUN_AnimationFPSRate](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js) |  | 1.1.1 |
 | [戦闘背景の変更](https://github.com/nuun888/MZ/blob/master/README/BattleBackgroundEX.md) | [NUUN_BattleBackgroundEX](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BattleBackgroundEX.js) | 共 | 1.2.0 |
-| [データベース上限突破](https://github.com/nuun888/MZ/blob/master/README/SystemDatabaseUnlimited.md) | [NUUN_SystemDatabaseUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js) | 共 | 1.0.1 |
+| [データベース上限突破](https://github.com/nuun888/MZ/blob/master/README/SystemDatabaseUnlimited.md) | [NUUN_SystemDatabaseUnlimited](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SystemDatabaseUnlimited.js) |  | 1.0.1 |
 | [追加アニメーション表示](https://github.com/nuun888/MZ/blob/master/README/AddAnimation.md) | [NUUN_AddAnimation](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AddAnimation.js) |  | 1.0.0 |
 | [会心力](https://github.com/nuun888/MZ/blob/master/README/CriticalPower.md) | [NUUN_CriticalPower](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CriticalPower.js) | 共 | 1.0.0 |
 |  |  |  |  |
@@ -384,7 +384,7 @@ A：APNG対応(トリアコンタン様ApngPicture(APNGピクチャプラグイ�
 | ---------- | ------------- | ------------- | -------- |
 | [アイテムなどのランダム取得](https://github.com/nuun888/MZ/blob/master/README/RandomItems.md) | [NUUN_RandomItems](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_RandomItems.js) |  | 1.3.3 |
 | イベントでアイテム消費時消耗率、使用回数反映  | [NUUN_EventUseItem](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EventUseItem.js) |  | 1.0.0 |
-| [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md) | [NUUN_GamePadVibration](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js) | 共 | 1.0.2 |
+| [ゲームパッド振動](https://github.com/nuun888/MZ/blob/master/README/GamePadVibration.md) | [NUUN_GamePadVibration](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js) | | 1.2.0 |
 | [キーボタン割り当て](https://github.com/nuun888/MZ/blob/master/README/UserKey.md) | [NUUN_UserKey](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_UserKey.js) | 共 | 1.2.8 |
 | ┗ [アナログ移動](https://github.com/nuun888/MZ/blob/master/README/RealMoveLeftStick.md) | [NUUN_realMoveLeftStick](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_realMoveLeftStick.js) |  | 1.0.3 |
 | [特徴パフォーマンス改善](https://github.com/nuun888/MZ/blob/master/README/TraitsFPSImprovement.md) | [TraitsFPSImprovement](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_TraitsFPSImprovement.js) |  | 1.0.0 |

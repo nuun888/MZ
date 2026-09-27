@@ -35,6 +35,10 @@ X Inputでのゲームパッドを振動させるためのプラグインです�
 
 #### スクリプトから指定
 `NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)`  
+StartDelay:振動を開始するまでのディレイフレーム数。  
+Duration:振動フレーム数。ミリ秒ではありません。最大300フレーム  
+WeakMagnitude:高周波 (弱い) ランブル モーターのランブル強度。  
+StrongMagnitude:低周波 (強い) ランブル モーターのランブル強度。  
 
 ## 更新履歴 
 2026/9/28 Ver.1.2.1  

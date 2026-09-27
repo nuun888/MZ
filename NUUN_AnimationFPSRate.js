@@ -10,7 +10,7 @@
  * @target MZ
  * @plugindesc Frame rate change when playing MV compatible animation
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Set the frame rate for each animation when playing MV animation.
@@ -19,11 +19,16 @@
  * Frame mode: 15FPS for 4frame, 30FPS for 2 frames, 60FPS for 1 frame
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
- * This plugin can be used for free or for a fee.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
- * 6/4/2024 Ver.1.1.4
+ * 9/27/2026 Ver.1.2.1
+ * Fixed the processing.
+ * 6/4/2024 Ver.1.2.0
  * Added the ability to specify the magnification ratio.
  * 6/3/2024 Ver.1.1.3
  * Fixed an issue where the frame rate would be set to 60 FPS in FPS mode.
@@ -113,7 +118,7 @@
  * @target MZ
  * @plugindesc MV互換アニメーション再生時のフレームレート変更
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * MVのアニメーションを再生するときのフレームレートをアニメーションごとに設定します。
@@ -122,9 +127,15 @@
  * フレームモード：4フレームで15FPS、2フレームで30FPS、1フレームで60FPS
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/9/27 Ver.1.2.1
+ * 処理の修正。
  * 2024/6/4 Ver.1.2.0
  * 拡大率を指定できる機能を追加。
  * 2024/6/3 Ver.1.1.3
@@ -215,39 +226,140 @@ var Imported = Imported || {};
 Imported.NUUN_AnimationFPSRate = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_AnimationFPSRate');
-const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_AnimationFPSRate {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_AnimationFPSRate = Nuun_PluginParams_AnimationFPSRate;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
 
 
-const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
-Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
-    _Sprite_AnimationMV_setup.apply(this, arguments);
-    if (this._animation) {
-        this.setupScale();
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_AnimationFPSRate.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunAnimationFPSRateManager() {
+        throw new Error("This is a static class");
     }
-};
 
-Sprite_AnimationMV.prototype.setupScale = function() {
-    const id = this._animation.id;
-    const find = params.AnimationSetting.find(data => data.AnimationID === id);
-    this.scale.x = (find ? Number(find.AnimationScaleX) : Number(params.DefaultAnimationScaleX)) / 100;
-    this.scale.y = (find ? Number(find.AnimationScaleY) : Number(params.DefaultAnimationScaleY)) / 100;
-};
+    window.NuunAnimationFPSRateManager = NuunAnimationFPSRateManager;
 
-Sprite_AnimationMV.prototype.setupRate = function() {
-    this._rate = this.getAnimationRate();
-};
+    NuunAnimationFPSRateManager.animationFPSRateParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.DefaultAnimationRate || 15;
+            case 1:
+                return params.DefaultAnimationScaleX;
+            case 2:
+                return params.DefaultAnimationScaleY;
+            case 3:
+                return params.AnimationSetting || [];
+            case 4:
+                return params.AnimationRateMode;
+        }
+    };
 
-Sprite_AnimationMV.prototype.getAnimationRate = function() {
-    const id = this._animation.id;
-    const find = params.AnimationSetting.find(data => data.AnimationID === id);
-    if (params.AnimationRateMode) {
-        return Math.max(60 / (find ? Number(find.AnimationRate) : Number(params.DefaultAnimationRate)), 1);
-    } else {
-        return find ? Number(find.AnimationRate) : Number(params.DefaultAnimationRate);
-    }
-};
+    const _Sprite_AnimationMV_setup = Sprite_AnimationMV.prototype.setup;
+    Sprite_AnimationMV.prototype.setup = function(targets, animation, mirror, delay) {
+        _Sprite_AnimationMV_setup.apply(this, arguments);
+        if (this._animation) {
+            this.setupScale();
+        }
+    };
 
+    Sprite_AnimationMV.prototype.setupScale = function() {
+        const id = this._animation.id;
+        const find = NuunAnimationFPSRateManager.animationFPSRateParams(3).find(data => data.AnimationID === id);
+        this.scale.x = (find ? Number(find.AnimationScaleX) : Number(NuunAnimationFPSRateManager.animationFPSRateParams(1))) / 100;
+        this.scale.y = (find ? Number(find.AnimationScaleY) : Number(NuunAnimationFPSRateManager.animationFPSRateParams(2))) / 100;
+    };
 
+    Sprite_AnimationMV.prototype.setupRate = function() {
+        this._rate = this.getAnimationRate();
+    };
+
+    Sprite_AnimationMV.prototype.getAnimationRate = function() {
+        const id = this._animation.id;
+        const find = NuunAnimationFPSRateManager.animationFPSRateParams(3).find(data => data.AnimationID === id);
+        if (NuunAnimationFPSRateManager.animationFPSRateParams(4)) {
+            return Math.max(60 / (find ? Number(find.AnimationRate) : Number(NuunAnimationFPSRateManager.animationFPSRateParams(0))), 1);
+        } else {
+            return find ? Number(find.AnimationRate) : Number(NuunAnimationFPSRateManager.animationFPSRateParams(0));
+        }
+    };
 
 })();

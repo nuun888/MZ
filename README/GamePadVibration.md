@@ -1,10 +1,10 @@
 # [ゲームパッド振動](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_GamePadVibration.js)  
 #### 無償ライセンス
 クレジット表記：任意  
 商業利用：可能  
-改変：可能  
+改変：可能(難読化されている部分は改変不可)  
 再配布：可能  
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 #### 必須、前提プラグイン
@@ -37,6 +37,8 @@ X Inputでのゲームパッドを振動させるためのプラグインです�
 `NuunManager.sprictGamePadVibration(StartDelay, Duration, WeakMagnitude, StrongMagnitude)`  
 
 ## 更新履歴 
+2026/9/28 Ver.1.2.1  
+安全策のため振動フレーム数を300フレームまでに制限。  
 2026/9/26 Ver.1.2.0  
 NUUN_Baseなしで実行できるように仕様を変更。  
 2023/4/2 Ver.1.1.0  

@@ -23,12 +23,12 @@
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Modifications: Possible
+ * Modifications: Possible(Obfuscated sections may not be modified.)
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
- * 9/28/2026 Ver.1.2.1
+ * 9/27/2026 Ver.1.2.1
  * Limited the vibration duration to a maximum of 300 frames as a safety measure.
  * 9/26/2026 Ver.1.2.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
@@ -79,6 +79,7 @@
  * @desc Number of vibration frames.
  * @text Number of vibration frames
  * @type number
+ * @max 300
  * @default 120
  * 
  * @param WeakMagnitude
@@ -113,12 +114,12 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 改変：可能
+ * 改変：可能(難読化されている部分は改変不可)
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2026/9/28 Ver.1.2.1
+ * 2026/9/27 Ver.1.2.1
  * 安全策のため振動フレーム数を300フレームまでに制限。
  * 2026/9/26 Ver.1.2.0
  * NUUN_Baseなしで実行できるように仕様を変更。

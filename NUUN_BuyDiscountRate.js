@@ -8,9 +8,7 @@
  * @target MZ
  * @plugindesc Items that give discounts when purchased when in possession
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * You can create items that will apply a discount when you purchase other items just by owning them.
@@ -23,12 +21,14 @@
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 9/29/2026 Ver.1.1.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
+ * Fixed an issue where the lowest discount rate was applied when multiple discount items were owned.
  * 11/6/2025 Ver.1.0.0
  * First edition.
  * 
@@ -65,9 +65,7 @@
  * @target MZ
  * @plugindesc 所持中割引率適用アイテム
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * 所持しているだけでアイテムを購入するときに割引が適用されるアイテムを制作できます。
@@ -77,7 +75,6 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
@@ -86,6 +83,9 @@
  * <NoBuyDiscount> 割引対象外にします。
  * 
  * 更新履歴
+ * 2026/9/29 Ver.1.1.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * 複数所持している場合、一番割引率の低い設定が適用されてしまう問題を修正。
  * 2025/11/6 Ver.1.0.0
  * 初版
  * 
@@ -123,7 +123,109 @@ var Imported = Imported || {};
 Imported.NUUN_BuyDiscountRate = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_BuyDiscountRate {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_BuyDiscountRate = Nuun_PluginParams_BuyDiscountRate;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                list.forEach(a => {
+                    a = this.getTextCodeMeta(a);
+                });
+                return list;
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_BuyDiscountRate.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunBuyDiscountRateManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunBuyDiscountRateManager = NuunBuyDiscountRateManager;
+
+    NuunBuyDiscountRateManager.buyDiscountRateParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.BuyDiscountRateItems || [];
+            case 1:
+                return params.EnableBuyDiscountSwitch;
+        }
+    };
 
     const _Window_ShopBuy_initialize = Window_ShopBuy.prototype.initialize;
     Window_ShopBuy.prototype.initialize = function(rect) {
@@ -138,15 +240,15 @@ Imported.NUUN_BuyDiscountRate = true;
     };
 
     Game_Party.prototype.getBuyDiscountRate = function() {
-        return Math.max(this.buyDiscountRate() + 100, 0) / 100
+        return Math.max((this.buyDiscountRate() * -1) + 100, 0) / 100
     };
 
     Game_Party.prototype.buyDiscountRate = function() {
-        if (params.EnableBuyDiscountSwitch > 0 && $gameSwitches.value(params.EnableBuyDiscountSwitch)) return 0;
-        return params.BuyDiscountRateItems.reduce((r, data) => {
+        if (NuunBuyDiscountRateManager.buyDiscountRateParams(1) > 0 && $gameSwitches.value(NuunBuyDiscountRateManager.buyDiscountRateParams(1))) return 0;
+        return NuunBuyDiscountRateManager.buyDiscountRateParams(0).reduce((r, data) => {
             const item = $dataItems[data.Item];
             if (data.Item > 0 && !!item && this.hasItem(item) && data.DiscountRate > r) {
-                return (data.DiscountRate * -1);
+                return (data.DiscountRate);
             }
             return r;
         }, 0);
@@ -162,6 +264,5 @@ Imported.NUUN_BuyDiscountRate = true;
         if (!!item.meta.NoBuyDiscount) return 1.0;
         return this._buyDiscountRate;
     };
-
     
 })();

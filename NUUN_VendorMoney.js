@@ -24,6 +24,7 @@
  * Parameters:
  * vendorMoney: The vendor's current money. (Available only when changing vendor money.)
  * initMoney: The vendor's initial amount of money.
+ * v[id]: Game variable. [id] is the game variable ID.
  * 
  * Terms of Use
  * Credit: Optional
@@ -123,6 +124,7 @@
  * パラメータ
  * vendorMoney:店の現在の所持金(店の所持金変更でのみ)
  * initMoney:所持金の初期金額
+ * v[id]:ゲーム変数 [id]はゲーム変数ID
  * 
  * 利用規約
  * クレジット表記：任意
@@ -376,6 +378,7 @@ Imported.NUUN_VendorMoney = true;
         try {
             const vendorMoney = this._vendorMoney[id];
             const initMoney = data.InitVendorMoney;
+            const v = $gameVariables._data;
             switch (type) {
                 case 0:
                     if (this._vendorMoney[id] === undefined) {
@@ -404,6 +407,7 @@ Imported.NUUN_VendorMoney = true;
             }
             if (this._vendorMoney[this._vendorId] === undefined) {//データがなければ初期化
                 try {
+                    const v = $gameVariables._data;
                     const initMoney = data.InitVendorMoney;
                     this._vendorMoney[this._vendorId] = Math.max((isNaN(initMoney) ? eval(initMoney) : initMoney), 0);
                 } catch (error) {

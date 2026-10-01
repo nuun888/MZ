@@ -2,6 +2,7 @@
 # Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AnimationFPSRate.js)
 
+## 概要
 MVのアニメーションを再生するときのフレームレートを変更します。  
 またアニメーションごとにフレームレートを変更できます。  
 

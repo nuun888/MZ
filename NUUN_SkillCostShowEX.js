@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Skill Cost Display Extension
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_SkillCostEX
  * 
@@ -32,6 +32,7 @@
  * actor: Actor game data
  * skill: Skill data to be activated
  * cost: Cost. Equipment consumption and evaluation formulas return true/false values.
+ * v: Game variable. v[6] retrieves the value of game variable 6.
  * 
  * <SkillCostWidth:[string]> Specifies the cost display width using a string. The width of the specified string affects the width available for the skill name.
  * [string]:string
@@ -54,12 +55,15 @@
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/3/2026 Ver.1.2.2
+ * Fixed an issue so that 0 is returned when an exception occurs in a cost evaluation formula.
+ * 9/21/2026 Ver.1.2.1
+ * Added support for displaying state costs from the Skill Cost State plugin.
  * 9/20/2026 Ver.1.2.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
  * Fixed an issue where 0 could not be set for some plugin parameters.
@@ -337,7 +341,7 @@
  * @target MZ
  * @plugindesc スキルコスト表示拡張
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * @base NUUN_SkillCostEX
  * @orderAfter NUUN_SkillCostEX
  * 
@@ -361,6 +365,7 @@
  * actor:アクターのゲームデータ
  * skill:発動するスキルデータ
  * cost:コスト　装備消費と評価式は真偽値で返します。
+ * v:ゲーム変数 v[6]でゲーム変数6番の値
  * 
  * <SkillCostWidth:[string]> コストの表示幅を文字列で指定します。指定した文字列の横幅がスキル名の横幅に影響します。
  * [string]:文字列
@@ -381,12 +386,13 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/3 Ver.1.2.2
+ * コスト評価式で例外が発生した場合0を返すように修正。
  * 2026/9/21 Ver.1.2.1
  * スキルコストステートのコスト表示に対応。
  * 2026/9/20 Ver.1.2.0
@@ -728,10 +734,12 @@ Imported.NUUN_SkillCostShowEX = true;
     };
 
     NuunSkillCostManager.getEvalCost = function(battler, cost, skill, param) {
-        const v = $gameVariables._data;
-        const actor = battler.isActor() ? battler : null;
-        const enemy = battler.isEnemy() ? battler : null;
         try {
+            const v = $gameVariables._data;
+            const actor = battler.isActor() ? battler : null;
+            const enemy = battler.isEnemy() ? battler : null;
+            const varCost = battler.getSkillVarCost(skill);
+            const varCostR = battler.getSkillVarCostR(skill);
             if (!!actor && actor[param] !== undefined) {
                 return actor[param];
             } else if (!!enemy && enemy[param] !== undefined) {

@@ -1,5 +1,5 @@
 # [スキルコスト表示拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
-# Ver.1.2.1
+# Ver.1.2.2
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillCostShowEX.js)
 #### 必須、前提プラグイン
 [スキルコスト拡張](https://github.com/nuun888/MZ/blob/master/README/SkillCostEX.md)  
@@ -54,6 +54,8 @@ HP、MP、TP、Gold、Exp、ステートはコスト値で取得されます。
 (https://github.com/nuun888/MZ/blob/master/README/EquipSkillLearning.md)
 
 ## 更新履歴
+2026/10/3 Ver.1.2.2  
+コスト評価式で例外が発生した場合0を返すように修正。  
 2026/9/21 Ver.1.2.1  
 スキルコストステートのコスト表示に対応。  
 2026/9/20 Ver.1.2.0  

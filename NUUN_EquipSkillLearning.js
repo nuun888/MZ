@@ -2,17 +2,13 @@
  * NUUN_EquipSkillLearning.js
  * 
  * Copyright (C) 2022 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
  * @plugindesc skill learning equip
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * You can set the equipment that can learn skills.
@@ -36,10 +32,22 @@
  * <EquipSkillLearningRate:150>
  * If the acquisition point is 4, acquire 6 points with 150% effect.
  * 
+ * Display costs with "NUUN_SkillCostShowEX"
+ * You can display the learning progress as a skill cost by selecting EquipSkillLearnSkill as the cost display target in Skill Cost Display Order in the "NUUN_SkillCostShowEX" plugin parameters.
+ * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/3/2026 Ver.1.2.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
+ * Fixed an issue where the default value was not applied when the points required to learn a skill were not specified.
+ * Added support for NUUN_ResultEx.
+ * Fixed an issue where 0 could not be specified for gauge colors.
  * 12/24/2022 Ver.1.1.1
  * Fixed an issue where skills could not be selected.
  * 12/24/2022 Ver.1.1.0
@@ -126,9 +134,7 @@
  * @target MZ
  * @plugindesc スキル習得装備
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.1.1
+ * @version 1.2.0
  * 
  * @help
  * スキルを習得できる装備を設定できます。
@@ -140,6 +146,7 @@
  * 
  * スキルのメモ欄
  * <EquipSkillLearningPoint:「num]> 習得に必要なポイントを設定します。
+ * 未指定の場合は10になります。
  * [num]:必要ポイント
  * 
  * 敵キャラのメモ欄
@@ -151,10 +158,22 @@
  * <EquipSkillLearningRate:「rate]>
  * <EquipSkillLearningRate:150>の場合は取得ポイントが4の場合、150%の効果で6ポイント取得します。
  * 
+ * NUUN_SkillCostShowEXでコストを表示
+ * NUUN_SkillCostShowEXのプラグインパラメータのスキルコストの表示順でコスト表示対象でEquipSkillLearnSkillを選択することでスキルコストに表示させることができます。
+ * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/3 Ver.1.2.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * スキルに習得に必要なポイントが設定されていない場合、デフォルト値が設定されるように修正。
+ * NUUN_ResultExに対応。
+ * ゲージ色で0が指定できない問題を修正。
  * 2022/12/25 Ver.1.1.1
  * スキルを選択できなくなる問題を修正。
  * 2022/12/24 Ver.1.1.0
@@ -242,27 +261,180 @@ var Imported = Imported || {};
 Imported.NUUN_EquipSkillLearning = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_EquipSkillLearning');
-    const EquipSkillLearningName = String(parameters['EquipSkillLearningName'] || 'AP');
-    const EquipSkillLearningResult = String(parameters['EquipSkillLearningResult']);
-    const EquipSkillLearningResultShow = eval(parameters['EquipSkillLearningResultShow'] || "true");
-    const EquipSkillLearnUseSkill = eval(parameters['EquipSkillLearnUseSkill'] || "false");
-    const EquipSkillLearningGaugeWidth = Number(parameters['EquipSkillLearningGaugeWidth'] || 0);
-    const EquipSkillLearningGaugeX = Number(parameters['EquipSkillLearningGaugeX'] || 0);
-    const EquipSkillLearningGaugeY = Number(parameters['EquipSkillLearningGaugeY'] || 8);
-    const EquipSkillLearningGaugeColor1 = (DataManager.nuun_structureData(parameters['EquipSkillLearningGaugeColor1'])) || 30;
-    const EquipSkillLearningGaugeColor2 = (DataManager.nuun_structureData(parameters['EquipSkillLearningGaugeColor2'])) || 5;
-    const DefaultGainPoint = Number(parameters['DefaultGainPoint'] || 0);
+    class Nuun_PluginParams_EquipSkillLearning {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
 
-    function getEquipSkillLearning(data) {
-        return data.split(',').map(Number);
+    window.Nuun_PluginParams_EquipSkillLearning = Nuun_PluginParams_EquipSkillLearning;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_EquipSkillLearning.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunEquipSkillLearningManager() {
+        throw new Error("This is a static class");
     }
+
+    window.NuunEquipSkillLearningManager = NuunEquipSkillLearningManager;
+
+    NuunEquipSkillLearningManager.getMetaCode = function(object, method) {
+        if (!object || !object.meta[method]) return null;
+        const meta = object.meta[method];
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunEquipSkillLearningManager.getMetaCodeList = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta || meta === true) return null;
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta.split(',');
+    };
+
+    NuunEquipSkillLearningManager.getColorCode = function(color) {
+        if (typeof(color) === "string" && color.indexOf('#') === 0) {
+            return color;
+        }
+        return ColorManager.textColor(color);
+    };
+
+    NuunEquipSkillLearningManager.LoadPictures = function(filename) {
+        const bitmap = ImageManager.loadBitmap("img/", filename);
+        return bitmap;
+    };
+
+    NuunEquipSkillLearningManager.setupGagueContents = function(data, width, ex, _class, type) {
+        if (!this._gaugeContents) {
+            this._gaugeContents = new GaugeContents();
+        }
+        this._gaugeContents.clear();
+        this._gaugeContents.setup(data, width, ex, _class, type);
+    }
+
+    NuunEquipSkillLearningManager.getGaugeContents = function() {
+        return this._gaugeContents;
+    };
+
+    NuunEquipSkillLearningManager.getLearningPoint = function(skill) {
+        const point = NuunEquipSkillLearningManager.getMetaCode(skill, "EquipSkillLearningPoint");
+        return !!point ? Number(point) : 10;
+    };
+    
+    NuunEquipSkillLearningManager.equipSkillLearningParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.EquipSkillLearningName || 'AP';
+            case 1:
+                return params.EquipSkillLearningResult;
+            case 2:
+                return params.EquipSkillLearningResultShow;
+            case 3:
+                return params.EquipSkillLearnUseSkill;
+            case 4:
+                return params.EquipSkillLearningGaugeWidth || 0;
+            case 5:
+                return params.EquipSkillLearningGaugeX || 0;
+            case 6:
+                return params.EquipSkillLearningGaugeY || 0;
+            case 7:
+                return params.EquipSkillLearningGaugeColor1;
+            case 8:
+                return params.EquipSkillLearningGaugeColor2;
+            case 9:
+                return params.DefaultGainPoint;
+        }
+    };
 
     const _Game_Actor_initMembers = Game_Actor.prototype.initMembers;
     Game_Actor.prototype.initMembers = function() {
-        _Game_Actor_initMembers.call(this);
+        _Game_Actor_initMembers.apply(this, arguments);
         this.initEquipSkillLearning();
-        this.equipSkillLearningNewSkill = [];
+        this.initEquipSkillNewSkill();
     };
 
     Game_Actor.prototype.initEquipSkillLearning = function() {
@@ -271,13 +443,20 @@ Imported.NUUN_EquipSkillLearning = true;
         }
     };
 
+    Game_Actor.prototype.initEquipSkillNewSkill = function() {
+        if (!this.equipSkillLearningNewSkill) {
+            this.equipSkillLearningNewSkill = [];
+        }
+    };
+
     Game_Actor.prototype.gainEquipSkillLearningPoint = function(id, num) {
         if (this.isEquipSkillLearning(id)) {
             return;
         }
         const skill = $dataSkills[id];
-        const point = skill.meta.EquipSkillLearningPoint ? Number(skill.meta.EquipSkillLearningPoint) : 0;
+        const point = NuunEquipSkillLearningManager.getLearningPoint(skill);
         this.initEquipSkillLearning();
+        this.initEquipSkillNewSkill();
         if (this._equipSkillLearning[id] === undefined) {
             this._equipSkillLearning[id] = 0;
         }
@@ -294,7 +473,7 @@ Imported.NUUN_EquipSkillLearning = true;
 
     Game_Actor.prototype.getEquipSkillLearningRate = function() {
         return this.traitObjects().reduce((r, trait) => {
-            return trait.meta.EquipSkillLearningRate ? (Number(trait.meta.EquipSkillLearningRate) / 100) * r : r;
+            return trait.meta.EquipSkillLearningRate ? (Number(NuunEquipSkillLearningManager.getMetaCode(trait, "EquipSkillLearningRate")) / 100) * r : r;
         }, 1.0);
     };
 
@@ -311,26 +490,41 @@ Imported.NUUN_EquipSkillLearning = true;
         return this.isLearnedSkill(skillId);
     };
 
+     Game_Actor.prototype.isEquipSkillLearningSkill = function(skillId) {
+        this.initEquipSkillLearning();
+        return Number.isFinite(this._equipSkillLearning[skillId]);
+    };
+
     const _Game_Actor_findNewSkills = Game_Actor.prototype.findNewSkills;
     Game_Actor.prototype.findNewSkills = function(lastSkills) {
-        const newSkills = _Game_Actor_findNewSkills.call(this, lastSkills);
-        Array.prototype.push.apply(newSkills, this.equipSkillLearningNewSkill);
+        return this.findNewLearningSkills(_Game_Actor_findNewSkills.apply(this, arguments));
+    };
+
+    Game_Actor.prototype.findNewLearningSkills = function(newSkills) {
+        Array.prototype.push.apply(newSkills, (this.equipSkillLearningNewSkill || []));
         return newSkills;
     };
 
     const _Game_BattlerBase_addedSkills = Game_BattlerBase.prototype.addedSkills;
     Game_BattlerBase.prototype.addedSkills = function() {
-        const skills = _Game_BattlerBase_addedSkills.call(this);
+        return this.addLearningSkills(_Game_BattlerBase_addedSkills.apply(this, arguments));
+    };
+
+    Game_BattlerBase.prototype.addLearningSkills = function(skills) {
+        return skills;
+    };
+
+    Game_Actor.prototype.addLearningSkills = function(skills) {
         Array.prototype.push.apply(skills, this.getEquipSkillLearningList());
         return skills;
     };
 
-    Game_BattlerBase.prototype.getEquipSkillLearningList = function() {
+    Game_Actor.prototype.getEquipSkillLearningList = function() {
         const skillList = [];
         for (const item of this.equips()) {
             if (item) {
-                if (item.meta.EquipSkillLearning) {
-                    Array.prototype.push.apply(skillList, getEquipSkillLearning(item.meta.EquipSkillLearning));
+                if (!!item.meta.EquipSkillLearning) {
+                    Array.prototype.push.apply(skillList, NuunEquipSkillLearningManager.getMetaCodeList(item, "EquipSkillLearning").map(Number));
                 }
             }
         }
@@ -338,7 +532,7 @@ Imported.NUUN_EquipSkillLearning = true;
     };
 
     Game_Enemy.prototype.equipSkillLearningPoint = function() {
-        return this.enemy().meta.EquipSkillLearningPoint ? Number(this.enemy().meta.EquipSkillLearningPoint) : DefaultGainPoint;
+        return this.enemy().meta.EquipSkillLearningPoint ? Number(NuunEquipSkillLearningManager.getMetaCode(this.enemy(), "EquipSkillLearningPoint")) : NuunEquipSkillLearningManager.equipSkillLearningParams(9);
     };
 
     Game_Troop.prototype.equipSkillLearningPointTotal = function() {
@@ -349,14 +543,14 @@ Imported.NUUN_EquipSkillLearning = true;
 
     const _Window_SkillList_initialize = Window_SkillList.prototype.initialize;
     Window_SkillList.prototype.initialize = function(rect) {
-        _Window_SkillList_initialize.call(this, rect);
+        _Window_SkillList_initialize.apply(this, arguments);
         this._equipSkillLearning = [];
     };
 
     const _Window_SkillList_refresh = Window_SkillList.prototype.refresh;
     Window_SkillList.prototype.refresh = function() {
         this.hideGaugeSprite();
-        _Window_SkillList_refresh.call(this);
+        _Window_SkillList_refresh.apply(this, arguments)
     };
 
     Window_SkillList.prototype.hideGaugeSprite = function() {
@@ -367,11 +561,11 @@ Imported.NUUN_EquipSkillLearning = true;
 
     const _Window_SkillList_isEnabled = Window_SkillList.prototype.isEnabled;
     Window_SkillList.prototype.isEnabled = function(item) {
-        return _Window_SkillList_isEnabled.call(this, item) && this.isUseEquipSkillLearn(item);
+        return _Window_SkillList_isEnabled.apply(this, arguments) && this.isUseEquipSkillLearn(item);
     };
 
     Window_SkillList.prototype.isUseEquipSkillLearn = function(skill) {
-        return EquipSkillLearnUseSkill ? actor.canUseEquipSkillLearn(skill) : true;
+        return NuunEquipSkillLearningManager.equipSkillLearningParams(3) ? this.canUseEquipSkillLearn(skill) : true;
     };
 
     Window_SkillList.prototype.canUseEquipSkillLearn = function(skill) {
@@ -384,30 +578,35 @@ Imported.NUUN_EquipSkillLearning = true;
     };
 
     Window_Base.prototype.equipSkillLearnSkill = function(skill) {//必要ポイント
-        return skill.meta.EquipSkillLearningPoint ? Number(skill.meta.EquipSkillLearningPoint) : 0;
+        return NuunEquipSkillLearningManager.getLearningPoint(skill);
     };
 
     Window_Base.prototype.equipSkillLearnSkillText = function(skill) {//必要ポイントテキスト
-        return skill.meta.EquipSkillLearningPoint ? this._actor.getEquipSkillLearningPoint(skill.id) +"/"+ this.equipSkillLearnSkill(skill) : '';
+        return this._actor.isEquipSkillLearningSkill(skill.id) ? this._actor.getEquipSkillLearningPoint(skill.id) +"/"+ this.equipSkillLearnSkill(skill) : 0;
     };
 
     const _Window_SkillList_drawItem = Window_SkillList.prototype.drawItem;
     Window_SkillList.prototype.drawItem = function(index) {
-        _Window_SkillList_drawItem.call(this, index);
-        const skill = this.itemAt(index);
+        _Window_SkillList_drawItem.apply(this, arguments)
+        this.drawEquipSkillLearningGauge(index);
+    };
+
+    Window_SkillList.prototype.drawEquipSkillLearningGauge = function(index) {
         const actor = this._actor;
-        if (!actor.isEquipSkillLearning(skill.id) && skill.meta.EquipSkillLearningPoint && Number(skill.meta.EquipSkillLearningPoint) > 0) {
-            const rect = this.itemLineRect(index);
-            if (!this._equipSkillLearning[index]) {
-                const width = (EquipSkillLearningGaugeWidth > 0 ? Math.min(rect.width, EquipSkillLearningGaugeWidth) : rect.width) - EquipSkillLearningGaugeX;
-                const sprite = new Sprite_EquipSkillLearningGauge(width);
-                this._contentsBackSprite.addChild(sprite);
-                this._equipSkillLearning[index] = sprite;
-            }
-            this._equipSkillLearning[index].setup(actor, 'n_skill', skill);
-            this._equipSkillLearning[index].move(rect.x + EquipSkillLearningGaugeX, rect.y + EquipSkillLearningGaugeY);
-            this._equipSkillLearning[index].show();
+        const skill = this.itemAt(index);
+        const point = NuunEquipSkillLearningManager.getLearningPoint(skill);
+        if (!actor || !skill || !!actor.isEquipSkillLearning(skill.id) || point === 0) return;
+        const rect = this.itemLineRect(index);
+        if (!this._equipSkillLearning[index]) {
+            const width = (NuunEquipSkillLearningManager.equipSkillLearningParams(4) > 0 ? Math.min(rect.width, NuunEquipSkillLearningManager.equipSkillLearningParams(4)) : rect.width) - NuunEquipSkillLearningManager.equipSkillLearningParams(5);
+            NuunEquipSkillLearningManager.setupGagueContents(null, width, null, this, "n_skill");
+            const sprite = new Sprite_EquipSkillLearningGauge(width);
+            this._contentsBackSprite.addChild(sprite);
+            this._equipSkillLearning[index] = sprite;
         }
+        this._equipSkillLearning[index].setup(actor, 'n_skill', skill);
+        this._equipSkillLearning[index].move(rect.x + NuunEquipSkillLearningManager.equipSkillLearningParams(5), rect.y + NuunEquipSkillLearningManager.equipSkillLearningParams(6));
+        this._equipSkillLearning[index].show();
     };
 
     function Sprite_EquipSkillLearningGauge() {
@@ -417,47 +616,52 @@ Imported.NUUN_EquipSkillLearning = true;
     Sprite_EquipSkillLearningGauge.prototype = Object.create(Sprite_Gauge.prototype);
     Sprite_EquipSkillLearningGauge.prototype.constructor = Sprite_EquipSkillLearningGauge;
       
-    Sprite_EquipSkillLearningGauge.prototype.initialize = function(width) {
+    Sprite_EquipSkillLearningGauge.prototype.initialize = function() {
+        this.setupGaugeContents();
+        Sprite_Gauge.prototype.initialize.call(this);
+    };
+
+    Sprite_EquipSkillLearningGauge.prototype.initMembers = function() {
+        Sprite_Gauge.prototype.initMembers.apply(this, arguments);
         this._skillId = 0;
         this._maxEquipSkillLearningPoint = 0;
-        this._gaugeWidth = width;
-        Sprite_Gauge.prototype.initialize.call(this);
     };
 
     Sprite_EquipSkillLearningGauge.prototype.setup = function(battler, statusType, skill) {
         this._skillId = skill.id;
-        this._maxEquipSkillLearningPoint = skill.meta.EquipSkillLearningPoint ? Number(skill.meta.EquipSkillLearningPoint) : 0;
+        this._maxEquipSkillLearningPoint = NuunEquipSkillLearningManager.getLearningPoint(skill);
         Sprite_Gauge.prototype.setup.call(this, battler, statusType);
     };
 
-    Sprite_EquipSkillLearningGauge.prototype.bitmapWidth = function() {
-        return this._gaugeWidth;
+    Sprite_EquipSkillLearningGauge.prototype.setupGaugeContents = function() {
+        const gaugeContents = NuunEquipSkillLearningManager.getGaugeContents();
+        this._gaugeWidth = gaugeContents.getWidth();
+        this._gaugeHeight = gaugeContents.getHeight();
+        this._data = gaugeContents.getEx();
     };
 
-    const _Sprite_Gauge_currentValue = Sprite_Gauge.prototype.currentValue;
-    Sprite_Gauge.prototype.currentValue = function() {
-        if (this._battler && this._statusType === 'n_skill') {
-            return this._battler.getEquipSkillLearningPoint(this._skillId);
-        } else {
-            return _Sprite_Gauge_currentValue.call(this);
-        }
+    Sprite_EquipSkillLearningGauge.prototype.bitmapWidth = function() {
+        return this._gaugeWidth || Sprite_Gauge.prototype.bitmapWidth.apply(this, arguments);
+    };
+
+    Sprite_EquipSkillLearningGauge.prototype.gaugeHeight = function() {
+        return this._gaugeHeight || Sprite_Gauge.prototype.gaugeHeight.apply(this, arguments);
     };
     
-    const _Sprite_Gauge_currentMaxValue = Sprite_Gauge.prototype.currentMaxValue;
-    Sprite_Gauge.prototype.currentMaxValue = function() {
-        if (this._battler && this._statusType === 'n_skill') {
-            return this._maxEquipSkillLearningPoint;
-        } else {
-            return _Sprite_Gauge_currentMaxValue.call(this);
-        }
+    Sprite_EquipSkillLearningGauge.prototype.currentValue = function() {
+        return this._battler.getEquipSkillLearningPoint(this._skillId);
+    };
+
+    Sprite_EquipSkillLearningGauge.prototype.currentMaxValue = function() {
+        return this._maxEquipSkillLearningPoint;
     };
 
     Sprite_EquipSkillLearningGauge.prototype.gaugeColor1 = function() {
-        return NuunManager.getColorCode(EquipSkillLearningGaugeColor1);
+        return NuunEquipSkillLearningManager.getColorCode(NuunEquipSkillLearningManager.equipSkillLearningParams(7));
     };
     
     Sprite_EquipSkillLearningGauge.prototype.gaugeColor2 = function() {
-        return NuunManager.getColorCode(EquipSkillLearningGaugeColor2);
+        return NuunEquipSkillLearningManager.getColorCode(NuunEquipSkillLearningManager.equipSkillLearningParams(8));
     };
 
     Sprite_EquipSkillLearningGauge.prototype.drawLabel = function() {
@@ -476,14 +680,18 @@ Imported.NUUN_EquipSkillLearning = true;
     };
 
     BattleManager.displayEquipSkillLearningPoint = function() {
-        if (Imported.NUUN_Result || !EquipSkillLearningResultShow) {
+        if (this.isResultPlugin() || !NuunEquipSkillLearningManager.equipSkillLearningParams(2)) {
             return;
         }
         const equipSkillLearningPoint = this._rewards.equipSkillLearningPoint;
         if (equipSkillLearningPoint > 0) {
-            const text = EquipSkillLearningResult.format(EquipSkillLearningName, equipSkillLearningPoint);
+            const text = NuunEquipSkillLearningManager.equipSkillLearningParams(1).format(NuunEquipSkillLearningManager.equipSkillLearningParams(0), equipSkillLearningPoint);
             $gameMessage.add("\\." + text);
         }
+    };
+
+    BattleManager.isResultPlugin  = function() {
+        return Imported.NUUN_Result || Imported.NUUN_ResultEx;
     };
 
     const _BattleManager_makeRewards = BattleManager.makeRewards;
@@ -505,6 +713,50 @@ Imported.NUUN_EquipSkillLearning = true;
             for (const skillId of actor.getEquipSkillLearningList()) {
                 actor.gainEquipSkillLearningPoint(skillId, equipSkillLearningPoint);
             }
+        }
+    };
+
+
+    class GaugeContents {
+        constructor() {
+            this.clear();
+        }
+
+        clear() {
+            this._data = null;
+            this.width = 128;
+            this.color = 0;
+            this._ex = null;
+            this._class = null;
+            this._type = "";
+        }
+
+        setup(data, width, ex, _class, type) {
+            this._data = data;
+            this.width = width;
+            this._ex = ex;
+            this._class = _class;
+            this._type = type;
+        }
+
+        getData() {
+            return this._data;
+        }
+
+        getWidth() {
+            return this.width;
+        }
+
+        getHeight() {
+            return this._data ? this._data.GaugeHeight : 12;
+        }
+
+        getEx() {
+            return this._ex;
+        }
+
+        getClass() {
+            return this._class;
         }
     };
 

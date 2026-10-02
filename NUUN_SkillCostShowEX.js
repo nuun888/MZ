@@ -2,8 +2,6 @@
  * NUUN_SkillCostShowEX.js
  * 
  * Copyright (C) 2021 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */ 
 /*:

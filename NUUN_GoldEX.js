@@ -17,10 +17,10 @@
  * Main function
  * Can be separated by commas.
  * You can specify the maximum amount of money you have with a game variable.
- * You can change the maximum holding amount. 0: Default -1: Infinite 1 or more: Arbitrary upper limit (up to 1 quintillion)
+ * You can change the maximum holding amount. 0: Default -1: Infinite 1 or more: Arbitrary upper limit. (up to 9,007,199,254,740,991)
  * 
  * plugin command
- * With the event command, you can only increase or decrease your money up to 9999999, but with this plug-in you can increase or decrease it beyond the upper limit.
+ * With the event command, you can only increase or decrease your money up to 9999999, but with this plug-in you can increase or decrease it beyond the upper limit. (up to 9,007,199,254,740,991)
  * 
  * If a maximum gold variable is specified and its value is set to -1 or lower, the maximum gold amount specified in the plugin parameters will be applied.
  * 
@@ -38,6 +38,7 @@
  * 10/3/2026 Ver.1.3.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
  * Fixed the icon to be displayed in all windows when no icon display class is specified.
+ * Limited the maximum value to 9,007,199,254,740,991.
  * 12/10/2022 Ver.1.2.1
  * Changed the Type of icon specified plug-in parameter to icon. (Ver.1.6.0 or later)
  * 11/23/2022 Ver.1.2.0
@@ -54,12 +55,12 @@
  * first edition.
  * 
  * @param MaxGold
- * @desc Set the max amount of money you can have. 0: Default -1: No limit　1 or more: Arbitrary upper limit (up to 1 quintillion)
+ * @desc Set the max amount of money you can have. 0: Default -1: No limit  1 or more: Arbitrary upper limit.
  * @text Max amount of possession
  * @type number
  * @default -1
  * @min -1
- * @max 10000000000000000
+ * @max 9007199254740991
  * 
  * @param MaxGoldVariable
  * @type variable
@@ -101,9 +102,9 @@
  * @type number
  * @default 0
  * @text Increase/decrease amount of money in possession
- * @desc Increases or decreases possession money. Amounts above or below the event command limit are also possible. (up to 1 quintillion)
+ * @desc Increases or decreases possession money. Amounts above or below the event command limit are also possible. 
  * @min 0
- * @max 10000000000000000
+ * @max 9007199254740991
  * 
  * @arg GoldMode
  * @text Increase/decrease processing
@@ -128,12 +129,12 @@
  * 主な機能
  * カンマ区切りに出来ます。
  * 所持金の最大数をゲーム変数で指定できます。
- * 最大所持金額を変更出来ます。0:デフォルト -1:無限　1以上:任意の上限（１京まで）
+ * 最大所持金額を変更出来ます。0:デフォルト -1:無限　1以上:任意の上限（9,007,199,254,740,991まで）
  * 
  * 
  * 
  * プラグインコマンド
- * イベントコマンドでは所持金を9999999までしか増減できませんが、このプラグインでは上限を超えて増減出来ます。
+ * イベントコマンドでは所持金を9999999までしか増減できませんが、このプラグインでは上限を超えて増減出来ます。（9,007,199,254,740,991まで）
  * 
  * 最大所持金変数が設定されている場合、最大所持金変数に-1以下の数値を格納した場合は、プラグインパラメータの最大所持金額で設定した最大金額が適用されます。
  * 
@@ -151,6 +152,7 @@
  * 2026/10/3 Ver.1.3.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * アイコン表示クラスが未指定ならすべてのウィンドウに適用するように修正。
+ * 最大値を9,007,199,254,740,991 に制限。
  * 2022/12/10 Ver.1.2.1
  * アイコン指定のプラグインパラメータのTypeをiconに変更。(Ver.1.6.0以降)
  * 2022/11/23 Ver.1.2.0
@@ -167,7 +169,7 @@
  * 初版
  * 
  * @param MaxGold
- * @desc お金を所持できる最大金額を設定します。0:デフォルト -1:制限なし　1以上:任意の上限（１京まで）
+ * @desc お金を所持できる最大金額を設定します。0:デフォルト -1:制限なし　1以上:任意の上限
  * @text 最大所持金額
  * @type number
  * @default -1
@@ -179,6 +181,7 @@
  * @default 0
  * @text 最大所持金変数
  * @desc 所持金の最大金額を格納する変数。なし及び変数の値が-1以下の場合は最大所持金額での設定が適用されます。
+ * @max 9007199254740991
  * 
  * @param GoldIcon
  * @desc アイコンを表示します。0で非表示になります。
@@ -214,9 +217,9 @@
  * @type number
  * @default 0
  * @text 所持金増減金額
- * @desc 所持金を増減させます。イベントコマンドの上限を超える金額または下回る金額でも可能です。（１京まで）
+ * @desc 所持金を増減させます。イベントコマンドの上限を超える金額または下回る金額でも可能です。
  * @min 0
- * @max 10000000000000000
+ * @max 9007199254740991
  * 
  * @arg GoldMode
  * @text 増減処理
@@ -360,15 +363,15 @@ Imported.NUUN_GoldEX = true;
     Game_Party.prototype.maxGold = function() {
         if (NuunGoldEXManager.goldEXParams(2) > 0) {
             const max = $gameVariables.value(NuunGoldEXManager.goldEXParams(2));
-            if (max >= 0) return max;
+            if (max >= 0) return Math.min(max, Number.MAX_SAFE_INTEGER);
         }
         switch (NuunGoldEXManager.goldEXParams(0)) {
             case -1:
-                return Infinity;
+                return Number.MAX_SAFE_INTEGER;
             case 0:
                 return _Game_Party_maxGold.apply(this, arguments);
             default:
-                return NuunGoldEXManager.goldEXParams(0);
+                return Math.min(NuunGoldEXManager.goldEXParams(0), Number.MAX_SAFE_INTEGER);
         }
     };
 

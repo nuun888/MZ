@@ -1,9 +1,9 @@
 # [スキル習得装備](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
-# Ver.1.1.2
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_EquipSkillLearning.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
+## 概要
 スキルを習得できる装備を設定できます。  
 装備中に得たポイントが指定のポイントまで取得したときにスキルを習得できます。  
 

@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Vendor money
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * Implement vendor money.
@@ -34,6 +34,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/3/2026 Ver.1.1.1
+ * Fixed to prevent exceeding the safe integer limit (9,007,199,254,740,991).
  * 9/30/2026 Ver.1.1.0
  * Changed the plugin to work without NUUN_Base.
  * Added a feature that prevents selling items if the selling price exceeds the vendor's available funds.
@@ -101,7 +103,7 @@
  * @param InitVendorMoney
  * @type string
  * @default 0
- * @text Initial vendor money
+ * @text Initial vendor money(Javascript)
  * @desc Specifies the initial amount of money the vendor has.
  * 
  */
@@ -109,7 +111,7 @@
  * @target MZ
  * @plugindesc 店の所持金
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 店の所持金を実装します。
@@ -134,6 +136,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/3 Ver.1.1.1
+ * 安全整数上限(9,007,199,254,740,991)をお超えないように修正。
  * 2026/9/30 Ver.1.1.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * 売却価格が店の所持金を上回る場合、売却できない機能を追加。
@@ -202,7 +206,7 @@
  * @param InitVendorMoney
  * @type string
  * @default 0
- * @text 店所持金初期値
+ * @text 店所持金初期値(Javascript)
  * @desc 店の所持金の初期値を指定します。
  * 
  */
@@ -390,8 +394,9 @@ Imported.NUUN_VendorMoney = true;
                     this._vendorMoney[id] = Math.max((isNaN(money) ? eval(money) : money), 0);
                     break;
             }
+            this._vendorMoney[id] = this._vendorMoney[id].clamp(0, Number.MAX_SAFE_INTEGER);
         } catch (error) {
-
+            
         }
     };
 
@@ -410,6 +415,7 @@ Imported.NUUN_VendorMoney = true;
                     const v = $gameVariables._data;
                     const initMoney = data.InitVendorMoney;
                     this._vendorMoney[this._vendorId] = Math.max((isNaN(initMoney) ? eval(initMoney) : initMoney), 0);
+                    this._vendorMoney[this._vendorId] = this._vendorMoney[this._vendorId].clamp(0, Number.MAX_SAFE_INTEGER);
                 } catch (error) {
                     
                 }
@@ -431,7 +437,7 @@ Imported.NUUN_VendorMoney = true;
             this.initVendorMoney();
         }
         const id = (this._vendorId || 0);
-        this._vendorMoney[id] = this._vendorMoney[id] + momey;
+        this._vendorMoney[id] = Math.min(Number.MAX_SAFE_INTEGER, this._vendorMoney[id] + momey);
     };
 
     Game_System.prototype.vendorSellMoney = function(momey) {

@@ -174,14 +174,13 @@
  * @type number
  * @default -1
  * @min -1
- * @max 10000000000000000
+ * @max 9007199254740991
  * 
  * @param MaxGoldVariable
  * @type variable
  * @default 0
  * @text 最大所持金変数
  * @desc 所持金の最大金額を格納する変数。なし及び変数の値が-1以下の場合は最大所持金額での設定が適用されます。
- * @max 9007199254740991
  * 
  * @param GoldIcon
  * @desc アイコンを表示します。0で非表示になります。

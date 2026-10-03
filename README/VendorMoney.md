@@ -1,5 +1,5 @@
 # [店の所持金](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_VendorMoney.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_VendorMoney.js)  
 #### 必須、前提プラグイン
 
@@ -33,6 +33,8 @@ IDは変更したいベンダーIDを指定します。
 ベンダーの所持金を増やすには、その店の商品を買うかプラグインコマンドの「店の所持金変更」で加算または代入で増やすことが出来ます。  
 
 ## 更新履歴
+2026/10/3 Ver.1.1.1  
+安全整数上限(9,007,199,254,740,991)をお超えないように修正。  
 2026/9/30 Ver.1.1.0  
 NUUN_Baseなしで実行できるように仕様を変更。  
 売却価格が店の所持金を上回る場合、売却できない機能を追加。  

@@ -1,33 +1,282 @@
 /*:-----------------------------------------------------------------------------------
  * NUUN_CustomWindowFrame.js
- * 
- * Copyright (C) 2022 NUUN
+ * Copyright (C) 2026 NUUN
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
- * @plugindesc カスタムウィンドウフレーム
- * 
+ * @plugindesc Custom Window Frame
  * @author NUUN
  * @version 1.0.0
  * 
  * @help
- * ウィンドウスキンをウィンドウ毎に設定できます。
- * リストにないクラスは該当するクラスをテキストタブで直接記入してください。
+ * You can customize window skins and use window images that do not follow the standard RPG Maker format.
+ * Window skins and images can be specified for individual windows or scenes.
+ * 
+ * If neither the target window nor the target scene is specified, the settings will apply to all windows in all scenes.
+ * If only the target window is specified, the settings will apply to the specified window class.
+ * If only the target scene is specified, the settings will apply to all windows in the specified scene.
+ * If both are specified, the settings will apply only to the specified window class in the specified scene.
+ * Windows that do not match any of the above conditions will use the window skin specified in the database.
+ * Window skins and images applied by this plugin cannot be changed using the "Change Window Color" event command.
+ * Use the "Change Window Appearance" plugin command to change these settings.
+ * 
+ * If the desired class is not listed, enter the class name manually.
+ * Example: Window_Base
+ * 
+ * Plugin Command
+ * Change Window Appearance
+ * Specify the identifier name or list ID from the Window Settings plugin parameter in Window Settings ID.
+ * Changes will only apply to windows that match the conditions of the specified settings.
+ * To reset all settings, leave Window Settings ID blank.
+ * To reset the window color, clear the Window Color field (Delete key).
+ * 
+ * Terms of Use
+ * Credit: Optional
+ * Commercial use: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
+ * 
+ * Log
+ * 10/10/2026 Ver.1.0.0
+ * First edition.
+ * 
+ * 
+ * @command ChangeWindowAppearance
+ * @text @text Change Window Appearance
+ * @desc Changes the window skin, color tone, and frame image of the specified window.
+ * 
+ * @arg WindowSettingsId
+ * @text Window Settings ID
+ * @desc Specifies the list ID or identifier name of the window settings to change.
+ * @type string
+ * @default 
+ *  
+ * @arg WindowSkin
+ * @desc Window Skin Image
+ * @desc Specifies the window skin to change. Applies when the frame type is set to "Window Skin".
+ * @type file
+ * @dir img/system
+ * @default 
+ * 
+ * @arg WindowColor
+ * @text Window Color
+ * @desc Sets the window color tone. Applies when the frame type is set to "Window Skin".
+ * @default 
+ * @type struct<WindowTone>
+ * 
+ * @arg WindowImage
+ * @text Window Frame Image
+ * @desc Specifies the frame image to change. Applies when the frame type is set to "Image".
+ * @type file
+ * @dir img/
+ * @default
+ * 
+ * @param WindowImageSettings
+ * @text Window Settings
+ * @desc Configures the window settings.
+ * @default []
+ * @type struct<WindowSettingsList>[]
+ * 
+ */
+/*~struct~WindowSettingsList:
+ * 
+ * @param IdentifierName
+ * @text Identifier Name
+ * @desc Sets an optional identifier name.
+ * @type string
+ * @default 
+ * 
+ * @param ClassName
+ * @text Target Window
+ * @desc Specifies the window class to apply the settings to.
+ * @type combo
+ * @option 'Window_TitleCommand'
+ * @option 'Window_Options'
+ * @option 'Window_Help'
+ * @option 'Window_SavefileList'
+ * @option 'Window_MapName'
+ * @option 'Window_Message'
+ * @option 'Window_ScrollText'
+ * @option 'Window_Gold'
+ * @option 'Window_NameBox'
+ * @option 'Window_ChoiceList'
+ * @option 'Window_NumberInput'
+ * @option 'Window_EventItem'
+ * @option 'Window_MenuCommand'
+ * @option 'Window_MenuStatus'
+ * @option 'Window_ItemCategory'
+ * @option 'Window_ItemList'
+ * @option 'Window_MenuActor'
+ * @option 'Window_SkillType'
+ * @option 'Window_SkillStatus'
+ * @option 'Window_SkillList'
+ * @option 'Window_MenuActor'
+ * @option 'Window_EquipStatus'
+ * @option 'Window_EquipCommand'
+ * @option 'Window_EquipSlot'
+ * @option 'Window_EquipItem'
+ * @option 'Window_Status'
+ * @option 'Window_StatusParams'
+ * @option 'Window_StatusEquip'
+ * @option 'Window_GameEnd'
+ * @option 'Window_BattleStatus'
+ * @option 'Window_PartyCommand'
+ * @option 'Window_ActorCommand'
+ * @option 'Window_BattleSkill'
+ * @option 'Window_BattleItem'
+ * @option 'Window_BattleActor'
+ * @option 'Window_BattleEnemy'
+ * @option 'Window_ShopBuy'
+ * @option 'Window_ShopSell'
+ * @default
+ * 
+ * @param ClassSceneName
+ * @text Target Scene
+ * @desc Specifies the scene class to apply the settings to.
+ * @type combo
+ * @option Scene_Title
+ * @option Scene_Map
+ * @option Scene_Battle
+ * @option Scene_Menu
+ * @option Scene_Item
+ * @option Scene_Skill
+ * @option Scene_Equip
+ * @option Scene_Status
+ * @option Scene_Save
+ * @option Scene_Load
+ * @option Scene_Shop
+ * @option Scene_Options
+ * @option Scene_Name
+ * @option Scene_Gameover
+ * @option Scene_SkillTree
+ * @option Scene_AchievementSystem
+ * @option Scene_EnemyBook
+ * @option Scene_ItemBook
+ * @option Scene_Formation
+ * @option Scene_Result
+ * @default
+ * 
+ * @param WindowImageMode
+ * @text Window Frame Type
+ * @desc Specifies how the window frame is displayed.
+ * @type select
+ * @option Window Skin
+ * @value skin
+ * @option Image
+ * @value image
+ * @default skin
+ * 
+ * @param WindowSkinSetting
+ * @text Window Skin Settings
+ * @default ------------------------------
+ * 
+ * @param WindowSkin
+ * @desc Specifies the window skin.
+ * @text Window Skin Image
+ * @type file
+ * @dir img/system
+ * @default 
+ * @parent WindowSkinSetting
+ * 
+ * @param WindowColor
+ * @text Window Color
+ * @desc Sets the window color tone.
+ * @default {"red":"0","green":"0","bule":"0"}
+ * @type struct<WindowTone>
+ * @parent WindowSkinSetting
+ * 
+ * @param ImageSetting
+ * @text Window Image Settings
+ * @default ------------------------------
+ * 
+ * @param WindowImage
+ * @text Window Frame Image
+ * @desc Specifies the image to display as the window frame.
+ * @type file
+ * @dir img/
+ * @default
+ * @parent ImageSetting
+ * 
+ * @param WindowImageType
+ * @text Frame Image Slicing Method
+ * @desc Specifies how the window frame image is sliced and scaled.
+ * @type select
+ * @option Single Image
+ * @value default
+ * @option 3-Slice Image
+ * @value 3slice
+ * @option 9-Slice Image
+ * @value 9slice
+ * @default default
+ * @parent ImageSetting
+ * 
+ */
+/*~struct~WindowTone:
+ * 
+ * @param red
+ * @desc Red
+ * @text Red
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ *
+ * @param green
+ * @text Green
+ * @desc Green
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ *
+ * @param bule
+ * @text Blue
+ * @desc Blue
+ * @type number
+ * @default 0
+ * @max 255
+ * @min -255
+ * 
+ */
+/*:ja
+ * @target MZ
+ * @plugindesc カスタムウィンドウフレーム
+ * @author NUUN
+ * @version 1.0.0
+ * 
+ * @help
+ * ウィンドウのスキンやツクール規格以外のウィンドウ画像を設定できます。
+ * ウィンドウスキンやウィンドウ画像はウィンドウ毎またはシーン毎に指定できます。
+ * 
+ * 適用ウィンドウ設定と適用シーン設定がどちらも未指定の場合、すべてのシーンのすべてのウィンドウに適用されます。
+ * 適用ウィンドウ設定のみ指定した場合、指定したウィンドウクラスに適用されます。
+ * 適用シーン設定のみ指定した場合、指定したシーン内のすべてのウィンドウに適用されます。
+ * 両方を指定した場合、指定したシーン内の指定したウィンドウクラスにのみ適用されます。
+ * 上記の何れかの条件に当てはまらない場合はデータベースのウィンドウスキンが表示されます。
+ * このプラグインで適用したウィンドウスキン及びウィンドウ画像はイベントコマンドのウィンドウカラーの変更での変更は行えません。
+ * プラグインコマンドのウィンドウ、ウィンドウカラーの変更で変更を行ってください。
+ * 
+ * リストにないクラスは該当するクラスを直接記入してください。
  * 例:Window_Base
  * 
- * ウィンドウ設定で、適用ウィンドウ設定及び、適用シーン設定が指定されていない場合はすべてのシーンのウィンドウで適用されます。
- * 適用ウィンドウ設定が指定されている場合は、指定のウィンドウクラスにのみ適用されます。
- * 適用シーン設定が指定されている場合は、指定のシーンにのみ適用されます。
- * データベースのウィンドウスキンを表示したい場合は
- * 
- * 
+ * プラグインコマンド
+ * ウィンドウ、ウィンドウカラーの変更
+ * ウィンドウ設定IDにプラグインパラメータのウィンドウ設定の識別名またはリストIDを指定してください。
+ * 変更対象は指定した設定の条件に一致したウィンドウのみ適用されます。
+ * 初期化を行う場合はウィンドウ設定IDを空白にしてください。
+ * ウィンドウカラーの初期化を行う場合はウィンドウカラーを空白(Deleteキー)にしてください。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * ※https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
- * 2022/6/15 Ver.1.0.0
+ * 2026/10/10 Ver.1.0.0
  * 初版
  * 
  * 
@@ -61,10 +310,6 @@
  * @dir img/
  * @default
  * 
- * @command ShowAchievementWindow
- * @desc 実績ウィンドウを表示します。
- * @text 実績ウィンドウ表示
- * 
  * @param WindowImageSettings
  * @text ウィンドウ設定
  * @desc ウィンドウの設定をします。
@@ -72,7 +317,7 @@
  * @type struct<WindowSettingsList>[]
  * 
  */
-/*~struct~WindowSettingsList:
+/*~struct~WindowSettingsList:ja
  * 
  * @param IdentifierName
  * @text 識別名
@@ -82,7 +327,7 @@
  * 
  * @param ClassName
  * @text 適用ウィンドウ設定
- * @desc 適用するウィンドウクラス(識別名)を指定します。
+ * @desc 適用するウィンドウクラスを指定します。
  * @type combo
  * @option 'Window_TitleCommand'
  * @option 'Window_Options'
@@ -205,7 +450,7 @@
  * @parent ImageSetting
  * 
  */
-/*~struct~WindowTone:
+/*~struct~WindowTone:ja
  * 
  * @param red
  * @desc 赤
@@ -335,7 +580,7 @@ Imported.NUUN_CustomWindowFrame = true;
         customWindowFrame.WindowSkin = String(args.WindowSkin);
         customWindowFrame.WindowImage = String(args.WindowImage);
         const windowColor = NuunCustomWindowFrameManager.structureData(args.WindowColor);
-        customWindowFrame.WindowColor = !!windowColor ? windowColor : null;console.log(windowColor)
+        customWindowFrame.WindowColor = !!windowColor ? windowColor : null;
         if (!!customWindowFrame.WindowSkin) {
             ImageManager.loadSystem(customWindowFrame.WindowSkin);
         }
@@ -405,16 +650,7 @@ Imported.NUUN_CustomWindowFrame = true;
         }
     };
 
-    for (const data of NuunCustomWindowFrameManager.windowCustomWindowFrameParams(0)) {
-        if (!data) continue;
-        if (data.WindowImageMode === "skin") {
-            ImageManager.loadSystem(data.WindowSkin);
-        } else {
-            NuunCustomWindowFrameManager.LoadPictures(data.WindowImage);
-        }
-    }
-
-
+    
     const _Game_System_initialize = Game_System.prototype.initialize;
     Game_System.prototype.initialize = function() {
         _Game_System_initialize.apply(this, arguments);
@@ -438,8 +674,19 @@ Imported.NUUN_CustomWindowFrame = true;
     Scene_Base.prototype.initialize = function() {
         _Scene_Base_initialize.apply(this, arguments);
         NuunCustomWindowFrameManager.scene = String(this.constructor.name);
+        this.nuun_loadWindowImage();
     };
 
+    Scene_Base.prototype.nuun_loadWindowImage = function() {
+        for (const data of NuunCustomWindowFrameManager.windowCustomWindowFrameParams(0)) {
+            if (!data) continue;
+            if (data.WindowImageMode === "skin") {
+                ImageManager.loadSystem(data.WindowSkin);
+            } else {
+                NuunCustomWindowFrameManager.LoadPictures(data.WindowImage);
+            }
+        }
+    };
 
     const _Window_createFrameSprite = Window.prototype._createFrameSprite;
     Window.prototype._createFrameSprite = function() {
@@ -482,8 +729,9 @@ Imported.NUUN_CustomWindowFrame = true;
         const data = NuunCustomWindowFrameManager.windowCustomWindowFrameParams(0)[index];
         if (!data) return;
         this._skinData = data;
-        const customWindowFrame = $gameSystem.getCustomWindowFrame();
-        if (!!customWindowFrame && (data.IdentifierName ? $gameSystem.getCustomWindowFrame(data.IdentifierName) : $gameSystem.getCustomWindowFrame(String(index + 1)))) {
+        const method = data.IdentifierName ? data.IdentifierName : String(index + 1);
+        const customWindowFrame = $gameSystem.getCustomWindowFrame(method);
+        if (!!customWindowFrame) {
             this.customWindowFrame = customWindowFrame;
         }
         this.loadWindowImage();

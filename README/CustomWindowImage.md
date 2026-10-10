@@ -1,6 +1,6 @@
-# [カスタムウィンドウフレーム](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CustomWindowFrame.js)
+# [カスタムウィンドウフレーム](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CustomWindowImage.js)
 # Ver.1.0.0
-[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CustomWindowFrame.js)  
+[ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_CustomWindowImage.js)  
 
 ## 概要
 ウィンドウのスキンやツクール規格以外のウィンドウ画像を設定できます。  

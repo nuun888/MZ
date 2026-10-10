@@ -1,11 +1,11 @@
 /*:-----------------------------------------------------------------------------------
- * NUUN_CustomWindowFrame.js
+ * NUUN_CustomWindowImage.js
  * Copyright (C) 2026 NUUN
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
- * @plugindesc Custom Window Frame
+ * @plugindesc Custom Window Image
  * @author NUUN
  * @version 1.0.0
  * 
@@ -92,44 +92,44 @@
  * @text Target Window
  * @desc Specifies the window class to apply the settings to.
  * @type combo
- * @option 'Window_TitleCommand'
- * @option 'Window_Options'
- * @option 'Window_Help'
- * @option 'Window_SavefileList'
- * @option 'Window_MapName'
- * @option 'Window_Message'
- * @option 'Window_ScrollText'
- * @option 'Window_Gold'
- * @option 'Window_NameBox'
- * @option 'Window_ChoiceList'
- * @option 'Window_NumberInput'
- * @option 'Window_EventItem'
- * @option 'Window_MenuCommand'
- * @option 'Window_MenuStatus'
- * @option 'Window_ItemCategory'
- * @option 'Window_ItemList'
- * @option 'Window_MenuActor'
- * @option 'Window_SkillType'
- * @option 'Window_SkillStatus'
- * @option 'Window_SkillList'
- * @option 'Window_MenuActor'
- * @option 'Window_EquipStatus'
- * @option 'Window_EquipCommand'
- * @option 'Window_EquipSlot'
- * @option 'Window_EquipItem'
- * @option 'Window_Status'
- * @option 'Window_StatusParams'
- * @option 'Window_StatusEquip'
- * @option 'Window_GameEnd'
- * @option 'Window_BattleStatus'
- * @option 'Window_PartyCommand'
- * @option 'Window_ActorCommand'
- * @option 'Window_BattleSkill'
- * @option 'Window_BattleItem'
- * @option 'Window_BattleActor'
- * @option 'Window_BattleEnemy'
- * @option 'Window_ShopBuy'
- * @option 'Window_ShopSell'
+ * @option Window_TitleCommand
+ * @option Window_Options
+ * @option Window_Help
+ * @option Window_SavefileList
+ * @option Window_MapName
+ * @option Window_Message
+ * @option Window_ScrollText
+ * @option Window_Gold
+ * @option Window_NameBox
+ * @option Window_ChoiceList
+ * @option Window_NumberInput
+ * @option Window_EventItem
+ * @option Window_MenuCommand
+ * @option Window_MenuStatus
+ * @option Window_ItemCategory
+ * @option Window_ItemList
+ * @option Window_MenuActor
+ * @option Window_SkillType
+ * @option Window_SkillStatus
+ * @option Window_SkillList
+ * @option Window_MenuActor
+ * @option Window_EquipStatus
+ * @option Window_EquipCommand
+ * @option Window_EquipSlot
+ * @option Window_EquipItem
+ * @option Window_Status
+ * @option Window_StatusParams
+ * @option Window_StatusEquip
+ * @option Window_GameEnd
+ * @option Window_BattleStatus
+ * @option Window_PartyCommand
+ * @option Window_ActorCommand
+ * @option Window_BattleSkill
+ * @option Window_BattleItem
+ * @option Window_BattleActor
+ * @option Window_BattleEnemy
+ * @option Window_ShopBuy
+ * @option Window_ShopSell
  * @default
  * 
  * @param ClassSceneName
@@ -242,7 +242,7 @@
  */
 /*:ja
  * @target MZ
- * @plugindesc カスタムウィンドウフレーム
+ * @plugindesc カスタムウィンドウ画像
  * @author NUUN
  * @version 1.0.0
  * 
@@ -329,44 +329,44 @@
  * @text 適用ウィンドウ設定
  * @desc 適用するウィンドウクラスを指定します。
  * @type combo
- * @option 'Window_TitleCommand'
- * @option 'Window_Options'
- * @option 'Window_Help'
- * @option 'Window_SavefileList'
- * @option 'Window_MapName'
- * @option 'Window_Message'
- * @option 'Window_ScrollText'
- * @option 'Window_Gold'
- * @option 'Window_NameBox'
- * @option 'Window_ChoiceList'
- * @option 'Window_NumberInput'
- * @option 'Window_EventItem'
- * @option 'Window_MenuCommand'
- * @option 'Window_MenuStatus'
- * @option 'Window_ItemCategory'
- * @option 'Window_ItemList'
- * @option 'Window_MenuActor'
- * @option 'Window_SkillType'
- * @option 'Window_SkillStatus'
- * @option 'Window_SkillList'
- * @option 'Window_MenuActor'
- * @option 'Window_EquipStatus'
- * @option 'Window_EquipCommand'
- * @option 'Window_EquipSlot'
- * @option 'Window_EquipItem'
- * @option 'Window_Status'
- * @option 'Window_StatusParams'
- * @option 'Window_StatusEquip'
- * @option 'Window_GameEnd'
- * @option 'Window_BattleStatus'
- * @option 'Window_PartyCommand'
- * @option 'Window_ActorCommand'
- * @option 'Window_BattleSkill'
- * @option 'Window_BattleItem'
- * @option 'Window_BattleActor'
- * @option 'Window_BattleEnemy'
- * @option 'Window_ShopBuy'
- * @option 'Window_ShopSell'
+ * @option Window_TitleCommand
+ * @option Window_Options
+ * @option Window_Help
+ * @option Window_SavefileList
+ * @option Window_MapName
+ * @option Window_Message
+ * @option Window_ScrollText
+ * @option Window_Gold
+ * @option Window_NameBox
+ * @option Window_ChoiceList
+ * @option Window_NumberInput
+ * @option Window_EventItem
+ * @option Window_MenuCommand
+ * @option Window_MenuStatus
+ * @option Window_ItemCategory
+ * @option Window_ItemList
+ * @option Window_MenuActor
+ * @option Window_SkillType
+ * @option Window_SkillStatus
+ * @option Window_SkillList
+ * @option Window_MenuActor
+ * @option Window_EquipStatus
+ * @option Window_EquipCommand
+ * @option Window_EquipSlot
+ * @option Window_EquipItem
+ * @option Window_Status
+ * @option Window_StatusParams
+ * @option Window_StatusEquip
+ * @option Window_GameEnd
+ * @option Window_BattleStatus
+ * @option Window_PartyCommand
+ * @option Window_ActorCommand
+ * @option Window_BattleSkill
+ * @option Window_BattleItem
+ * @option Window_BattleActor
+ * @option Window_BattleEnemy
+ * @option Window_ShopBuy
+ * @option Window_ShopSell
  * @default
  * 
  * @param ClassSceneName
@@ -479,10 +479,10 @@
  */
 
 var Imported = Imported || {};
-Imported.NUUN_CustomWindowFrame = true;
+Imported.NUUN_CustomWindowImage = true;
 
 (() => {
-    class Nuun_PluginParams_CustomWindowFrame {
+    class Nuun_PluginParams_CustomWindowImage {
         static getPluginParams(text) {//document.currentScript
             try {
                 const name = String(Utils.extractFileName(text.src).split('.').shift());
@@ -500,7 +500,7 @@ Imported.NUUN_CustomWindowFrame = true;
         }
     };
 
-    window.Nuun_PluginParams_CustomWindowFrame = Nuun_PluginParams_CustomWindowFrame;
+    window.Nuun_PluginParams_CustomWindowImage = Nuun_PluginParams_CustomWindowImage;
 
     class Nuun_PluginParamData {
         constructor(text) {
@@ -568,48 +568,48 @@ Imported.NUUN_CustomWindowFrame = true;
         }
     };
 
-    const params = Nuun_PluginParams_CustomWindowFrame.getPluginParams(document.currentScript);
+    const params = Nuun_PluginParams_CustomWindowImage.getPluginParams(document.currentScript);
     const pluginName = params.pluginName;
 
     PluginManager.registerCommand(pluginName, 'ChangeWindowAppearance', args => {
-        if (!String(args.WindowSettingsId)) {
-            $gameSystem.customWindowFrame = {};
+        if (!args.WindowSettingsId) {
+            $gameSystem.customWindowImage = {};
             return;
         }
-        const customWindowFrame = {};
-        customWindowFrame.WindowSkin = String(args.WindowSkin);
-        customWindowFrame.WindowImage = String(args.WindowImage);
-        const windowColor = NuunCustomWindowFrameManager.structureData(args.WindowColor);
-        customWindowFrame.WindowColor = !!windowColor ? windowColor : null;
-        if (!!customWindowFrame.WindowSkin) {
-            ImageManager.loadSystem(customWindowFrame.WindowSkin);
+        const customWindowImage = {};
+        customWindowImage.WindowSkin = String(args.WindowSkin);
+        customWindowImage.WindowImage = String(args.WindowImage);
+        const windowColor = NuunCustomWindowImageManager.structureData(args.WindowColor);
+        customWindowImage.WindowColor = !!windowColor ? windowColor : null;
+        if (!!customWindowImage.WindowSkin) {
+            ImageManager.loadSystem(customWindowImage.WindowSkin);
         }
-        if (!!customWindowFrame.WindowImage) {
-            NuunCustomWindowFrameManager.LoadPictures(customWindowFrame.WindowImage);
+        if (!!customWindowImage.WindowImage) {
+            NuunCustomWindowImageManager.LoadPictures(customWindowImage.WindowImage);
         }
-        $gameSystem.setCustomWindowFrame(String(args.WindowSettingsId), customWindowFrame);
+        $gameSystem.setCustomWindowImage(String(args.WindowSettingsId), customWindowImage);
     });
 
 
-    function NuunCustomWindowFrameManager() {
+    function NuunCustomWindowImageManager() {
         throw new Error("This is a static class");
     }
 
-    window.NuunCustomWindowFrameManager = NuunCustomWindowFrameManager;
+    window.NuunCustomWindowImageManager = NuunCustomWindowImageManager;
 
-    NuunCustomWindowFrameManager.scene = null;
+    NuunCustomWindowImageManager.scene = null;
 
-    NuunCustomWindowFrameManager.structureData = function(params){
+    NuunCustomWindowImageManager.structureData = function(params){
         return JSON.parse(JSON.stringify(params, function(key, value) {
             try {
                 return JSON.parse(value);
             } catch (e) {
-                return NuunCustomWindowFrameManager.getEvalCode(value);
+                return NuunCustomWindowImageManager.getEvalCode(value);
             }
         }));
     };
 
-    NuunCustomWindowFrameManager.getEvalCode = function(code) {
+    NuunCustomWindowImageManager.getEvalCode = function(code) {
         if (isNaN(code)) {
             if (!code) {
                 return null;
@@ -620,7 +620,7 @@ Imported.NUUN_CustomWindowFrame = true;
         }
     };
 
-    NuunCustomWindowFrameManager.stringCode = function(code){
+    NuunCustomWindowImageManager.stringCode = function(code){
         try {
             if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
                 return eval(code);//'または"を外す。
@@ -631,20 +631,20 @@ Imported.NUUN_CustomWindowFrame = true;
         }
     };
 
-    NuunCustomWindowFrameManager.LoadPictures = function(filename) {
+    NuunCustomWindowImageManager.LoadPictures = function(filename) {
         return ImageManager.loadBitmap("img/", filename);
     };
 
-    NuunCustomWindowFrameManager.windowCustomWindowFrameParams = function(code) {
+    NuunCustomWindowImageManager.windowCustomWindowImageParams = function(code) {
         switch (code) {
             case 0:
                 return params.WindowImageSettings || [];
         }
     };
 
-    NuunCustomWindowFrameManager.getWindowImageSettingsId = function(id) {
+    NuunCustomWindowImageManager.getWindowImageSettingsId = function(id) {
         if (isNaN(id)) {
-            return this.windowCustomWindowFrameParams(0).findIndex(data => data.IdentifierName === id);
+            return this.windowCustomWindowImageParams(0).findIndex(data => data.IdentifierName === id);
         } else {
             return Number(id) - 1;
         }
@@ -654,36 +654,36 @@ Imported.NUUN_CustomWindowFrame = true;
     const _Game_System_initialize = Game_System.prototype.initialize;
     Game_System.prototype.initialize = function() {
         _Game_System_initialize.apply(this, arguments);
-        this.customWindowFrame = {};
+        this.customWindowImage = {};
     };
 
-    Game_System.prototype.setCustomWindowFrame = function(method, data) {
-        if (!this.customWindowFrame) {
-            this.customWindowFrame = {};
+    Game_System.prototype.setCustomWindowImage = function(method, data) {
+        if (!this.customWindowImage) {
+            this.customWindowImage = {};
         }
-        this.customWindowFrame[method] = data;
+        this.customWindowImage[method] = data;
     };
 
-    Game_System.prototype.getCustomWindowFrame = function(method) {
-        if (!this.customWindowFrame) return null;
-        return this.customWindowFrame[method];
+    Game_System.prototype.getCustomWindowImage = function(method) {
+        if (!this.customWindowImage) return null;
+        return this.customWindowImage[method];
     };
 
 
     const _Scene_Base_initialize = Scene_Base.prototype.initialize;
     Scene_Base.prototype.initialize = function() {
         _Scene_Base_initialize.apply(this, arguments);
-        NuunCustomWindowFrameManager.scene = String(this.constructor.name);
+        NuunCustomWindowImageManager.scene = String(this.constructor.name);
         this.nuun_loadWindowImage();
     };
 
     Scene_Base.prototype.nuun_loadWindowImage = function() {
-        for (const data of NuunCustomWindowFrameManager.windowCustomWindowFrameParams(0)) {
+        for (const data of NuunCustomWindowImageManager.windowCustomWindowImageParams(0)) {
             if (!data) continue;
             if (data.WindowImageMode === "skin") {
-                ImageManager.loadSystem(data.WindowSkin);
+                if (!!data.WindowSkin) ImageManager.loadSystem(data.WindowSkin);
             } else {
-                NuunCustomWindowFrameManager.LoadPictures(data.WindowImage);
+                if (!!data.WindowImage) NuunCustomWindowImageManager.LoadPictures(data.WindowImage);
             }
         }
     };
@@ -715,7 +715,7 @@ Imported.NUUN_CustomWindowFrame = true;
 
     const _Window_Base_initialize = Window_Base.prototype.initialize;
     Window_Base.prototype.initialize = function(rect) {
-        this.customWindowFrame = null;
+        this.customWindowImage = null;
         this.nuun_SetupWindowSkin();
         _Window_Base_initialize.apply(this, arguments);
     };
@@ -723,16 +723,16 @@ Imported.NUUN_CustomWindowFrame = true;
     Window_Base.prototype.nuun_SetupWindowSkin = function() {
         this._skinData = null;
         const className = String(this.constructor.name);
-        const index = NuunCustomWindowFrameManager.windowCustomWindowFrameParams(0).findIndex(data => {
-            return !!data && (!data.ClassName || className === data.ClassName) && (!data.ClassSceneName || NuunCustomWindowFrameManager.scene === data.ClassSceneName);
+        const index = NuunCustomWindowImageManager.windowCustomWindowImageParams(0).findIndex(data => {
+            return !!data && (!data.ClassName || className === data.ClassName) && (!data.ClassSceneName || NuunCustomWindowImageManager.scene === data.ClassSceneName);
         });
-        const data = NuunCustomWindowFrameManager.windowCustomWindowFrameParams(0)[index];
+        const data = NuunCustomWindowImageManager.windowCustomWindowImageParams(0)[index];
         if (!data) return;
         this._skinData = data;
         const method = data.IdentifierName ? data.IdentifierName : String(index + 1);
-        const customWindowFrame = $gameSystem.getCustomWindowFrame(method);
-        if (!!customWindowFrame) {
-            this.customWindowFrame = customWindowFrame;
+        const customWindowImage = !!$gameSystem ? $gameSystem.getCustomWindowImage(method) : null;
+        if (!!customWindowImage) {
+            this.customWindowImage = customWindowImage;
         }
         this.loadWindowImage();
     };
@@ -741,24 +741,26 @@ Imported.NUUN_CustomWindowFrame = true;
     Window_Base.prototype.loadWindowskin = function() {
         _Window_Base_loadWindowskin.apply(this, arguments);
         if (!!this._skinData) {
-            if (this._skinData.WindowImageMode === "skin" && !!this._skinData.WindowSkin) {
-                const windowSkin = this.customWindowFrame && !!this.customWindowFrame.WindowSkin ? this.customWindowFrame.WindowSkin : this._skinData.WindowSkin;
-                this.windowskin = ImageManager.loadSystem(windowSkin);
+            if (this._skinData.WindowImageMode === "skin") {
+                const windowSkin = this.customWindowImage && !!this.customWindowImage.WindowSkin ? this.customWindowImage.WindowSkin : this._skinData.WindowSkin;
+                if (!!windowSkin) {
+                    this.windowskin = ImageManager.loadSystem(windowSkin);
+                }
             }
-        } 
+        }
     };
 
     Window_Base.prototype.loadWindowImage = function() {
         if (!!this._skinData && this._skinData.WindowImageMode === "image") {
-            const windowImage = this.customWindowFrame && !!this.customWindowFrame.WindowImage ? this.customWindowFrame.WindowImage : this._skinData.WindowImage;
-            this.windowImage = NuunCustomWindowFrameManager.LoadPictures(windowImage);
+            const windowImage = this.customWindowImage && !!this.customWindowImage.WindowImage ? this.customWindowImage.WindowImage : this._skinData.WindowImage;
+            this.windowImage = NuunCustomWindowImageManager.LoadPictures(windowImage);
         }
     };
     
     const _Window_Base_updateTone = Window_Base.prototype.updateTone;
     Window_Base.prototype.updateTone = function() {
         if (!!this._skinData && this._skinData.WindowColor) {
-            const windowColor = this.customWindowFrame && !!this.customWindowFrame.WindowColor ? this.customWindowFrame.WindowColor : this._skinData.WindowColor;
+            const windowColor = this.customWindowImage && !!this.customWindowImage.WindowColor ? this.customWindowImage.WindowColor : this._skinData.WindowColor;
             const tone = windowColor;
             this.setTone(tone.red, tone.green, tone.bule);
         } else {

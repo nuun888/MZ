@@ -15,6 +15,8 @@
 [アップフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md)  
 [スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md)  
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
+#### 戦利品の撃破時ドロップポップアップ
+[撃破時ドロップポップアップ](https://github.com/nuun888/MZ/blob/master/README/DefeatDropPopup.md)  
 
 ## 概要
 ポップアップを拡張します。  
@@ -80,9 +82,6 @@
 #### スキルラーニングでスキル習得時のポップアップ
 スキルラーニングでスキル習得時に習得した対象にポップアップを表示させます。なおNUUN_PopupEx、NUUN_SkillLearning(Ver.1.1.3以降)が必要になります。  
 [スキルラーニングポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearningPopUp.js)  
-
-#### 戦利品の撃破時ドロップポップアップ
-[撃破時ドロップポップアップ](https://github.com/nuun888/MZ/blob/master/README/DefeatDropPopup.md)  
 
 ## 更新履歴
 2026/10/15 Ver.1.2.0  

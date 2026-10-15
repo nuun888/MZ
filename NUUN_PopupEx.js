@@ -8,9 +8,7 @@
  * @target MZ
  * @plugindesc Popup
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * Expands popups.
@@ -74,12 +72,15 @@
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/15/2026 Ver.1.2.0
+ * Changed the specifications to allow the plugin to run without NUUN_Base.
+ * Fixed an issue where fonts were not applied correctly.
+ * Fixed an issue where the plugin parameters for the reflection popup settings were incorrect.
  * 9/30/2025 Ver.1.1.0
  * "Defeat Drop Pop-up" feature added.
  * 3/29/2025 Ver.1.0.1
@@ -139,7 +140,7 @@
  * @desc Set the failure popup.
  * @default {"PopUpText":"%1","RemovePopUpText":"%1","PopupColor":"0","PopupIconIndex":"0","PopupFontSize":"4","PopupFontFace":"","PopUpImges":"","PopupMode":"'Default'"}
  * @type struct<PopUpData>
- * @parent Ptting
+ * @parent PopUpSetting
  * 
  * @param PopUpResistance
  * @text Resistance popup settings
@@ -169,7 +170,7 @@
  * @type struct<PopUpData>
  * @parent PopUpSetting
  * 
- * @param PopUpRefleopUpSection
+ * @param PopUpReflection
  * @text Reflection popup settings
  * @desc Set the reflection popup.
  * @default {"PopUpText":"%1","RemovePopUpText":"%1","PopupColor":"0","PopupIconIndex":"0","PopupFontSize":"4","PopupFontFace":"","PopUpImges":"","PopupMode":"'Default'"}
@@ -511,9 +512,7 @@
  * @target MZ
  * @plugindesc ポップアップ拡張
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.1.0
+ * @version 1.2.0
  * 
  * @help
  * ポップアップを拡張します。
@@ -573,12 +572,14 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/15 Ver.1.2.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * フォントが適用できない問題を修正。
  * 2025/9/30 Ver.1.1.0
  * 撃破時ドロップポップアップに対応。
  * 2025/3/29 Ver.1.0.1
@@ -1011,7 +1012,165 @@ var Imported = Imported || {};
 Imported.NUUN_PopupEx = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_PopupEx {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_PopupEx = Nuun_PluginParams_PopupEx;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+        
+    };
+
+    const params = Nuun_PluginParams_PopupEx.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunPopupExManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunPopupExManager = NuunPopupExManager;
+
+    NuunPopupExManager.getMetaCode = function(object, method) {
+        const meta = object.meta[method];
+        if (!meta) return null;
+        if (meta === true) {
+            return null;
+        }
+        if (meta.indexOf('[') >= 0) {
+            const log = ($gameSystem.isJapanese() ? "パラメータに[]が含まれています。[]を外して記入して下さい。" : "The parameter contains []. Please remove the [] and enter it.");
+            throw ["ParameterError", log];
+        }
+        return meta;
+    };
+
+    NuunPopupExManager.getColorCode = function(color) {
+        if (typeof(color) === "string" && color.indexOf('#') === 0) {
+            return color;
+        }
+        return ColorManager.textColor(color);
+    };
+
+    NuunPopupExManager.popupExParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.PopUpMode || 'Same';
+            case 1:
+                return params.PopUpUpInterval || 0;
+            case 2:
+                return params.PopUpReleaseOpacity || 0
+            case 3:
+                return params.PopUpCritical;
+            case 4:
+                return params.PopUpAvoid;
+            case 5:
+                return params.PopUpMiss;
+            case 6:
+                return params.PopUpResistance;
+            case 7:
+                return params.PopUpWeakness;
+            case 8:
+                return params.PopUpInvalid;
+            case 9:
+                return params.PopUpCounter;
+            case 10:
+                return params.PopUpReflection;
+            case 11:
+                return params.PopUpDefeat;
+            case 12:
+                return params.PopUpSubstitute;
+            case 13:
+                return params.PopUpAdvantageousState || [];
+            case 14:
+                return params.PopUpBadState || [];
+            case 15:
+                return params.DefaultStatePopup || 'Default';
+            case 16:
+                return params.BuffPopUp || [];
+            case 17:
+                return params.DebuffPopUp || [];
+            case 18:
+                return params.DefaultBuffPopup || 'Default';
+        }
+    };
+
+    NuunPopupExManager.isDefaultPopupMode = function() {
+        return this.popupExParams(0) === 'default';
+    };
 
     class PopupData {
         constructor(state) {
@@ -1080,13 +1239,13 @@ Imported.NUUN_PopupEx = true;
         }
 
         setupBuffs(battler, status) {
-            this.setup(status);
             this._buffLevel = battler.buff(status);
+            this.setup(status);
         }
 
         setupRemovedBuffs(battler, status) {
-            this.setup(status);
             this._buffLevel = battler.result().buffLevel[status];
+            this.setup(status);
         }
 
         setupSteal(battler, status) {
@@ -1106,7 +1265,7 @@ Imported.NUUN_PopupEx = true;
         }
 
         setupBuff(status) {
-            const data = params.BuffPopUp.find(buff => buff.StateType === status);
+            const data = NuunPopupExManager.popupExParams(16).find(buff => buff.StateType === status);
             this._data = data ? data.PopUpData : _noneBuffPopupData();
             if (this._data) {
                 this._name = this.getPopupBuffText(status);
@@ -1114,7 +1273,7 @@ Imported.NUUN_PopupEx = true;
         }
         
         setupDebuff(status) {
-            const data = params.DebuffPopUp.find(buff => buff.StateType === status);
+            const data = NuunPopupExManager.popupExParams(17).find(buff => buff.StateType === status);
             this._data = data ? data.PopUpData : _noneBuffPopupData();
             if (this._data) {
                 this._name = this.getPopupBuffText(status);
@@ -1122,7 +1281,7 @@ Imported.NUUN_PopupEx = true;
         }
 
         removedBuff(status) {
-            const data = params.BuffPopUp.find(buff => buff.StateType === status);
+            const data = NuunPopupExManager.popupExParams(16).find(buff => buff.StateType === status);
             this._data = data ? data.PopUpData : _noneBuffPopupData();
             if (this._data) {
                 this._name = this.getPopupBuffText(status);
@@ -1130,7 +1289,7 @@ Imported.NUUN_PopupEx = true;
         }
 
         removedDeDebuff(status) {
-            const data = params.DebuffPopUp.find(buff => buff.StateType === status);
+            const data = NuunPopupExManager.popupExParams(17).find(buff => buff.StateType === status);
             this._data = data ? data.PopUpData : _noneBuffPopupData();
             if (this._data) {
                 this._name = this.getPopupBuffText(status);
@@ -1145,56 +1304,56 @@ Imported.NUUN_PopupEx = true;
         }
 
         setupGetSteal(status) {
-            this._data = NuunManager.getStealPopupParams();
+            this._data = NuunManager.getStealPopupParams();//盗みスキル更新までこのまま
             if (this._data) {
                 this._name = this.getPopupStealText(status);
             }
         }
 
         setupStolen(status) {
-            this._data = NuunManager.getStealPopupParams();
+            this._data = NuunManager.getStealPopupParams();//盗みスキル更新までこのまま
             if (this._data) {
                 this._name = this.getPopupStolenText(status);
             }
         }
 
         setupStealGold(status) {
-            this._data = NuunManager.getStealGoldPopupParams();
+            this._data = NuunManager.getStealGoldPopupParams();//盗みスキル更新までこのまま
             if (this._data) {
                 this._name = this.getPopupStealGoldText(status);
             }
         }
 
         setupStolenGold(status) {
-            this._data = NuunManager.getStealGoldPopupParams();
+            this._data = NuunManager.getStealGoldPopupParams();//盗みスキル更新までこのまま
             if (this._data) {
                 this._name = this.getPopupStolenGoldText(status);
             }
         }
 
         setupLearn(status) {
-            this._data = NuunManager.getSkillLearningPopupParams();
+            this._data = NuunManager.getSkillLearningPopupParams();//アップデート待ち
             if (this._data) {
                 this._name = this.getPopupSkillLearningText(status);
             }
         }
 
         setupRewardsExp(status) {
-            this._data = NuunManager.getRewardExpPopupParams();
+            this._data = NuunPopupExManager.defeatDropPopupParams(2);
             if (this._data) {
                 this._name = this.getRewardGoldText(status);
             }
         }
 
         setupRewardsGold(status) {
-            this._data = NuunManager.getRewardGoldPopupParams();
+            this._data = NuunPopupExManager.defeatDropPopupParams(1);
             if (this._data) {
                 this._name = this.getRewardGoldText(status);
             }
         }
 
         setupRewardsItem(status) {
-            this._data = NuunManager.getRewardPopupParams();
+            this._data = NuunPopupExManager.defeatDropPopupParams(1);
             if (this._data) {
                 this._name = this.getRewardItemText(status);
             }
@@ -1206,7 +1365,8 @@ Imported.NUUN_PopupEx = true;
 
         getPopupStateText(status) {
             if (status.meta.PopUpStateName) {
-                return status.meta.PopUpStateName.format(status.name);
+                const text = NuunPopupExManager.getMetaCode(status, "PopUpStateName");
+                return text.format(status.name);
             } else if (this._state === "removedState" && this._data.RemovePopUpText) {
                 return this._data.RemovePopUpText.format(status.name);
             } else if (this._state === "addState" && this._data.PopUpText) {
@@ -1218,10 +1378,10 @@ Imported.NUUN_PopupEx = true;
         getBadState(state) {
             let find = null;
             if (state.meta.BatStatePopupId) {
-                find = params.PopUpBadState[Number(NuunManager.getMetaCode(state, "BatStatePopupId")) - 1];
+                find = NuunPopupExManager.popupExParams(14)[(Number(NuunPopupExManager.getMetaCode(state, "BatStatePopupId")) || 0) - 1];
             }
             if (!find) {
-                find = params.PopUpBadState.find(data => data.State === state.id);
+                find = NuunPopupExManager.popupExParams(14).find(data => data.State === state.id);
             }
             return !!find ? find.PopUpData : null;
         }
@@ -1229,10 +1389,10 @@ Imported.NUUN_PopupEx = true;
         getPopUpAdvantageousState(state) {
             let find = null;
             if (state.meta.StatePopupId) {
-                find = params.PopUpAdvantageousState[Number(NuunManager.getMetaCode(state, "StatePopupId")) - 1];
+                find = NuunPopupExManager.popupExParams(13)[(Number(NuunPopupExManager.getMetaCode(state, "StatePopupId")) || 0) - 1];
             }
             if (!find) {
-                find = params.PopUpAdvantageousState.find(data => data.State === state.id);
+                find = NuunPopupExManager.popupExParams(13).find(data => data.State === state.id);
             }
             return !!find ? find.PopUpData : _noneStatePopupData();
         }
@@ -1282,25 +1442,25 @@ Imported.NUUN_PopupEx = true;
         getPopupData() {
             switch (this._state) {
                 case "critical":
-                    return params.PopUpCritical;
+                    return NuunPopupExManager.popupExParams(3);
                 case "miss":
-                    return params.PopUpMiss;
+                    return NuunPopupExManager.popupExParams(5);
                 case "avoid":
-                    return params.PopUpAvoid;
+                    return NuunPopupExManager.popupExParams(4);
                 case "resistance":
-                    return params.PopUpResistance;
+                    return NuunPopupExManager.popupExParams(6);
                 case "weakness":
-                    return params.PopUpWeakness;
+                    return NuunPopupExManager.popupExParams(7);
                 case "invalid":
-                    return params.PopUpInvalid;
+                    return NuunPopupExManager.popupExParams(8);
                 case "defeat":
-                    return params.PopUpDefeat;
+                    return NuunPopupExManager.popupExParams(11);
                 case "counter":
-                    return params.PopUpCounter;
+                    return NuunPopupExManager.popupExParams(9);
                 case "reflection":
-                    return params.PopUpReflection;
+                    return NuunPopupExManager.popupExParams(10);
                 case "substitute":
-                    return params.PopUpSubstitute;
+                    return NuunPopupExManager.popupExParams(12);
             }
         }
 
@@ -1353,7 +1513,7 @@ Imported.NUUN_PopupEx = true;
         }
 
         opacity() {
-            return this.isRemoved() ? params.PopUpReleaseOpacity : 255;
+            return this.isRemoved() ? NuunPopupExManager.popupExParams(2) : 255;
         }
 
         isRemoved() {
@@ -1371,7 +1531,7 @@ Imported.NUUN_PopupEx = true;
         getPopupImges() {
             if (this.isBuffPopup()) {
                 const buffLevel = this.arrayBuffLevel();
-                if (this._data.PopUpImges && this._data.PopupImges[buffLevel]) {
+                if (this._data.PopUpImges && this._data.PopUpImges[buffLevel]) {
                     return this._data.PopUpImges[buffLevel];
                 } else if (this._data.PopUpImges && this._data.PopUpImges[0]) {
                     return this._data.PopUpImges[0];
@@ -1434,9 +1594,9 @@ Imported.NUUN_PopupEx = true;
             let mode = 'Default';
             if (id > 0) return id;
             if (this._state.includes("State")) {
-                mode = params.DefaultStatePopup;
+                mode = NuunPopupExManager.popupExParams(15);
             } else if (this._state.includes("Buff") || this._state.includes("Debuff")) {
-                mode = params.DefaultBuffPopup;
+                mode = NuunPopupExManager.popupExParams(18);
             }
             return this.CheckPopupClass(mode);
         }
@@ -1792,7 +1952,7 @@ Imported.NUUN_PopupEx = true;
         const last = this._damages[this._damages.length - 1];
         const popupData = this._battler.getNuunPopupData();
         const sprite = new Sprite_PopUpEX(popupData);
-        if (last && params.PopUpMode === 'default') {
+        if (last && NuunPopupExManager.isDefaultPopupMode()) {
             sprite.x = last.x + 8;
             sprite.y = last.y - 16;
         } else {
@@ -1800,7 +1960,7 @@ Imported.NUUN_PopupEx = true;
             sprite.y = this.y + this.damageOffsetY() + this.damagePopupOffsetY(popupData);
         }
         if (last) {
-            sprite.delay = this._damages.length * Math.max(params.PopUpUpInterval, 1);
+            sprite.delay = this._damages.length * Math.max(NuunPopupExManager.popupExParams(1), 1);
             sprite.hide();
         } else {
             sprite.delay = 0;
@@ -1861,7 +2021,7 @@ Imported.NUUN_PopupEx = true;
             if (this.delay <= 0) {
                 this.show();
             }
-            if (params.PopUpUpInterval > 0) {
+            if (NuunPopupExManager.popupExParams(1) > 0) {
                 return;
             }
         }
@@ -1904,7 +2064,7 @@ Imported.NUUN_PopupEx = true;
             const sy = Math.floor(iconIndex / 16) * ph;
             sprite.setFrame(sx, sy, pw, ph);
             sprite.x -= textMargin;
-            sprite.bitmap.y = 2;
+            sprite.y = 2;
         }
     };
 
@@ -1932,11 +2092,11 @@ Imported.NUUN_PopupEx = true;
     };
     
     Sprite_PopUpEX.prototype.fontFace = function() {
-        return this.popupData && this.popupData.fontFace ? this.popupData.fontFace : $gameSystem.mainFontFace();
+        return !!this._popupData && !!this._popupData.fontFace ? this._popupData.fontFace() : $gameSystem.mainFontFace();
     };
 
     Sprite_PopUpEX.prototype.damageColor = function() {
-        return NuunManager.getColorCode(this._colorType);
+        return NuunPopupExManager.getColorCode(this._colorType);
     };
 
 

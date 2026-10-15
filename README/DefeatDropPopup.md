@@ -23,6 +23,7 @@
 [アップフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md)  
 [スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md)  
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
+ポップアップを適用させるには、適用クラスに'Sprite_PopUpEX'を指定するか何も設定していない状態にしてください。  
 
 ## 更新履歴
 2026/10/15 Ver.1.1.0  

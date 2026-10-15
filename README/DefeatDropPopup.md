@@ -8,7 +8,7 @@
 再配布：可能  
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 #### 必須、前提プラグイン
-[ポップアップ拡張](https://github.com/nuun888/MZ/blob/master/README/PopupEx.md)Ver.1.1.0以降  
+[ポップアップ拡張](https://github.com/nuun888/MZ/blob/master/README/PopupEx.md)Ver.1.2.0以降  
 
 敵を倒した際に得る報酬を撃破時にポップアップ表示します。報酬は戦闘終了時に取得されます。  
 なおこのプラグインはNUUN_PopupExの拡張プラグインです。  

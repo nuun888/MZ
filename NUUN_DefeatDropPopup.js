@@ -8,11 +8,9 @@
  * @target MZ
  * @plugindesc Defeat Drop Pop-up
  * @author NUUN
- * @base NUUN_Base
  * @base NUUN_PopupEx
- * @orderAfter NUUN_Base
  * @orderAfter NUUN_PopupEx
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * The rewards obtained after defeating an enemy will be displayed in a pop-up window during the battle.
@@ -28,6 +26,9 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/15/2026 Ver.1.1.0
+ * Changed the plugin to work without NUUN_Base.
+ * Fixed an error that occurred when a battle was skipped while using NUUN_EventTargetAction or NUUN_SymbolEncounter.
  * 10/4/2025 Ver.1.0.1
  * Fixed an issue where an error would occur when an actor died.
  * 9/30/2025 Ver.1.0.0
@@ -124,11 +125,9 @@
  * @target MZ
  * @plugindesc 撃破時ドロップポップアップ
  * @author NUUN
- * @base NUUN_Base
  * @base NUUN_PopupEx
- * @orderAfter NUUN_Base
  * @orderAfter NUUN_PopupEx
- * @version 1.0.1
+ * @version 1.1.0
  * 
  * @help
  * 敵を倒した際に得る報酬を撃破時にポップアップ表示します。報酬は戦闘終了時に取得されます。
@@ -137,12 +136,14 @@
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/15 Ver.1.1.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * NUUN_EventTargetActionまたはNUUN_SymbolEncounterとの併用でスキップ戦闘が発生するとエラーが出る問題を修正。
  * 2025/10/4 Ver.1.0.1
  * アクター死亡時にエラーが出る問題を修正。
  * 2025/9/30 Ver.1.0.0
@@ -240,18 +241,24 @@ var Imported = Imported || {};
 Imported.NUUN_DefeatDropPopup = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const params = Nuun_PluginParams_PopupEx.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
 
-    NuunManager.getRewardPopupParams = function() {
-        return params.PopUpRewards;
-    };
-
-    NuunManager.getRewardGoldPopupParams = function() {
-        return params.PopUpRewardsGold;
-    };
-
-    NuunManager.getRewardExpPopupParams = function() {
-        return params.PopUpRewardsExp;
+    NuunPopupExManager.defeatDropPopupParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.PopUpRewards;
+            case 1:
+                return params.PopUpRewardsGold;
+            case 2:
+                return params.PopUpRewardsExp;
+            case 3:
+                return params.ShowPopUpRewardsExp;
+            case 4:
+                return params.ShowPopUpRewardsGold;
+            case 5:
+                return params.ShowPopUpRewards;
+        }
     };
 
 
@@ -262,6 +269,10 @@ Imported.NUUN_DefeatDropPopup = true;
     };
 
     Game_Enemy.prototype.makeRewards = function() {
+        this.initRewards();
+    };
+
+    Game_Enemy.prototype.initRewards = function() {
         if (!!this._rewards) return;
         this._rewards = {
             gold: this.gold(),
@@ -271,18 +282,22 @@ Imported.NUUN_DefeatDropPopup = true;
     };
 
     Game_Enemy.prototype.getRewards = function() {
+        this.initRewards();
         return this._rewards;
     };
 
     Game_Enemy.prototype.getRewardExp = function() {
+        this.initRewards();
         return this._rewards.exp || 0;
     };
 
     Game_Enemy.prototype.getRewardGold = function() {
+        this.initRewards();
         return this._rewards.gold || 0;
     };
 
     Game_Enemy.prototype.getRewardDropItems = function() {
+        this.initRewards();
         return this._rewards.items || [];
     };
 
@@ -306,7 +321,7 @@ Imported.NUUN_DefeatDropPopup = true;
     Game_Troop.prototype.clearDropRewards = function() {
         const members = this.deadMembers();
         for (const member of members) {
-             member._rewards = {};
+             member._rewards = null;
         }
     };
 
@@ -314,13 +329,13 @@ Imported.NUUN_DefeatDropPopup = true;
     Window_BattleLog.prototype.displayRewards = function(target) {
         if (target.isActor()) return;
         const rewards = target.getRewards();
-        if (rewards.exp > 0 && params.ShowPopUpRewardsExp && !!params.PopUpRewardsExp) {
+        if (rewards.exp > 0 && NuunPopupExManager.defeatDropPopupParams(3) && !!NuunPopupExManager.defeatDropPopupParams(2)) {
             this.popupRewardExp(target, rewards);
         }
-        if (rewards.gold > 0 && params.ShowPopUpRewardsGold && !!params.PopUpRewardsGold) {
+        if (rewards.gold > 0 && NuunPopupExManager.defeatDropPopupParams(4) && !!NuunPopupExManager.defeatDropPopupParams(1)) {
             this.popupRewardGold(target, rewards);
         }
-        if (params.ShowPopUpRewards && !!params.PopUpRewards) {
+        if (NuunPopupExManager.defeatDropPopupParams(5) && !!NuunPopupExManager.defeatDropPopupParams(0)) {
             for (const item of rewards.items) {
                 this.popupRewardItem(target, item);
             }

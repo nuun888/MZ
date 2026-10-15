@@ -16,6 +16,7 @@
 [スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md)  
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
 
+## 概要
 ポップアップを拡張します。  
 このプラグインでは以下のポップアップを追加します。  
 ステート  

@@ -15,7 +15,7 @@
 [アップフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/UpFadeoutPopup.md)  
 [スライドフェードアウトポップアップ](https://github.com/nuun888/MZ/blob/master/README/SlideFadeoutPopup.md)  
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
-#### 戦利品の撃破時ドロップポップアップ
+#### 拡張プラグイン
 [撃破時ドロップポップアップ](https://github.com/nuun888/MZ/blob/master/README/DefeatDropPopup.md)  
 
 ## 概要

@@ -1,15 +1,13 @@
 # [撃破時ドロップポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DefeatDropPopup.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_DefeatDropPopup.js)
 #### 無償ライセンス
 クレジット表記：任意  
 商業利用：可能  
-成人向け：可能  
 改変：可能  
 再配布：可能  
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 [ポップアップ拡張](https://github.com/nuun888/MZ/blob/master/README/PopupEx.md)Ver.1.1.0以降  
 
 敵を倒した際に得る報酬を撃破時にポップアップ表示します。報酬は戦闘終了時に取得されます。  
@@ -27,6 +25,9 @@
 [バウンドポップアップ](https://github.com/nuun888/MZ/blob/master/README/LateralBoundPopUp.md)  
 
 ## 更新履歴
+2026/10/15 Ver.1.1.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
+NUUN_EventTargetActionまたはNUUN_SymbolEncounterとの併用でスキップ戦闘が発生するとエラーが出る問題を修正。  
 2025/10/4 Ver.1.0.1  
 アクター戦闘不能時にエラーが出る問題を修正。  
 2025/9/30 Ver.1.0.0  

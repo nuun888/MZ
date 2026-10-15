@@ -1353,7 +1353,7 @@ Imported.NUUN_PopupEx = true;
         }
 
         setupRewardsItem(status) {
-            this._data = NuunPopupExManager.defeatDropPopupParams(1);
+            this._data = NuunPopupExManager.defeatDropPopupParams(0);
             if (this._data) {
                 this._name = this.getRewardItemText(status);
             }

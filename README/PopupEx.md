@@ -1,15 +1,14 @@
 # [ポップアップ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PopupEx.js)
-# Ver.1.1.0
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PopupEx.js)
 #### 無償ライセンス
 クレジット表記：任意  
 商業利用：可能  
-成人向け：可能  
 改変：可能  
 再配布：可能  
 当リポジトリ内、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
+
 #### 対応ポップアッププラグイン
 [盗みスキルのポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_StealPopUp.js)  
 [スキルラーニングポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearningPopUp.js)  
@@ -85,6 +84,9 @@
 [撃破時ドロップポップアップ](https://github.com/nuun888/MZ/blob/master/README/DefeatDropPopup.md)  
 
 ## 更新履歴
+2026/10/15 Ver.1.2.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
+フォントが適用できない問題を修正。  
 2025/9/30 Ver.1.1.0  
 撃破時ドロップポップアップに対応。  
 2025/3/29 Ver.1.0.1  

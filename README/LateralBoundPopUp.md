@@ -1,14 +1,18 @@
 # [バウンドポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js)
-# Ver.1.1.4
+# Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_LateralBoundPopUp.js)  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)
- 
+
+## 概要
 ポップアップの表示を上にバウンドから左右にバウンドさせながら表示させます。 
  
 ![gif](img/LateralBoundPopUp.gif)  
  
 ## 更新履歴 
+2026/10/17 Ver.1.2.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
+NUUN_PopupExで表示されたポップアップで、バウンドの弾み高さが適用されない問題を修正。  
+他ポップアッププラグインでの重複適用を修正。  
 2025/10/4 Ver.1.1.4  
 バウンドの処理の修正。  
 2025/2/2 Ver.1.1.3  

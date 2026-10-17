@@ -1,9 +1,9 @@
 # [スライドフェードアウトポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlideFadeoutPopup.js)
-# Ver.1.0.1
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SlideFadeoutPopup.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
+## 概要
 ポップアップの動作を横にスライドしてフェードアウトするように変更します。  
 
 ![gif](img/SlideFadeoutPopup.gif)  
@@ -12,10 +12,16 @@ Sprite_Damage:ダメージポップアップ
 Sprite_PopUpEX:ポップアッププラグイン  
 Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン  
 上記にないクラスはテキストタブで直接記入してください。  
+白または設定がない場合はすべてのクラスで表示されます。  
+
+NUUN_UpFadeoutPopup、NUUN_SlideFadeoutPopup、NUUN_LateralBoundPopUpでのポップアップ表示条件で複数有効の場合、プラグインリストの上位のポップアップが優先的に表示されます。  
 
 ステート、バフポップアップは別途プラグインが必要になります。
 
 ## 更新履歴
+2026/10/17 Ver.1.1.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
+他ポップアッププラグインでの重複適用を修正。  
 2022/12/5 Ver.1.0.1  
 ポップアッププラグイン更新による定義修正。  
 適用ポップアップ設定の説明文を修正。  

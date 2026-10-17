@@ -22,6 +22,9 @@
  * Please fill in classes not listed above directly in the text tab.
  * If left blank or not configured, the popup will be displayed for all classes.
  * 
+ * If multiple popup display conditions are met in NUUN_UpFadeoutPopup, NUUN_SlideFadeoutPopup, and NUUN_LateralBoundPopUp, 
+ * the popup from the plugin listed highest in the plugin list takes priority.
+ * 
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
@@ -122,6 +125,9 @@
  * Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
  * 上記にないクラスはテキストタブで直接記入してください。
  * 空白または設定がない場合はすべてのクラスで表示されます。
+ * 
+ * NUUN_UpFadeoutPopup、NUUN_SlideFadeoutPopup、NUUN_LateralBoundPopUpでのポップアップ表示条件で複数有効の場合、
+ * プラグインリストの上位のポップアップが優先的に表示されます。
  * 
  * 利用規約
  * クレジット表記：任意

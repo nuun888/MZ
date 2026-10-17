@@ -20,6 +20,10 @@
  * Sprite_PopUpEX:NUUN_popUp.js
  * Sprite_PopupMessage:BattleEffectPopup.js
  * Please fill in classes not listed above directly in the text tab.
+ * If left blank or not configured, the popup will be displayed for all classes.
+ * 
+ * If multiple popup display conditions are met in NUUN_UpFadeoutPopup, NUUN_SlideFadeoutPopup, and NUUN_LateralBoundPopUp, 
+ * the popup from the plugin listed highest in the plugin list takes priority.
  * 
  * Terms of Use
  * Credit: Optional
@@ -103,7 +107,11 @@
  * 
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
  * 2026/10/17 Ver.1.1.0

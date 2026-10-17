@@ -22,6 +22,10 @@
  * Sprite_PopUpEX:NUUN_popUp.js
  * Sprite_PopupMessage:BattleEffectPopup.js
  * Please fill in classes not listed above directly in the text tab.
+ * If left blank or not configured, the popup will be displayed for all classes.
+ * 
+ * If multiple popup display conditions are met in NUUN_UpFadeoutPopup, NUUN_SlideFadeoutPopup, and NUUN_LateralBoundPopUp, 
+ * the popup from the plugin listed highest in the plugin list takes priority.
  * 
  * Terms of Use
  * Credit: Optional
@@ -45,7 +49,7 @@
  * @param PopupClass
  * @text Applicable class
  * @desc Set the class to apply.
- * @default ["{\"ClassName\":\"'Sprite_Damage'\"}"]
+ * @default []
  * @type struct<ClassList>[]
  * 
  * @param PopUpDuration 
@@ -85,15 +89,22 @@
  * @help
  * ポップアップの動作を上に上昇してフェードアウトするように変更します。
  * 
- * ※初期設定ではクラス指定していません。適用するクラスを選択し設定してください。
+ * 適用クラス設定
  * Sprite_Damage:ダメージポップアップ
  * Sprite_PopUpEX:ポップアッププラグイン
  * Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
  * 上記にないクラスはテキストタブで直接記入してください。
  * 空白または設定がない場合はすべてのクラスで表示されます。
  * 
+ * NUUN_UpFadeoutPopup、NUUN_SlideFadeoutPopup、NUUN_LateralBoundPopUpでのポップアップ表示条件で複数有効の場合、
+ * プラグインリストの上位のポップアップが優先的に表示されます。
+ * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
  * 2026/10/17 Ver.1.1.0
@@ -110,7 +121,7 @@
  * @param PopupClass
  * @text 適用クラス
  * @desc 適用させるクラスを設定をします。
- * @default ["{\"ClassName\":\"'Sprite_Damage'\"}"]
+ * @default []
  * @type struct<ClassList>[]
  * 
  * @param PopUpDuration 

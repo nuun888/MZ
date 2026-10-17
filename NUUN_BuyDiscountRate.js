@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Items that give discounts when purchased when in possession
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * You can create items that will apply a discount when you purchase other items just by owning them.
@@ -26,6 +26,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/17/2026 Ver.1.1.1
+ * Minor fixes.
  * 9/29/2026 Ver.1.1.0
  * Changed the specifications so that the plugin can run without NUUN_Base.
  * Fixed an issue where the lowest discount rate was applied when multiple discount items were owned.
@@ -65,7 +67,7 @@
  * @target MZ
  * @plugindesc 所持中割引率適用アイテム
  * @author NUUN
- * @version 1.1.0
+ * @version 1.1.1
  * 
  * @help
  * 所持しているだけでアイテムを購入するときに割引が適用されるアイテムを制作できます。
@@ -83,6 +85,8 @@
  * <NoBuyDiscount> 割引対象外にします。
  * 
  * 更新履歴
+ * 2026/10/18 Ver.1.1.1
+ * 微細な修正。
  * 2026/9/29 Ver.1.1.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * 複数所持している場合、一番割引率の低い設定が適用されてしまう問題を修正。
@@ -230,16 +234,19 @@ Imported.NUUN_BuyDiscountRate = true;
     const _Window_ShopBuy_initialize = Window_ShopBuy.prototype.initialize;
     Window_ShopBuy.prototype.initialize = function(rect) {
         _Window_ShopBuy_initialize.apply(this, arguments);
-        this._moneyDiscountRate = 1.0;
     };
 
     const _Window_ShopBuy_refresh = Window_ShopBuy.prototype.refresh;
     Window_ShopBuy.prototype.refresh = function() {
-        this._buyDiscountRate = $gameParty.getBuyDiscountRate();
+        this.buyDiscountMultiplier();
         _Window_ShopBuy_refresh.apply(this, arguments);
     };
 
-    Game_Party.prototype.getBuyDiscountRate = function() {
+    Window_ShopBuy.prototype.buyDiscountMultiplier = function() {
+        this._buyDiscountMultiplier = $gameParty.buyDiscountMultiplier();
+    };
+
+    Game_Party.prototype.buyDiscountMultiplier = function() {
         return Math.max((this.buyDiscountRate() * -1) + 100, 0) / 100
     };
 
@@ -256,13 +263,13 @@ Imported.NUUN_BuyDiscountRate = true;
 
     const _Window_ShopBuy_price = Window_ShopBuy.prototype.price;
     Window_ShopBuy.prototype.price = function(item) {
-        return _Window_ShopBuy_price.apply(this, arguments) * this.getBuyDiscountRate(item);
+        return Math.floor(_Window_ShopBuy_price.apply(this, arguments) * this.itemDiscountMultiplier(item));
     };
 
-    Window_ShopBuy.prototype.getBuyDiscountRate = function(item) {
-        if (!item || this._buyDiscountRate === undefined) return 1.0;
+    Window_ShopBuy.prototype.itemDiscountMultiplier = function(item) {
+        if (!item || this._buyDiscountMultiplier === undefined) return 1.0;
         if (!!item.meta.NoBuyDiscount) return 1.0;
-        return this._buyDiscountRate;
+        return this._buyDiscountMultiplier;
     };
     
 })();

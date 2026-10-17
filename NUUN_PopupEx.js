@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Popup
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * Expands popups.
@@ -77,6 +77,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/17/2026 Ver.1.2.1
+ * Fixed an issue with NUUN_LateralBoundPopUp.
  * 10/15/2026 Ver.1.2.0
  * Changed the specifications to allow the plugin to run without NUUN_Base.
  * Fixed an issue where fonts were not applied correctly.
@@ -512,7 +514,7 @@
  * @target MZ
  * @plugindesc ポップアップ拡張
  * @author NUUN
- * @version 1.2.0
+ * @version 1.2.1
  * 
  * @help
  * ポップアップを拡張します。
@@ -577,6 +579,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/17 Ver.1.2.1
+ * NUUN_LateralBoundPopUpでの不具合を修正。
  * 2026/10/15 Ver.1.2.0
  * NUUN_Baseなしで実行できるように仕様を変更。
  * フォントが適用できない問題を修正。
@@ -1988,7 +1992,7 @@ Imported.NUUN_PopupEx = true;
       
     Sprite_PopUpEX.prototype.initialize = function(data) {
         this._popupData = data;
-        this._popupMode = data ? data.getPopupMode() : 'Default';
+        this._popupMode = data ? data.getPopupMode() : 0;
         Sprite_Damage.prototype.initialize.call(this);
     };
 
@@ -2013,6 +2017,9 @@ Imported.NUUN_PopupEx = true;
 
     Sprite_PopUpEX.prototype.setup = function(battler) {
         this.drawPopup();
+        if (Imported.NUUN_LateralBoundPopUp && this._popupMode === 1) {
+            this.setLateralBoundPopUp();
+        }
     };
 
     Sprite_PopUpEX.prototype.update = function() {
@@ -2088,7 +2095,7 @@ Imported.NUUN_PopupEx = true;
     };
 
     Sprite_PopUpEX.prototype.fontSize = function() {
-        return $gameSystem.mainFontSize() + this._popupData.fontSize() || 4;
+        return $gameSystem.mainFontSize() + (this._popupData.fontSize() || 0);
     };
     
     Sprite_PopUpEX.prototype.fontFace = function() {

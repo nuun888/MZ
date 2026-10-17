@@ -10,9 +10,8 @@
  * @target MZ
  * @plugindesc Up Fadeout Popup
  * @author NUUN
- * @version 1.0.2
- * @base NUUN_Base
- * @orderAfter NUUN_Base
+ * @version 1.1.0
+ * @orderAfter NUUN_PopupEx
  * @orderAfter NUUN_popUp
  * 
  * @help
@@ -25,9 +24,16 @@
  * Please fill in classes not listed above directly in the text tab.
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/17/2026 Ver.1.1.0
+ * Changed the specifications to allow the plugin to run without NUUN_Base.
+ * Fixed an issue where multiple popup plugins were applied simultaneously.
  * 12/5/2022 Ver.1.0.2
  * Definition correction by "NUUN_popUp" update.
  * Fixed description of apply popup setting.
@@ -39,7 +45,7 @@
  * @param PopupClass
  * @text Applicable class
  * @desc Set the class to apply.
- * @default []
+ * @default ["{\"ClassName\":\"'Sprite_Damage'\"}"]
  * @type struct<ClassList>[]
  * 
  * @param PopUpDuration 
@@ -72,9 +78,8 @@
  * @target MZ
  * @plugindesc アップフェードアウトポップアップ
  * @author NUUN
- * @version 1.0.2
- * @base NUUN_Base
- * @orderAfter NUUN_Base
+ * @version 1.1.0
+ * @orderAfter NUUN_PopupEx
  * @orderAfter NUUN_popUp
  * 
  * @help
@@ -85,11 +90,15 @@
  * Sprite_PopUpEX:ポップアッププラグイン
  * Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
  * 上記にないクラスはテキストタブで直接記入してください。
+ * 空白または設定がない場合はすべてのクラスで表示されます。
  * 
  * 利用規約
  * このプラグインはMITライセンスで配布しています。
  * 
  * 更新履歴
+ * 2026/10/17 Ver.1.1.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * 他ポップアッププラグインでの重複適用を修正。
  * 2022/12/5 Ver.1.1.2
  * ポップアッププラグイン更新による定義修正。
  * 適用ポップアップ設定の説明文を修正。
@@ -101,7 +110,7 @@
  * @param PopupClass
  * @text 適用クラス
  * @desc 適用させるクラスを設定をします。
- * @default []
+ * @default ["{\"ClassName\":\"'Sprite_Damage'\"}"]
  * @type struct<ClassList>[]
  * 
  * @param PopUpDuration 
@@ -135,22 +144,127 @@ var Imported = Imported || {};
 Imported.NUUN_UpFadeoutPopup = true;
 
 (() => {
-    const parameters = PluginManager.parameters('NUUN_UpFadeoutPopup');
-    const PopupClass = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopupClass'])) : null) || [];
-    const PopUpDuration = Number(parameters['PopUpDuration'] || 90);
-    const FadeoutFlame = Number(parameters['FadeoutFlame'] || 20);
+    class Nuun_PluginParams_UpFadeoutPopup {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
 
-    function upFadeoutPopupSprite(className) {
-        return PopupClass.find(_class => _class.ClassName === className);
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                list = list.map(a => this.getTextCodeMeta(a));
+                return list;
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_UpFadeoutPopup.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function Nuun_UpFadeoutPopupManager() {
+        throw new Error("This is a static class");
     }
+
+    Nuun_UpFadeoutPopupManager.upFadeoutParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.PopupClass || [];
+            case 1:
+                return params.PopUpDuration || 90;
+            case 2:
+                return params.FadeoutFlame  || 20;
+        }
+    };
+
+    Nuun_UpFadeoutPopupManager.upFadeoutPopupSprite = function(className) {
+        const list = this.upFadeoutParams(0);
+        if (!list || list.length === 0) return true;
+        return list.some(_class => _class.ClassName === className);
+    };
 
     const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
     Sprite_Damage.prototype.initialize = function() {
-        _Sprite_Damage_initialize.call(this);
-        this._upFadeoutPopupClass = !!upFadeoutPopupSprite(String(this.constructor.name)) || this._popupMode === 3;
+        _Sprite_Damage_initialize.apply(this, arguments);
+        this._upFadeoutPopupClass = this.isUpFadeoutApplyPopup();
         if (this._upFadeoutPopupClass) {
-            this._duration = PopUpDuration;
+            this._duration = Nuun_UpFadeoutPopupManager.upFadeoutParams(1);
         }
+    };
+
+    Sprite_Damage.prototype.isUpFadeoutApplyPopup = function() {
+        return this._popupMode === 3 || (!!Nuun_UpFadeoutPopupManager.upFadeoutPopupSprite(String(this.constructor.name)) && this.otherUpFadeoutPopupCheck());
+    };
+
+    Sprite_Damage.prototype.otherUpFadeoutPopupCheck = function() {
+        return !this._slideFadeoutPopupClass && !this._damageClass && (!!this._popupMode ? this._popupMode === 3 : true);
     };
 
     const _Sprite_Damage_updateChild = Sprite_Damage.prototype.updateChild;
@@ -168,11 +282,11 @@ Imported.NUUN_UpFadeoutPopup = true;
     const _Sprite_Damage_updateOpacity = Sprite_Damage.prototype.updateOpacity;
     Sprite_Damage.prototype.updateOpacity = function() {
         if (this._upFadeoutPopupClass) {
-            if (this._duration < FadeoutFlame) {
-                this.opacity = (this.getUpFadeoutOpacity() * this._duration) / FadeoutFlame;
+            if (this._duration < Nuun_UpFadeoutPopupManager.upFadeoutParams(2)) {
+                this.opacity = (this.getUpFadeoutOpacity() * this._duration) / Nuun_UpFadeoutPopupManager.upFadeoutParams(2);
             }
         } else {
-            _Sprite_Damage_updateOpacity.call(this);
+            _Sprite_Damage_updateOpacity.apply(this, arguments);
         }
     };
 

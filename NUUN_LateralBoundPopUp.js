@@ -8,8 +8,9 @@
  * @target MZ
  * @plugindesc Bound popup
  * @author NUUN
- * @version 1.1.4
+ * @version 1.2.0
  * @orderBefore BattleEffectPopup
+ * @orderAfter NUUN_PopupEx
  * 
  * @help
  * Makes the popup display appear while bouncing upwards.
@@ -19,16 +20,20 @@
  * Sprite_PopUpEX:NUUN_popUp.js
  * Sprite_PopupMessage:BattleEffectPopup.js
  * Please fill in classes not listed above directly in the text tab.
+ * If left blank or not configured, the popup will be displayed for all classes.
  * 
  * Terms of Use
  * Credit: Optional
  * Commercial use: Possible
- * Adult content: Possible
  * Modifications: Possible
  * Redistribution: Possible
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/17/2025 Ver.1.2.0
+ * Changed the specifications to allow the plugin to run without NUUN_Base.
+ * Fixed an issue where the bounce height was not applied to popups displayed by NUUN_PopupEx.
+ * Fixed an issue where multiple popup plugins were applied simultaneously.
  * 10/4/2025 Ver.1.1.4
  * Bound handling correction.
  * 2/2/2025 Ver.1.1.3
@@ -104,8 +109,9 @@
  * @target MZ
  * @plugindesc バウンドポップアップ
  * @author NUUN
- * @version 1.1.4
+ * @version 1.2.0
  * @orderBefore BattleEffectPopup
+ * @orderAfter NUUN_PopupEx
  * 
  * @help
  * ポップアップの表示を上にバウンドから左右にバウンドさせながら表示させます。
@@ -115,16 +121,20 @@
  * Sprite_PopUpEX:ポップアッププラグイン
  * Sprite_PopupMessage:戦闘行動結果ポップアッププラグイン
  * 上記にないクラスはテキストタブで直接記入してください。
+ * 空白または設定がない場合はすべてのクラスで表示されます。
  * 
  * 利用規約
  * クレジット表記：任意
  * 商業利用：可能
- * 成人向け：可能
  * 改変：可能
  * 再配布：可能
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/17 Ver.1.2.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
+ * NUUN_PopupExで表示されたポップアップで、バウンドの弾み高さが適用されない問題を修正。
+ * 他ポップアッププラグインでの重複適用を修正。
  * 2025/10/4 Ver.1.1.4
  * バウンドの処理の修正。
  * 2025/2/2 Ver.1.1.3
@@ -201,88 +211,204 @@ var Imported = Imported || {};
 Imported.NUUN_LateralBoundPopUp = true;
 
 (() => {
-const parameters = PluginManager.parameters('NUUN_LateralBoundPopUp');
-const PopupClass = (NUUN_Base_Ver >= 113 ? (DataManager.nuun_structureData(parameters['PopupClass'])) : null) || [];
-const PopUpDuration = Number(parameters['PopUpDuration'] || 120);
-const BoundHeight = Number(parameters['BoundHeight'] || 8);
-const BoundGravity = Number.parseFloat(parameters['BoundGravity']) || 0.21;
-const BoundRepulsion = Number.parseFloat(parameters['BoundRepulsion']) || 0.7;
-const BoundRange = Number.parseFloat(parameters['BoundRange']) || 2.2;
-const BoundRange_c = BoundRange / 2;
-
-function LateralBoundPupupSprite(className) {
-    return PopupClass.some(_class => _class.ClassName === className);
-}
-
-
-
-const _Sprite_Battler_createDamageSprite = Sprite_Battler.prototype.createDamageSprite;
-Sprite_Battler.prototype.createDamageSprite = function() {
-    _Sprite_Battler_createDamageSprite.call(this);
-    if (this._damages[this._damages.length - 1]) {
-        this._damages[this._damages.length - 1].setupPosition(this.x + this.damageOffsetX(), this.y + this.damageOffsetY());
-    }
-};
-
-
-const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
-Sprite_Damage.prototype.initialize = function() {
-    _Sprite_Damage_initialize.call(this);
-    this._damageClass = !!LateralBoundPupupSprite(String(this.constructor.name)) || this._popupMode === 1;
-    if (this._damageClass) {
-        this._duration = PopUpDuration;
-        this.setRondomMoveX();
-    }
-};
-
-Sprite_Damage.prototype.setupPosition = function(x, y) {
-    if (this._damageClass) {
-        this.x = x;
-        this.y = y;
-    }
-};
-
-Sprite_Damage.prototype.setRondomMoveX = function() {
-    this.MoveX = Math.random() * BoundRange - BoundRange_c;
-};
-
-const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
-Sprite_Damage.prototype.setup = function(target) {
-    _Sprite_Damage_setup.call(this, target);
-    if (this._damageClass) {
-        this.setLateralBoundPopUp();
-    }
-};
-
-Sprite_Damage.prototype.setLateralBoundPopUp = function() {
-    this.popup_dy();
-};
-
-Sprite_Damage.prototype.popup_dy = function() {
-    for (const child of this.children) {
-        child.dy = BoundHeight;
-    }
-};
-
-const _Sprite_Damage_updateChild = Sprite_Damage.prototype.updateChild;
-Sprite_Damage.prototype.updateChild = function(sprite) {
-    if (this._damageClass) {
-        if (!sprite.dy) {
-            sprite.dy = BoundHeight;
+    class Nuun_PluginParams_LateralBoundPopUp {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
         }
-        sprite.dy += BoundGravity;//0.21;
-        sprite.ry += sprite.dy;
-        if (sprite.ry >= 0) {
-            sprite.ry = 0;
-            sprite.dy *= -BoundRepulsion;//-0.7;
+    };
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                list = list.map(a => this.getTextCodeMeta(a));
+                return list;
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+    };
+
+    const params = Nuun_PluginParams_LateralBoundPopUp.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunLateralBoundPopUpManager() {
+        throw new Error("This is a static class");
+    }
+
+    NuunLateralBoundPopUpManager.lateralBoundParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.PopupClass || [];
+            case 1:
+                return params.PopUpDuration || 120;
+            case 2:
+                return params.BoundHeight || 8;
+            case 3:
+                return params.BoundGravity || 0.21;
+            case 4:
+                return params.BoundRepulsion || 0.7;
+            case 5:
+                return params.BoundRange || 2.2;
+        }
+    };
+
+    NuunLateralBoundPopUpManager.boundRange = function() {
+        return this.lateralBoundParams(5) / 2;
+    };
+
+    NuunLateralBoundPopUpManager.lateralBoundPupupSprite = function(className) {
+        const list = this.lateralBoundParams(0);
+        if (!list || list.length === 0) return true;
+        return list.some(_class => _class.ClassName === className);
+    };
+
+    NuunLateralBoundPopUpManager.rondomMoveX = function() {
+        return Math.random() * this.lateralBoundParams(5) - this.boundRange();
+    };
+
+
+    const _Sprite_Battler_createDamageSprite = Sprite_Battler.prototype.createDamageSprite;
+    Sprite_Battler.prototype.createDamageSprite = function() {
+        _Sprite_Battler_createDamageSprite.apply(this, arguments);
+        if (this._damages[this._damages.length - 1]) {
+            this._damages[this._damages.length - 1].setupPosition(this.x + this.damageOffsetX(), this.y + this.damageOffsetY());
+        }
+    };
+
+
+    const _Sprite_Damage_initialize = Sprite_Damage.prototype.initialize;
+    Sprite_Damage.prototype.initialize = function() {
+        _Sprite_Damage_initialize.apply(this, arguments);
+        this._damageClass = this.isLateralBoundApplyPopup();
+        if (this._damageClass) {
+            this._duration = NuunLateralBoundPopUpManager.lateralBoundParams(1);
             this.setRondomMoveX();
         }
-        sprite.y = Math.round(sprite.ry);
-        sprite.x += sprite.y < 0 ? this.MoveX : 0;
-        sprite.setBlendColor(this._flashColor);
-    } else {
-        _Sprite_Damage_updateChild.call(this, sprite);
-    }
-};
+    };
+
+    Sprite_Damage.prototype.isLateralBoundApplyPopup = function() {
+        return this._popupMode === 1 || (!!NuunLateralBoundPopUpManager.lateralBoundPupupSprite(String(this.constructor.name)) && this.otherLateralBoundPopupCheck());
+    };
+
+    Sprite_Damage.prototype.otherLateralBoundPopupCheck = function() {
+        return !this._slideFadeoutPopupClass && !this._upFadeoutPopupClass && (!!this._popupMode ? this._popupMode === 1 : true);
+    };
+
+    Sprite_Damage.prototype.setupPosition = function(x, y) {
+        if (this._damageClass) {
+            this.x = x;
+            this.y = y;
+        }
+    };
+
+    Sprite_Damage.prototype.setRondomMoveX = function() {
+        this.MoveX = NuunLateralBoundPopUpManager.rondomMoveX();
+    };
+
+    const _Sprite_Damage_setup = Sprite_Damage.prototype.setup;
+    Sprite_Damage.prototype.setup = function(target) {
+        _Sprite_Damage_setup.apply(this, arguments);
+        this.setLateralBoundPopUp();
+    };
+
+    Sprite_Damage.prototype.setLateralBoundPopUp = function() {
+        if (this._damageClass) {
+            this.popup_dy();
+        }
+    };
+
+    Sprite_Damage.prototype.popup_dy = function() {
+        const boundHeight = NuunLateralBoundPopUpManager.lateralBoundParams(2);
+        for (const child of this.children) {
+            child.dy = boundHeight;
+        }
+    };
+
+    const _Sprite_Damage_updateChild = Sprite_Damage.prototype.updateChild;
+    Sprite_Damage.prototype.updateChild = function(sprite) {
+        if (this._damageClass) {
+            if (sprite.dy === undefined) {
+                sprite.dy = NuunLateralBoundPopUpManager.lateralBoundParams(2);
+            }
+            sprite.dy += NuunLateralBoundPopUpManager.lateralBoundParams(3);//0.21;
+            sprite.ry += sprite.dy;
+            if (sprite.ry >= 0) {
+                sprite.ry = 0;
+                sprite.dy *= -NuunLateralBoundPopUpManager.lateralBoundParams(4);//-0.7;
+                this.setRondomMoveX();
+            }
+            sprite.y = Math.round(sprite.ry);
+            sprite.x += sprite.y < 0 ? this.MoveX : 0;
+            sprite.setBlendColor(this._flashColor);
+        } else {
+            _Sprite_Damage_updateChild.apply(this, arguments);
+        }
+    };
+
 
 })();

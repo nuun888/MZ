@@ -1,5 +1,5 @@
 # [所持中割引率適用アイテム](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuyDiscountRate.js)
-# Ver.1.1.0
+# Ver.1.1.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_BuyDiscountRate.js)
 #### 必須、前提プラグイン
 
@@ -13,6 +13,8 @@
 `<NoBuyDiscount>` 割引対象外にします。  
 
 ## 更新履歴
+2026/10/18 Ver.1.1.1  
+微細な修正。  
 2026/9/29 Ver.1.1.0  
 NUUN_Baseなしで実行できるように仕様を変更。  
 複数所持している場合、一番割引率の低い設定が適用されてしまう問題を修正。  

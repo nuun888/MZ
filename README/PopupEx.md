@@ -1,5 +1,5 @@
 # [ポップアップ拡張](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PopupEx.js)
-# Ver.1.2.0
+# Ver.1.2.1
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_PopupEx.js)
 #### 無償ライセンス
 クレジット表記：任意  
@@ -84,6 +84,8 @@
 [スキルラーニングポップアップ](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearningPopUp.js)  
 
 ## 更新履歴
+2026/10/17 Ver.1.2.1  
+NUUN_LateralBoundPopUpでの不具合を修正。  
 2026/10/15 Ver.1.2.0  
 NUUN_Baseなしで実行できるように仕様を変更。  
 フォントが適用できない問題を修正。  

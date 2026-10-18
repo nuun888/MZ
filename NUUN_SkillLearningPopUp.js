@@ -2,29 +2,31 @@
  * NUUN_SkillLearningPopUp.js
  * 
  * Copyright (C) 2025 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
  * @plugindesc Skill Learning Popup
  * @author NUUN
- * @base NUUN_Base
  * @base NUUN_PopupEx
  * @base NUUN_SkillLearning
- * @orderAfter NUUN_Base
  * @orderAfter NUUN_PopupEx
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * When a skill is acquired through skill learning, a popup will be displayed for the target who has learned the skill.
- * This plugin requires NUUN_PopupEx and NUUN_SkillLearning.
+ * This plugin requires NUUN_PopupEx and NUUN_SkillLearning(Ver.1.2.0 or later).
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/18/2026 Ver.1.1.0
+ * Changed the plugin to work without NUUN_Base.
  * 3/29/2025 Ver.1.0.0
  * First edition.
  * 
@@ -95,21 +97,25 @@
  * @target MZ
  * @plugindesc スキルラーニングポップアップ
  * @author NUUN
- * @base NUUN_Base
  * @base NUUN_PopupEx
  * @base NUUN_SkillLearning
- * @orderAfter NUUN_Base
  * @orderAfter NUUN_PopupEx
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * スキルラーニングでスキル習得時に習得した対象にポップアップを表示させます。
- * このプラグインはNUUN_PopupEx、NUUN_SkillLearningが必要になります。
+ * このプラグインはNUUN_PopupEx、NUUN_SkillLearning(Ver.1.2.0以降)が必要になります。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/18 Ver.1.1.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
  * 2025/3/29 Ver.1.0.0
  * 初版
  * 
@@ -176,7 +182,19 @@ var Imported = Imported || {};
 Imported.NUUN_SkillLearningPopUp = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    const params = Nuun_PluginParams_SkillLearning.getPluginParams(document.currentScript);
+
+    NuunSkillLearningManager.skillLearningPopUpParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.PopUpSkillLearning;
+        }
+    };
+
+    NuunSkillLearningManager.getSkillLearningPopupParams = function() {
+        return this.skillLearningPopUpParams(0);
+    };
+
 
     Window_BattleLog.prototype.displayAffectedSkillLearning = function(target, skills) {
         for (const skill of skills) {
@@ -184,10 +202,6 @@ Imported.NUUN_SkillLearningPopUp = true;
             popupData.setupSteal(skill.target, skill);
             this.setupPopup(skill.target, popupData);
         }
-    };
-
-    NuunManager.getSkillLearningPopupParams = function() {
-        return params.PopUpSkillLearning;
     };
 
     Game_Battler.prototype.shouldPopupSkillLearning = function() {

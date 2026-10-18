@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Popup
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * Expands popups.
@@ -77,6 +77,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 10/18/2026 Ver.1.2.2
+ * Added support for NUUN_SkillLearning Ver.1.2.0.
  * 10/17/2026 Ver.1.2.1
  * Fixed an issue with NUUN_LateralBoundPopUp.
  * 10/15/2026 Ver.1.2.0
@@ -514,7 +516,7 @@
  * @target MZ
  * @plugindesc ポップアップ拡張
  * @author NUUN
- * @version 1.2.1
+ * @version 1.2.2
  * 
  * @help
  * ポップアップを拡張します。
@@ -579,6 +581,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/10/18 Ver.1.2.2
+ * NUUN_SkillLearning Ver.1.2.0に対応。
  * 2026/10/17 Ver.1.2.1
  * NUUN_LateralBoundPopUpでの不具合を修正。
  * 2026/10/15 Ver.1.2.0
@@ -1336,7 +1340,11 @@ Imported.NUUN_PopupEx = true;
         }
 
         setupLearn(status) {
-            this._data = NuunManager.getSkillLearningPopupParams();//アップデート待ち
+            try {
+                this._data = NuunSkillLearningManager.getSkillLearningPopupParams();
+            } catch (error) {
+                this._data = NuunManager.getSkillLearningPopupParams();
+            }
             if (this._data) {
                 this._name = this.getPopupSkillLearningText(status);
             }

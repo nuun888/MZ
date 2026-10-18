@@ -2,8 +2,8 @@
 # Ver.1.2.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_SkillLearning.js)  
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)Ver.1.6.1以降  
 
+## 概要
 相手の使用するスキルを習得することができます。  
 
 ## 設定
@@ -32,11 +32,14 @@
 
 ### 攻撃をしたときに対象のスキルを習得
 スキルのメモ欄  
-`<AttackSkillLearning:[rate], [skill], [mode]>` 攻撃を与えた時に対象のスキルを習得します。  
+`<AttackSkillLearning:[rate], [skill], [mode]>` 攻撃を与えた時に対象にOnAttackSkillLearning[skillId]タグのあるスキルの中からスキルを習得します。  
+スキルのメモ欄にOnAttackSkillLearningタグを記入することでスキルを習得することができる対象を選択できます。  
 下記のタグ(OnAttackSkillLearning)があるスキルのみ習得出来ます。  
 `[rate]`:習得確率(百分率)  
 `[skill]`:習得スキル　0:全てのスキル 1:全てのスキルから１つランダム。  
 `[mode]`:習得モード 0:ヒット　1:撃破  
+`<AttackSkillLearning:50, 0, 0>`  
+攻撃成功時に50%の確率で対象の習得できるスキルを習得します。[1]と記入した場合、エラーが表示されますので数値のみ記入してください。  
 
 `<OnAttackSkillLearning:[mode]>` 攻撃時に習得可能にするスキルを設定します。  
 `[mode]`:習得対象 0:敵味方　1:味方のみ　2:敵のみ  
@@ -58,6 +61,11 @@
 敵が習得したスキルのレーティングは全て5で設定されます。  
 
 ## 更新履歴
+2026/10/18 Ver.1.2.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
+スキル設定でのOnAttackSkillLearningで敵味方で設定できない問題を修正。  
+スキルーラーニング習得数を変数に格納する機能を追加。  
+攻撃でのスキルーラーニング習得数に格納する機能を追加。  
 2025/3/29 Ver.1.1.3  
 NUUN_PopupEx対応のための修正。  
 ポップアップの表示対象を修正。  

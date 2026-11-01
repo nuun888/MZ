@@ -1,45 +1,47 @@
 /*:-----------------------------------------------------------------------------------
  * NUUN_AutoDeadMemberChange.js
- * 
  * Copyright (C) 2025 NUUN
- * This software is released under the MIT License.
- * http://opensource.org/licenses/mit-license.php
  * -------------------------------------------------------------------------------------
  */
 /*:
  * @target MZ
- * @plugindesc Automatic replacement of deceased members
+ * @plugindesc Automatic Replacement of Incapacitated Battle Members
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
- * When a member becomes incapacitated, they will be automatically replaced.
- * By default, replacements are set when all members are killed, so if you want to replace members every time they are incapacitated, set "Members are replaced every time a death occurs" to true and specify the specified switch ID.
+ * Automatically replaces battle members when they become incapacitated.
+ * By default, members are replaced only when all battle members are incapacitated.
+ * To replace members each time a battle member becomes incapacitated, specify a switch ID in "Replace Members on Each Incapacitation" and turn the switch ON.
  * 
  * Terms of Use
- * This plugin is distributed under the MIT license.
+ * Credit: Optional
+ * Commercial use: Possible
+ * Modifications: Possible
+ * Redistribution: Possible
+ * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 11/1/2026 Ver.1.1.0
+ * Changed the specifications so that the plugin can run without NUUN_Base.
  * 4/29/2025 Ver.1.0.0
  * First edition.
  * 
  * @param AutoDeadMemberChangeSwitch
- * @desc Switch ID to disable automatic replacement when incapacitated. 0 is always enabled
- * @text Automation rotation disable switch ID
+ * @desc Switch ID to disable auto replacement. 0: Always enabled.
+ * @text Disable automatic replacement switch ID
  * @type switch
  * @default 0
  * 
  * @param AutoDeadMemberChangeModeSwitch
- * @desc Whenever a battle incapacity occurs, the battle members are replaced. If false, the battle members are all killed.
- * @text Members are replaced every time a death occurs
+ * @desc Replaces members on each incapacitation. If false, only when all battle members are incapacitated.
+ * @text Replace members on each incapacitation
  * @type switch
  * @default 0
  * 
  * @param ExcludedActors
- * @desc Enter the evaluation formula for the target to be excluded from the battle members to be replaced. actor: Actor's game data
- * @text Substitution excluded actors
+ * @desc Enter an evaluation formula to exclude actors from replacement. actor: Actor game data.
+ * @text Excluded actors
  * @type combo[]
  * @option 'actor.isFixed();//Fixed actor exclusion'
  * @option 'actor.isBattleFixed();//Combat Actors Excluded'
@@ -50,18 +52,22 @@
  * @target MZ
  * @plugindesc 戦闘不能メンバー自動交代
  * @author NUUN
- * @base NUUN_Base
- * @orderAfter NUUN_Base
- * @version 1.0.0
+ * @version 1.1.0
  * 
  * @help
  * メンバーが戦闘不能になった時に自動でメンバーを交代します。
  * デフォルトでは全滅時に交代になっておりますので戦闘不能毎に交代する場合は、戦闘不能毎に交代に指定のスイッチIDを指定してtureに設定してください。
  * 
  * 利用規約
- * このプラグインはMITライセンスで配布しています。
+ * クレジット表記：任意
+ * 商業利用：可能
+ * 改変：可能
+ * 再配布：可能
+ * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/11/1 Ver.1.1.0
+ * NUUN_Baseなしで実行できるように仕様を変更。
  * 2025/4/29 Ver.1.0.0
  * 初版
  * 
@@ -92,12 +98,126 @@ var Imported = Imported || {};
 Imported.NUUN_AutoDeadMemberChange = true;
 
 (() => {
-    const params = Nuun_PluginParams.getPluginParams(document.currentScript);
+    class Nuun_PluginParams_AutoDeadMemberChange {
+        static getPluginParams(text) {//document.currentScript
+            try {
+                const name = String(Utils.extractFileName(text.src).split('.').shift());
+                const params = PluginManager.parameters(name);
+                if (params) {
+                    const pluginParam = new Nuun_PluginParamData(params);
+                    pluginParam.setPluginName(name);
+                    return pluginParam.getParameters();
+                }
+                return {pluginName: name};
+            } catch (error) {
+                const log = ($gameSystem.isJapanese() ? "コアスクリプトをVer.1.3.2以降に更新してください。" : "Please update the core script to version 1.3.2 or later.");
+                throw ["ParameterError", log];
+            }
+        }
+    };
+
+    window.Nuun_PluginParams_AutoDeadMemberChange = Nuun_PluginParams_AutoDeadMemberChange;
+
+    class Nuun_PluginParamData {
+        constructor(text) {
+            this._parameters = JSON.parse(JSON.stringify(text, this._convertParams)) || {};
+        }
+
+        _convertParams(key, code) {
+            try {
+                return JSON.parse(code);
+            } catch (e) {
+                if (isNaN(code)) {
+                    if (!code) {
+                        return null;
+                    }
+                    try {
+                        if (code.indexOf("'") === 0 || code.indexOf('"') === 0) {
+                            return eval(code);//'または"を外す。
+                        }
+                        return !!code ? String(code) : null;
+                    } catch (e) {
+                        if (typeof {} === "object") {
+                            return code;
+                        }
+                        return !!code ? String(code) : null;
+                    }
+                } else {
+                    return String(code);
+                }
+            }
+        }
+
+        getParameters() {
+            return this._parameters;
+        }
+
+        setPluginName(name) {
+            this._parameters.pluginName = name;
+        }
+
+
+        getMetaTag(object, code) {
+            const data = object.meta[code];
+            let list = [];
+            if (data !== undefined) {
+                try {
+                    list = data.split(',');
+                } catch (error) {
+                    return this.getTextCodeMeta(data);
+                }
+                return list.map(a => this.getTextCodeMeta(a));
+            } else {
+                return undefined;
+            }
+        }
+
+        getTextCodeMeta(text) {
+            if (isNaN(text)) {
+                return text;
+            } else {
+                return Number(text);
+            }
+        }
+        
+    };
+
+    const params = Nuun_PluginParams_AutoDeadMemberChange.getPluginParams(document.currentScript);
+    const pluginName = params.pluginName;
+
+    function NuunAutoDeadMemberChangeManager() {
+        throw new Error("This is a static class");
+    }
+
+    window.NuunAutoDeadMemberChangeManager = NuunAutoDeadMemberChangeManager;
+
+    NuunAutoDeadMemberChangeManager.autoDeadMemberChangeParams = function(code) {
+        switch (code) {
+            case 0:
+                return params.AutoDeadMemberChangeSwitch;
+            case 1:
+                return params.AutoDeadMemberChangeModeSwitch;
+            case 2:
+                return params.ExcludedActors;
+        }
+    };
+
+    NuunAutoDeadMemberChangeManager.isAutoDeadMemberChangeModeSwitch = function() {
+        return this.autoDeadMemberChangeParams(1) > 0;
+    };
+
+    NuunAutoDeadMemberChangeManager.isAutoDeadMemberChangeSwitch = function() {
+        return this.autoDeadMemberChangeParams(0) > 0;
+    };
+
+    NuunAutoDeadMemberChangeManager.isAutoDeadMemberChange = function() {
+        return !this.isAutoDeadMemberChangeSwitch() || !$gameSwitches.value(this.autoDeadMemberChangeParams(0));
+    };
 
     const _BattleManager_checkBattleEnd = BattleManager.checkBattleEnd;
     BattleManager.checkBattleEnd = function() {
-        if (this._phase && _isAutoDeadMemberChange()) {
-            if (params.AutoDeadMemberChangeModeSwitch > 0 && $gameSwitches.value(params.AutoDeadMemberChangeModeSwitch)) {
+        if (this._phase && NuunAutoDeadMemberChangeManager.isAutoDeadMemberChange()) {
+            if (NuunAutoDeadMemberChangeManager.isAutoDeadMemberChangeModeSwitch() && $gameSwitches.value(NuunAutoDeadMemberChangeManager.autoDeadMemberChangeParams(1))) {
                 if ($gameParty.notAllDeadMemberChange()) {
                     $gameParty.autoDeadMemberChange();
                 }
@@ -127,7 +247,7 @@ Imported.NUUN_AutoDeadMemberChange = true;
     };
 
     Game_Party.prototype.deadMemberChange = function() {
-        const subAliveMembers = $gameParty.subAliveMembers().map(actor => actor.actorId());
+        const subAliveMembers = this.subAliveMembers().map(actor => actor.actorId());
         const deadMembers = this.deadMembers().filter(actor => this.isDeadChangeFixed(actor)).map(actor => actor.actorId()).slice(0, subAliveMembers.length);
         if (deadMembers.length === 0) return;
         for (let i = 0; i < deadMembers.length; i++) {
@@ -141,7 +261,7 @@ Imported.NUUN_AutoDeadMemberChange = true;
     };
 
     Game_Party.prototype.autoDeadMemberChange = function() {
-        const subAliveMembers = $gameParty.subAliveMembers().map(actor => actor.actorId());
+        const subAliveMembers = this.subAliveMembers().map(actor => actor.actorId());
         const deadMembers = this.deadMembers().filter(actor => this.isDeadChangeFixed(actor)).map(actor => actor.actorId()).slice(0, subAliveMembers.length);
         if (deadMembers.length === 0) return;
         for (let i = 0; i < deadMembers.length; i++) {
@@ -158,13 +278,9 @@ Imported.NUUN_AutoDeadMemberChange = true;
     };
 
     Game_Party.prototype.isDeadChangeFixed = function(actor) {
-        if (!params.ExcludedActors) return true;
-        return !params.ExcludedActors.some(code => eval(code));
+        const list = NuunAutoDeadMemberChangeManager.autoDeadMemberChangeParams(2);
+        if (!list) return true;
+        return !list.some(code => eval(code));
     };
-
-    function _isAutoDeadMemberChange() {
-        return params.AutoDeadMemberChangeSwitch === 0 || !$gameSwitches.value(params.AutoDeadMemberChangeSwitch);
-    }
-    
     
 })();

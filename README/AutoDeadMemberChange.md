@@ -1,10 +1,15 @@
 # [戦闘不能メンバー自動交代](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AutoDeadMemberChange.js)
-# Ver.1.0.0
+# Ver.1.1.0
 [ダウンロード](https://raw.githubusercontent.com/nuun888/MZ/master/NUUN_AutoDeadMemberChange.js)
 #### 必須、前提プラグイン
-[共通処理](https://github.com/nuun888/MZ/blob/master/README/Base.md)  
 
+## 概要
 メンバーが戦闘不能になった時に自動でメンバーを交代します。  
+
+## 特徴
+戦闘メンバーが全滅の時に、控えメンバーと交代する機能。  
+戦闘不能毎にメンバーを交代できる機能。  
+特定アクターのみ交代を除外する機能。  
 
 ## 設定
 ### 戦闘不能毎に交代
@@ -19,5 +24,7 @@
 `actor.isBattleFixed()`NUUN_SceneFormationで設定を行っている戦闘メンバーから外せないメンバー  
 
 ## 更新履歴
+2026/11/1 Ver.1.1.0  
+NUUN_Baseなしで実行できるように仕様を変更。  
 2025/4/29 Ver.1.0.0  
 初版  

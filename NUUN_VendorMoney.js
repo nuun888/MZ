@@ -8,7 +8,7 @@
  * @target MZ
  * @plugindesc Vendor money
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * Implement vendor money.
@@ -34,6 +34,8 @@
  * Support is not available for modified versions or downloads from sources other than https://github.com/nuun888/MZ, the official forum, or authorized retailers.
  * 
  * Log
+ * 11/15/2026 Ver.1.1.2
+ * Fixed an error that occurred when opening a shop in NUUN_AchievementShop.
  * 10/3/2026 Ver.1.1.1
  * Fixed to prevent exceeding the safe integer limit (9,007,199,254,740,991).
  * 9/30/2026 Ver.1.1.0
@@ -111,7 +113,7 @@
  * @target MZ
  * @plugindesc 店の所持金
  * @author NUUN
- * @version 1.1.1
+ * @version 1.1.2
  * 
  * @help
  * 店の所持金を実装します。
@@ -136,6 +138,8 @@
  * https://github.com/nuun888/MZ、公式フォーラム、正規販売サイト以外からのダウンロード、改変済みの場合はサポートは対象外となります。
  * 
  * 更新履歴
+ * 2026/11/15 Ver.1.1.2
+ * NUUN_AchievementShopでのショップを開いた際にエラーが出る問題を修正。
  * 2026/10/3 Ver.1.1.1
  * 安全整数上限(9,007,199,254,740,991)をお超えないように修正。
  * 2026/9/30 Ver.1.1.0
@@ -208,6 +212,12 @@
  * @default 0
  * @text 店所持金初期値(Javascript)
  * @desc 店の所持金の初期値を指定します。
+ * 
+ * @param ResetBattleCountVendorMoney
+ * @type number
+ * @default 0
+ * @text リセット戦闘回数
+ * @desc 店の所持金をリセットする戦闘回数を指定します。0で無効になります。
  * 
  */
 
@@ -370,7 +380,8 @@ Imported.NUUN_VendorMoney = true;
     };
 
     Game_System.prototype.initVendorMoney = function() {
-        this._vendorMoney = [];
+        this._vendorMoney = [];//添字は1から
+        this._vendorMoneyResetCount = [];
     };
 
     Game_System.prototype.setVenderMoney = function(id, money, type = 1) {
@@ -388,10 +399,10 @@ Imported.NUUN_VendorMoney = true;
                     if (this._vendorMoney[id] === undefined) {
                         this._vendorMoney[id] = initMoney;
                     }
-                    this._vendorMoney[id] += Math.max((isNaN(money) ? eval(money) : money), 0);
+                    this._vendorMoney[id] += Math.max(Number(isNaN(money) ? eval(money) : money), 0);
                     break;
                 case 1:
-                    this._vendorMoney[id] = Math.max((isNaN(money) ? eval(money) : money), 0);
+                    this._vendorMoney[id] = Math.max(Number(isNaN(money) ? eval(money) : money), 0);
                     break;
             }
             this._vendorMoney[id] = this._vendorMoney[id].clamp(0, Number.MAX_SAFE_INTEGER);
@@ -414,7 +425,7 @@ Imported.NUUN_VendorMoney = true;
                 try {
                     const v = $gameVariables._data;
                     const initMoney = data.InitVendorMoney;
-                    this._vendorMoney[this._vendorId] = Math.max((isNaN(initMoney) ? eval(initMoney) : initMoney), 0);
+                    this._vendorMoney[this._vendorId] = Math.max(Number(isNaN(initMoney) ? eval(initMoney) : initMoney), 0);
                     this._vendorMoney[this._vendorId] = this._vendorMoney[this._vendorId].clamp(0, Number.MAX_SAFE_INTEGER);
                 } catch (error) {
                     
@@ -438,6 +449,7 @@ Imported.NUUN_VendorMoney = true;
         }
         const id = (this._vendorId || 0);
         this._vendorMoney[id] = Math.min(Number.MAX_SAFE_INTEGER, this._vendorMoney[id] + momey);
+        
     };
 
     Game_System.prototype.vendorSellMoney = function(momey) {
@@ -486,8 +498,12 @@ Imported.NUUN_VendorMoney = true;
     const _Scene_Shop_update = Scene_Shop.prototype.update;
     Scene_Shop.prototype.update = function() {
         _Scene_Shop_update.apply(this, arguments);
+        this.vendorGoldWindowVisible();
+    };
+
+    Scene_Shop.prototype.vendorGoldWindowVisible = function() {
         if (this._vendorGoldWindow) {
-            this._vendorGoldWindow.visible = this.isVendor() && (this._sellWindow.visible || this._numberWindow.visible);
+            this._vendorGoldWindow.visible = this.isVendor() && ((this._sellWindow && this._sellWindow.visible) || (!!this._numberWindow && this._numberWindow.visible));
         }
     };
 

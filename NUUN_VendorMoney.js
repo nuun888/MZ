@@ -213,12 +213,6 @@
  * @text 店所持金初期値(Javascript)
  * @desc 店の所持金の初期値を指定します。
  * 
- * @param ResetBattleCountVendorMoney
- * @type number
- * @default 0
- * @text リセット戦闘回数
- * @desc 店の所持金をリセットする戦闘回数を指定します。0で無効になります。
- * 
  */
 
 var Imported = Imported || {};
